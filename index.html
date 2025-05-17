@@ -9,7 +9,6 @@
     <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Structured Data -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -33,7 +32,6 @@
     </script>
 </head>
 <body>
-    <!-- Hero Section -->
     <section class="hero-section">
         <header>
             <div class="logo">
@@ -53,6 +51,9 @@
                     <li><a href="index.html#contact">Contact</a></li>
                     <li><a href="blog.html">Blog</a></li>
                     <li><a href="book-online.html">Book Online</a></li>
+                    <li><a href="#" onclick="showModal('signup-modal')">Sign Up</a></li>
+                    <li><a href="#" onclick="showModal('login-modal')">Login</a></li>
+                    <li><a href="#" onclick="logout()" id="logout-link" style="display: none;">Logout</a></li>
                 </ul>
             </nav>
         </header>
@@ -65,7 +66,16 @@
         </div>
     </section>
 
-    <!-- Features Section -->
+    <div id="verify-message">
+        <h2>Email Verification</h2>
+        <p id="verify-text"></p>
+    </div>
+
+    <div id="profile">
+        <h2>Welcome, <span id="user-name"></span></h2>
+        <p>Email: <span id="user-email"></span></p>
+    </div>
+
     <section class="features-section">
         <div class="features-header">
             <h2>Our Solutions</h2>
@@ -87,7 +97,6 @@
         </div>
     </section>
 
-    <!-- Testimonials Section -->
     <section class="testimonials-section">
         <div class="testimonials-header">
             <h2>What Our Clients Say</h2>
@@ -123,12 +132,9 @@
             </form>
             <div class="review-message" style="display: none; color: green; margin-top: 10px;"></div>
         </div>
-        <div class="testimonials-grid" id="reviews-container">
-            <!-- Reviews will be dynamically added here -->
-        </div>
+        <div class="testimonials-grid" id="reviews-container"></div>
     </section>
 
-    <!-- Contact Section -->
     <section class="contact-section">
         <div class="contact-header">
             <h2>Contact Us</h2>
@@ -148,9 +154,7 @@
                 <label for="message">Message</label>
                 <textarea id="message" name="message" placeholder="Your Message" rows="5" required></textarea>
             </div>
-            <!-- Honeypot field for spam protection -->
             <input type="text" name="_gotcha" style="display:none" />
-            <!-- Redirect to thank-you page after submission -->
             <input type="hidden" name="_next" value="https://akanalytics.com/thanks.html" />
             <button type="submit" class="submit-btn">Send Message</button>
         </form>
@@ -159,7 +163,6 @@
         </div>
     </section>
 
-    <!-- Footer Section -->
     <footer class="footer-section">
         <div class="footer-content">
             <div class="footer-logo">
@@ -188,13 +191,161 @@
         </div>
     </footer>
 
+    <div id="signup-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('signup-modal')">×</span>
+            <h2>Sign Up</h2>
+            <form id="signup-form">
+                <div class="form-group">
+                    <label for="signup-name">Name</label>
+                    <input type="text" id="signup-name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" placeholder="Your Email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" placeholder="Password (8+ characters)" minlength="8" required>
+                </div>
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('login-modal')">×</span>
+            <h2>Login</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="Your Email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Read More button functionality
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            try {
+                const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error);
+                alert('Sign up successful! Please check your email to verify your account.');
+                closeModal('signup-modal');
+                document.getElementById('signup-form').reset();
+            } catch (error) {
+                alert('Sign up failed: ' + error.message);
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            try {
+                const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error);
+                localStorage.setItem('token', data.token);
+                alert('Login successful!');
+                closeModal('login-modal');
+                updateUI();
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            }
+        });
+
+        async function updateUI() {
+            const token = localStorage.getItem('token');
+            const profileSection = document.getElementById('profile');
+            const logoutLink = document.getElementById('logout-link');
+            if (token) {
+                try {
+                    const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/profile', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const user = await response.json();
+                    if (response.ok) {
+                        profileSection.style.display = 'block';
+                        document.getElementById('user-name').textContent = user.name;
+                        document.getElementById('user-email').textContent = user.email;
+                        logoutLink.style.display = 'inline';
+                    } else {
+                        localStorage.removeItem('token');
+                        profileSection.style.display = 'none';
+                        logoutLink.style.display = 'none';
+                    }
+                } catch (error) {
+                    localStorage.removeItem('token');
+                    profileSection.style.display = 'none';
+                    logoutLink.style.display = 'none';
+                }
+            } else {
+                profileSection.style.display = 'none';
+                logoutLink.style.display = 'none';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            alert('Logged out successfully');
+            updateUI();
+        }
+
+        async function handleVerification() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('verify');
+            if (token) {
+                try {
+                    const response = await fetch(`https://a-k-analytics-backend.onrender.com/api/users/verify/${token}`);
+                    const data = await response.json();
+                    if (response.ok) {
+                        localStorage.setItem('token', data.token);
+                        document.getElementById('verify-message').style.display = 'block';
+                        document.getElementById('verify-text').textContent = 'Email verified successfully! You are now logged in.';
+                        updateUI();
+                    } else {
+                        document.getElementById('verify-message').style.display = 'block';
+                        document.getElementById('verify-text').textContent = 'Verification failed: ' + data.error;
+                    }
+                } catch (error) {
+                    document.getElementById('verify-message').style.display = 'block';
+                    document.getElementById('verify-text').textContent = 'Verification failed: ' + error.message;
+                }
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
         document.querySelector('.read-more').addEventListener('click', () => {
             alert('Learn More about how A & K Analytics can help your business!');
         });
 
-        // Contact form submission with client-side validation
         document.querySelector('.submit-btn').addEventListener('click', (e) => {
             e.preventDefault();
             const name = document.querySelector('#name').value;
@@ -211,7 +362,6 @@
             }
         });
 
-        // Review form submission
         document.querySelector('#review-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.querySelector('#review-name').value;
@@ -249,7 +399,6 @@
             }
         });
 
-        // Display reviews
         async function displayReviews() {
             const reviewsContainer = document.querySelector('#reviews-container');
             try {
@@ -275,11 +424,12 @@
             }
         }
 
-        // Load reviews on page load
-        displayReviews();
-
-        // Dynamically update copyright year
-        document.querySelector('.footer-copyright p').textContent = `© ${new Date().getFullYear()} A & K Analytics. All rights reserved.`;
+        window.onload = () => {
+            updateUI();
+            handleVerification();
+            displayReviews();
+            document.querySelector('.footer-copyright p').textContent = `© ${new Date().getFullYear()} A & K Analytics. All rights reserved.`;
+        };
     </script>
 </body>
 </html>
