@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Online - A & K Analytics</title>
+    <meta name="description" content="Schedule a consultation or service with A & K Analytics online. Book your data analytics appointment today!">
+    <meta name="keywords" content="book online, consultation, data analytics, A & K Analytics, appointment">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://yourdomain.com/book-online.html">
+    <meta property="og:title" content="Book Online - A & K Analytics">
+    <meta property="og:description" content="Book a consultation or service with A & K Analytics online to get started with your data analytics needs.">
+    <meta property="og:image" content="https://yourdomain.com/images/book-online.jpg">
+    <meta property="og:url" content="https://yourdomain.com/book-online.html">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="book-online.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            A & K Analytics
+            <span>Data Solutions</span>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search...">
+            <i class="fas fa-search"></i>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="industries.html">Industries</a></li>
+                <li><a href="insights.html">Insights</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="book-online.html">Book Online</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="book-online-section">
+        <div class="book-online-header">
+            <h1>Book a Consultation Online</h1>
+            <p>Schedule your data analytics consultation with A & K Analytics today.</p>
+        </div>
+        <div class="book-online-form animate-section">
+            <form id="booking-form" onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date *</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="time">Time *</label>
+                    <input type="time" id="time" name="time" required>
+                </div>
+                <div class="form-group">
+                    <label for="service">Service Type *</label>
+                    <select id="service" name="service" required>
+                        <option value="">Select a service</option>
+                        <option value="consultation">Consultation</option>
+                        <option value="data-analysis">Data Analysis</option>
+                        <option value="training">Training Session</option>
+                    </select>
+                </div>
+                <button type="submit">Submit Booking</button>
+            </form>
+            <div id="success-message" class="success-message animate-section" style="display: none;">
+                <p>Thank you for your booking! We will contact you soon to confirm.</p>
+                <a href="index.html" class="back-to-home">Back to Home</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-section">
+        <div class="footer-content">
+            <div class="footer-logo">
+                A & K Analytics
+                <span>Data Solutions</span>
+            </div>
+            <nav class="footer-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="industries.html">Industries</a></li>
+                    <li><a href="insights.html">Insights</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="book-online.html">Book Online</a></li>
+                </ul>
+            </nav>
+            <div class="footer-social">
+                <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+            </div>
+            <p class="footer-copyright">© 2025 A & K Analytics. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function handleSubmit(event) {
+            event.preventDefault();
+            const form = document.getElementById('booking-form');
+            const successMessage = document.getElementById('success-message');
+            if (form.checkValidity()) {
+                form.style.display = 'none';
+                successMessage.style.display = 'block';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.animate-section').forEach(element => {
+                observer.observe(element);
+            });
+        });
+    </script>
+</body>
+</html>

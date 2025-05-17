@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industries - A & K Analytics</title>
+    <meta name="description" content="Explore how A & K Analytics serves industries like healthcare, retail, and finance with tailored data analytics solutions.">
+    <meta name="keywords" content="data analytics industries, healthcare analytics, retail analytics, finance analytics, A & K Analytics">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="industries.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Industries - A & K Analytics",
+            "url": "https://akanalytics.com/industries.html",
+            "description": "Learn about the industries A & K Analytics supports with advanced data analytics services.",
+            "publisher": {
+                "@type": "Organization",
+                "name": "A & K Analytics",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://akanalytics.com/logo.png"
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            A & K Analytics
+            <span>Data Solutions</span>
+        </div>
+        <div class="search-bar">
+             <input type="text" id="search-input" placeholder="Search...">
+             <i class="fas fa-search"></i>
+           </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="industries.html">Industries</a></li>
+                <li><a href="insights.html">Insights</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="book-online.html">Book Online</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Industries Section -->
+    <section class="industries-section">
+        <div class="industries-header">
+            <h1>Industries We Serve</h1>
+            <p>Discover how A & K Analytics delivers tailored data solutions across various sectors.</p>
+        </div>
+        <div class="industries-grid">
+            <div class="industry-block animate-section">
+                <h2>Healthcare</h2>
+                <p>Optimize patient outcomes and streamline operations with predictive analytics and data visualization. We help healthcare providers forecast demand and improve treatment plans.</p>
+                <a href="post3.html" class="read-more">Read Case Study</a>
+            </div>
+            <div class="industry-block animate-section">
+                <h2>Retail</h2>
+                <p>Boost sales and manage inventory efficiently with business intelligence tools. Our solutions have increased retail sales by up to 20% for clients.</p>
+                <a href="post3.html" class="read-more">Read Case Study</a>
+            </div>
+            <div class="industry-block animate-section">
+                <h2>Finance</h2>
+                <p>Enhance decision-making with real-time forecasting and risk analysis. We support financial institutions with advanced analytics to stay competitive.</p>
+                <a href="post1.html" class="read-more">Learn More</a>
+            </div>
+            <div class="industry-block animate-section">
+                <h2>Manufacturing</h2>
+                <p>Improve efficiency with supply chain optimization and predictive maintenance.</p>
+                <a href="post1.html" class="read-more">Learn More</a>
+            </div>
+             <div class="industry-block animate-section">
+                <h2>Education</h2>
+                <p>Enhance student outcomes with performance analytics and resource management.</p>
+                <a href="post1.html" class="read-more">Learn More</a>
+            </div>
+             <div class="industry-block animate-section">
+                <h2>Transportation and Logistics</h2>
+                <p>Optimize routes and reduce costs with data-driven logistics solutions.</p>
+                <a href="post1.html" class="read-more">Learn More</a>
+            </div>
+            <div class="industry-block animate-section">
+                <h2>Energy and Utilities</h2>
+                <p>Forecast demand and improve sustainability with energy analytics.</p>
+                <a href="post1.html" class="read-more">Learn More</a>
+            </div>
+            <div class="industry-block animate-section">
+                <h2>Hospitality and Tourism</h2>
+                <p>Drive bookings with dynamic pricing and customer insights.</p>
+                <a href="post1.html" class="read-more">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-section">
+        <div class="footer-content">
+            <div class="footer-logo">
+                A & K Analytics
+                <span>Data Solutions</span>
+            </div>
+            <nav class="footer-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="industries.html">Industries</a></li>
+                    <li><a href="insights.html">Insights</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="book-online.html">Book Online</a></li>
+                </ul>
+            </nav>
+            <div class="footer-social">
+                <a href="https://facebook.com/akanalytics" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com/akanalytics" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="https://linkedin.com/company/akanalytics" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://instagram.com/akanalytics" class="social-icon"><i class="fab fa-instagram"></i></a>
+            </div>
+            <div class="footer-copyright">
+                <p>© 2025 A & K Analytics. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target); // Stop observing once animated
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.animate-section').forEach(element => {
+                observer.observe(element);
+            });
+             const searchInput = document.getElementById('search-input');
+        const blogPosts = document.querySelectorAll('.industry-card');
+
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            blogPosts.forEach(post => {
+                const text = post.textContent.toLowerCase();
+                post.style.display = text.includes(searchTerm) ? 'block' : 'none';
+            });
+        });
+    });
+    </script>
+</body>
+</html>
