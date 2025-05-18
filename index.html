@@ -171,24 +171,6 @@
     </div>
 
     <section id="customer-dashboard" class="dashboard customer-dashboard" style="display: none;">
-        <header>
-            <div class="logo">
-                A & K Analytics
-                <span>Data Solutions</span>
-            </div>
-            <nav id="customer-nav">
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="industries.html">Industries</a></li>
-                    <li><a href="insights.html">Insights</a></li>
-                    <li><a href="index.html#contact">Contact</a></li>
-                    <li><a href="blog.html">Blog</a></li>
-                    <li><a href="book-online.html">Book Online</a></li>
-                    <li><a href="#" onclick="logout()">Logout</a></li>
-                </ul>
-            </nav>
-        </header>
         <h2>Welcome, <span id="customer-name"></span>!</h2>
         <div class="profile">
             <p><strong>Name:</strong> <span id="customer-name-profile"></span></p>
@@ -225,25 +207,6 @@
     </section>
 
     <section id="admin-dashboard" class="dashboard admin-dashboard" style="display: none;">
-        <header>
-            <div class="logo">
-                A & K Analytics
-                <span>Data Solutions</span>
-            </div>
-            <nav id="admin-nav">
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="industries.html">Industries</a></li>
-                    <li><a href="insights.html">Insights</a></li>
-                    <li><a href="index.html#contact">Contact</a></li>
-                    <li><a href="blog.html">Blog</a></li>
-                    <li><a href="book-online.html">Book Online</a></li>
-                    <li><a href="/admin.html">Admin</a></li>
-                    <li><a href="#" onclick="logout()">Logout</a></li>
-                </ul>
-            </nav>
-        </header>
         <h2>Welcome, <span id="admin-name"></span>!</h2>
         <div class="profile">
             <p><strong>Name:</strong> <span id="admin-name-profile"></span></p>
@@ -449,7 +412,7 @@
                 });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Signup failed');
-                localStorage.setItem('token', data.token); // Fallback for demo; use HttpOnly cookie in production
+                localStorage.setItem('token', data.token);
                 showError('signup-form', 'Sign up successful! Please check your email to verify your account.', 'green');
                 closeModal('signup-modal');
                 document.getElementById('signup-form').reset();
@@ -480,7 +443,7 @@
                 });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Login failed');
-                localStorage.setItem('token', data.token); // Fallback for demo
+                localStorage.setItem('token', data.token);
                 showError('login-form', 'Login successful!', 'green');
                 closeModal('login-modal');
                 updateUI();
@@ -531,7 +494,7 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.error || '杯Failed to fetch consultation status');
+                if (!response.ok) throw new Error(data.error || 'Failed to fetch consultation status');
                 return data.status || 'none';
             } catch (error) {
                 return 'none';
@@ -600,7 +563,7 @@
 
         // Update UI based on user authentication and role
         async function updateUI() {
-            const token = localStorage.getItem('token'); // Fallback; ideally use cookie
+            const token = localStorage.getItem('token');
             const heroSection = document.querySelector('.hero-section');
             const publicContent = document.getElementById('public-content');
             const customerDashboard = document.getElementById('customer-dashboard');
@@ -620,16 +583,16 @@
                     const user = await response.json();
                     if (response.ok) {
                         document.body.classList.add('no-background');
-                        heroSection.style.display = 'none';
                         heroContent.style.display = 'none';
                         publicContent.style.display = 'none';
+                        customerDashboard.style.display = 'none';
+                        adminDashboard.style.display = 'none';
                         signupLink.style.display = 'none';
                         loginLink.style.display = 'none';
                         logoutLink.style.display = 'inline';
-                        const isAdmin = user.role === 'admin'; // Assumes backend returns role
+                        const isAdmin = user.email.includes('kevinakhondo9@gmail.com'); // Fallback since role isn't provided
                         adminLink.style.display = isAdmin ? 'inline' : 'none';
                         if (isAdmin) {
-                            customerDashboard.style.display = 'none';
                             adminDashboard.style.display = 'block';
                             document.getElementById('admin-name').textContent = sanitizeInput(user.name);
                             document.getElementById('admin-name-profile').textContent = sanitizeInput(user.name);
@@ -686,7 +649,6 @@
                                 }
                             });
                         } else {
-                            adminDashboard.style.display = 'none';
                             customerDashboard.style.display = 'block';
                             document.getElementById('customer-name').textContent = sanitizeInput(user.name);
                             document.getElementById('customer-name-profile').textContent = sanitizeInput(user.name);
@@ -712,7 +674,8 @@
                             }
                             const consultationStatus = await fetchConsultationProgress(user.email, token);
                             const steps = ['booked', 'confirmed', 'in-progress', 'completed'];
-                            const progress/>\n                            progressSteps.forEach(step => {
+                            const progressSteps = document.querySelectorAll('#consultation-progress .progress-step');
+                            progressSteps.forEach(step => {
                                 step.classList.remove('active');
                                 if (consultationStatus === 'none') return;
                                 const stepValue = step.getAttribute('data-step');
@@ -737,7 +700,6 @@
 
             function resetUI() {
                 document.body.classList.remove('no-background');
-                heroSection.style.display = 'block';
                 heroContent.style.display = 'block';
                 publicContent.style.display = 'block';
                 customerDashboard.style.display = 'none';
@@ -847,7 +809,7 @@
                             reviewMessage.style.color = 'green';
                             reviewMessage.textContent = 'Thank you for your review! It will appear after approval.';
                             document.querySelector('#review-form').reset();
-                            localStorage.removeItem(`reviews_${name}`); // Clear cache
+                            localStorage.removeItem(`reviews_${name}`);
                             setTimeout(() => {
                                 reviewMessage.style.display = 'none';
                             }, 3000);
