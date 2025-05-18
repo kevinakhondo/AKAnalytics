@@ -52,8 +52,8 @@
                     <li><a href="book-online.html">Book Online</a></li>
                     <li><a href="#" onclick="showModal('signup-modal')" id="signup-link">Sign Up</a></li>
                     <li><a href="#" onclick="showModal('login-modal')" id="login-link">Login</a></li>
-                    <li><a href="#" onclick="logout()" id="logout-link">Logout</a></li>
-                    <li><a href="/admin.html" id="admin-link">Admin</a></li>
+                    <li><a href="#" onclick="logout()" id="logout-link" style="display: none;">Logout</a></li>
+                    <li><a href="/admin.html" id="admin-link" style="display: none;">Admin</a></li>
                 </ul>
             </nav>
         </header>
@@ -197,7 +197,7 @@
     </section>
 
     <section id="admin-dashboard" class="dashboard admin-dashboard" style="display: none;">
-        <h2>Welcome, Admin <span id="admin-name"></span>!</h2>
+        <h2>Welcome, <span id="admin-name"></span>!</h2>
         <div class="profile">
             <p><strong>Name:</strong> <span id="admin-name-profile"></span></p>
             <p><strong>Email:</strong> <span id="admin-email"></span></p>
