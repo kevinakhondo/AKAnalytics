@@ -27,6 +27,11 @@ body {
     z-index: 0;
 }
 
+/* Remove background for logged-in users */
+.no-background .hero-section {
+    background: none;
+}
+
 /* Styling the header */
 header {
     position: fixed;
@@ -309,6 +314,296 @@ nav ul li a:hover::after {
     font-size: 16px;
     color: #555555;
     line-height: 1.5;
+}
+
+/* Dashboard Styling */
+.dashboard {
+    max-width: 1200px;
+    margin: 80px auto 20px;
+    padding: 20px;
+    border-radius: 8px;
+    background: none;
+    min-height: auto;
+}
+
+.customer-dashboard {
+    background: #e8ecef; /* Matches testimonials section background */
+    border: 2px solid #00bcd4; /* Primary accent color */
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.customer-dashboard h2 {
+    color: #333333;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.customer-dashboard .profile {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.customer-dashboard .profile p {
+    margin: 5px 0;
+    color: #555555;
+    font-size: 16px;
+}
+
+.customer-dashboard .activity {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.customer-dashboard .activity h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333333;
+    margin-bottom: 10px;
+}
+
+.customer-dashboard .activity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.customer-dashboard .activity-item {
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 4px;
+}
+
+.customer-dashboard .activity-item .rating {
+    color: #f5c518;
+}
+
+.customer-dashboard .cta a {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #00bcd4;
+    color: #ffffff;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background 0.3s;
+}
+
+.customer-dashboard .cta a:hover {
+    background: #0097a7;
+}
+
+.customer-dashboard .progress {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.customer-dashboard .progress h3 {
+    color: #333333;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.customer-dashboard .progress-timeline {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin: 20px 0;
+}
+
+.customer-dashboard .progress-timeline::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #ccc;
+    z-index: 0;
+}
+
+.customer-dashboard .progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    width: 25%;
+}
+
+.customer-dashboard .progress-step .step-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.customer-dashboard .progress-step.active .step-circle {
+    background: #00bcd4;
+}
+
+.customer-dashboard .progress-step .step-label {
+    font-size: 14px;
+    color: #555555;
+}
+
+.customer-dashboard .progress-step.active .step-label {
+    color: #00bcd4;
+}
+
+.admin-dashboard {
+    background: #e8ecef;
+    border: 2px solid #2c3e50; /* Matches header background */
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.admin-dashboard h2 {
+    color: #333333;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.admin-dashboard .profile {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.admin-dashboard .profile p {
+    margin: 5px 0;
+    color: #555555;
+    font-size: 16px;
+}
+
+.admin-dashboard .summary {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.admin-dashboard .summary h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333333;
+    margin-bottom: 10px;
+}
+
+.admin-dashboard .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.admin-dashboard .summary-item {
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 4px;
+}
+
+.admin-dashboard .bookings {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.admin-dashboard .bookings h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333333;
+    margin-bottom: 10px;
+}
+
+.admin-dashboard .bookings .filter {
+    margin-bottom: 15px;
+}
+
+.admin-dashboard .bookings .filter label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333333;
+    margin-right: 10px;
+}
+
+.admin-dashboard .bookings .filter select {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.admin-dashboard .bookings .filter select:focus {
+    border-color: #00bcd4;
+}
+
+.admin-dashboard .bookings .booking-item {
+    padding: 10px;
+    margin: 5px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.admin-dashboard .bookings .booking-item p {
+    font-size: 14px;
+    color: #555555;
+    margin: 5px 0;
+}
+
+.admin-dashboard .bookings button {
+    padding: 5px 10px;
+    background: #00bcd4;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.admin-dashboard .bookings button:hover {
+    background: #0097a7;
+}
+
+.admin-dashboard .cta a {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #2c3e50;
+    color: #ffffff;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0 5px;
+    transition: background 0.3s;
+}
+
+.admin-dashboard .cta a:hover {
+    background: #34495e;
 }
 
 /* Features Section */
@@ -770,6 +1065,83 @@ nav ul li a:hover::after {
         font-size: 14px;
     }
 
+    .dashboard {
+        margin: 260px auto 20px;
+        padding: 10px;
+    }
+
+    .customer-dashboard h2,
+    .admin-dashboard h2 {
+        font-size: 20px;
+    }
+
+    .customer-dashboard .profile p,
+    .admin-dashboard .profile p {
+        font-size: 14px;
+    }
+
+    .customer-dashboard .activity h3,
+    .admin-dashboard .summary h3,
+    .admin-dashboard .bookings h3 {
+        font-size: 16px;
+    }
+
+    .customer-dashboard .activity-grid,
+    .admin-dashboard .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .customer-dashboard .progress-timeline {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .customer-dashboard .progress-timeline::before {
+        left: 15px;
+        width: 2px;
+        height: 100%;
+        top: 0;
+        bottom: 0;
+    }
+
+    .customer-dashboard .progress-step {
+        flex-direction: row;
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .customer-dashboard .progress-step .step-circle {
+        margin-right: 10px;
+        margin-bottom: 0;
+    }
+
+    .customer-dashboard .progress-step .step-label {
+        font-size: 12px;
+    }
+
+    .customer-dashboard .cta a,
+    .admin-dashboard .cta a {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    .admin-dashboard .bookings .filter label {
+        font-size: 12px;
+    }
+
+    .admin-dashboard .bookings .filter select {
+        font-size: 12px;
+    }
+
+    .admin-dashboard .bookings .booking-item p {
+        font-size: 12px;
+    }
+
+    .admin-dashboard .bookings button {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
     .features-section {
         padding: 40px 30px;
     }
@@ -987,6 +1359,65 @@ nav ul li a:hover::after {
 
     #profile p {
         font-size: 12px;
+    }
+
+    .dashboard {
+        margin: 160px auto 10px;
+        padding: 10px;
+    }
+
+    .customer-dashboard h2,
+    .admin-dashboard h2 {
+        font-size: 18px;
+    }
+
+    .customer-dashboard .profile p,
+    .admin-dashboard .profile p {
+        font-size: 12px;
+    }
+
+    .customer-dashboard .activity h3,
+    .admin-dashboard .summary h3,
+    .admin-dashboard .bookings h3 {
+        font-size: 14px;
+    }
+
+    .customer-dashboard .activity-grid,
+    .admin-dashboard .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .customer-dashboard .progress-step .step-circle {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+
+    .customer-dashboard .progress-step .step-label {
+        font-size: 10px;
+    }
+
+    .customer-dashboard .cta a,
+    .admin-dashboard .cta a {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .admin-dashboard .bookings .filter label {
+        font-size: 10px;
+    }
+
+    .admin-dashboard .bookings .filter select {
+        font-size: 10px;
+    }
+
+    .admin-dashboard .bookings .booking-item p {
+        font-size: 10px;
+    }
+
+    .admin-dashboard .bookings button {
+        font-size: 10px;
+        padding: 3px 6px;
     }
 
     .features-section {
