@@ -30,10 +30,15 @@
         }
     </script>
     <style>
+        /* Remove background for logged-in users */
+        .no-background .hero-section {
+            background: none;
+        }
+   
         /* Dashboard styling */
         .dashboard {
             max-width: 1200px;
-            margin: 20px auto;
+            margin: 80px auto 20px;
             padding: 20px;
             border-radius: 8px;
             background: none;
@@ -235,11 +240,7 @@
             opacity: 0.9;
         }
         @media (max-width: 768px) {
-            .hero-section {
-                height: auto;
-                min-height: 500px;
-                padding: 20px;
-            }
+     
             .customer-dashboard, .admin-dashboard {
                 padding: 10px;
             }
@@ -649,7 +650,7 @@
         }
 
         // Fetch available bookings for admin dashboard
-        let allBookings = []; // Store all bookings for filtering
+        let allBookings = [];
         async function fetchBookings(token) {
             try {
                 console.log('Fetching bookings');
@@ -750,7 +751,7 @@
                             const pendingCount = await fetchPendingReviews(token);
                             document.getElementById('pending-reviews').textContent = pendingCount;
                             const bookings = await fetchBookings(token);
-                            filterBookings('all'); // Default filter
+                            filterBookings('all');
                         } else {
                             adminDashboard.style.display = 'none';
                             customerDashboard.style.display = 'block';
