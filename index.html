@@ -233,6 +233,7 @@
                     <option value="pending">Pending</option>
                     <option value="confirmed">Confirmed</option>
                 </select>
+                <button onclick="refreshBookings()" style="margin-left: 10px;">Refresh Bookings</button>
             </div>
             <div id="booking-list"></div>
         </div>
@@ -517,6 +518,70 @@
             }
         }
 
+        // Refresh bookings manually
+        async function refreshBookings() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            document.getElementById('loading').style.display = 'block';
+            try {
+                const bookings = await fetchBookings(token);
+                const statusFilter = document.getElementById('booking-filter').value;
+                filterBookings(statusFilter);
+
+                // Update the bookings chart
+                const statusCounts = {
+                    pending: bookings.filter(b => b.status === 'pending').length,
+                    confirmed: bookings.filter(b => b.status === 'confirmed').length,
+                    completed: bookings.filter(b => b.status === 'completed').length
+                };
+                const ctx = document.getElementById('bookingsChart').getContext('2d');
+                if (ctx.chart) ctx.chart.destroy();
+                ctx.chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Pending', 'Confirmed', 'Completed'],
+                        datasets: [{
+                            label: 'Bookings',
+                            data: [statusCounts.pending, statusCounts.confirmed, statusCounts.completed],
+                            backgroundColor: ['#3498db', '#2ecc71', '#e74c3c'],
+                            borderColor: ['#2980b9', '#27ae60', '#c0392b'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Number of Bookings'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Status'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Bookings by Status'
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                showError('admin-dashboard', 'Failed to refresh bookings: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
         // Filter bookings based on status
         function filterBookings(status) {
             const bookingList = document.getElementById('booking-list');
@@ -599,55 +664,7 @@
                             document.getElementById('admin-email').textContent = sanitizeInput(user.email);
                             const pendingCount = await fetchPendingReviews(token);
                             document.getElementById('pending-reviews').textContent = pendingCount;
-                            const bookings = await fetchBookings(token);
-                            filterBookings('all');
-
-                            // Render bookings chart
-                            const statusCounts = {
-                                pending: bookings.filter(b => b.status === 'pending').length,
-                                confirmed: bookings.filter(b => b.status === 'confirmed').length,
-                                completed: bookings.filter(b => b.status === 'completed').length
-                            };
-                            const ctx = document.getElementById('bookingsChart').getContext('2d');
-                            new Chart(ctx, {
-                                type: 'bar',
-                                data: {
-                                    labels: ['Pending', 'Confirmed', 'Completed'],
-                                    datasets: [{
-                                        label: 'Bookings',
-                                        data: [statusCounts.pending, statusCounts.confirmed, statusCounts.completed],
-                                        backgroundColor: ['#3498db', '#2ecc71', '#e74c3c'],
-                                        borderColor: ['#2980b9', '#27ae60', '#c0392b'],
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    scales: {
-                                        y: {
-                                            beginAtZero: true,
-                                            title: {
-                                                display: true,
-                                                text: 'Number of Bookings'
-                                            }
-                                        },
-                                        x: {
-                                            title: {
-                                                display: true,
-                                                text: 'Status'
-                                            }
-                                        }
-                                    },
-                                    plugins: {
-                                        legend: {
-                                            display: false
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: 'Bookings by Status'
-                                        }
-                                    }
-                                }
-                            });
+                            await refreshBookings();
                         } else {
                             customerDashboard.style.display = 'block';
                             document.getElementById('customer-name').textContent = sanitizeInput(user.name);
@@ -711,7 +728,7 @@
             }
 
             document.getElementById('loading').style.display = 'none';
-            displayReviews(); // Refresh reviews after UI update
+            displayReviews();
         }
 
         // Handle logout
