@@ -5,7 +5,7 @@
          <meta name="viewport" content="width=device-width, initial-scale=1.0">
          <meta name="robots" content="noindex, nofollow">
          <title>Admin - Review Moderation - A & K Analytics</title>
-         <link rel="stylesheet" href="/index.css">
+         <link rel="stylesheet" href="admin.css">
          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
      </head>
      <body>
@@ -54,7 +54,7 @@
                      });
                      if (!response.ok) throw new Error('Invalid token');
                      const user = await response.json();
-                     if (!user.email.includes('admin@akanalytics.com')) {
+                     if (!user.email.includes('kevinakhondo9@gmail.com')) {
                          alert('Access denied: Admin only');
                          window.location.href = '/index.html';
                          return false;
