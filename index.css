@@ -63,6 +63,7 @@ header {
     color: #a0a0a0;
 }
 
+/* Styling the search bar */
 .search-bar {
     position: relative;
     margin: 0 20px;
@@ -99,6 +100,7 @@ header {
 nav ul {
     list-style: none;
     display: flex;
+    align-items: center;
     gap: 20px;
 }
 
@@ -327,8 +329,8 @@ nav ul li a:hover::after {
 }
 
 .customer-dashboard {
-    background: #e8ecef; /* Matches testimonials section background */
-    border: 2px solid #00bcd4; /* Primary accent color */
+    background: #e8ecef;
+    border: 2px solid #00bcd4;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -471,7 +473,7 @@ nav ul li a:hover::after {
 
 .admin-dashboard {
     background: #e8ecef;
-    border: 2px solid #2c3e50; /* Matches header background */
+    border: 2px solid #2c3e50;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
