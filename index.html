@@ -8,7 +8,6 @@
     <meta name="keywords" content="data analytics, predictive analytics, data visualization, business intelligence, A & K Analytics">
     <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script type="application/ld+json">
         {
@@ -30,6 +29,75 @@
             }
         }
     </script>
+    <style>
+        /* Profile styling for customer vs admin */
+        .customer-profile {
+            background: #e6f4ea;
+            border: 2px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px auto;
+            max-width: 600px;
+            text-align: center;
+        }
+        .admin-profile {
+            background: #e6f0fa;
+            border: 2px solid #007bff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px auto;
+            max-width: 600px;
+            text-align: center;
+        }
+        .customer-profile h2, .admin-profile h2 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .customer-profile p, .admin-profile p {
+            color: #555;
+            font-size: 1rem;
+        }
+        /* Welcome message styling */
+        .welcome-message {
+            text-align: center;
+            margin: 20px auto;
+            padding: 10px;
+            max-width: 600px;
+            font-size: 1.2rem;
+            border-radius: 4px;
+        }
+        .welcome-message.customer {
+            background: #28a745;
+            color: #fff;
+        }
+        .welcome-message.admin {
+            background: #007bff;
+            color: #fff;
+        }
+        /* Admin navigation styling */
+        .admin-nav {
+            background: #007bff;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .admin-nav ul li a {
+            color: #fff !important;
+        }
+        .admin-nav #admin-link {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            .customer-profile, .admin-profile {
+                padding: 10px;
+            }
+            .welcome-message {
+                font-size: 1rem;
+                margin: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
     <section class="hero-section">
@@ -42,7 +110,7 @@
                 <input type="text" id="search-input" placeholder="Search...">
                 <i class="fas fa-search"></i>
             </div>
-            <nav>
+            <nav id="main-nav">
                 <ul>
                     <li><a href="index.html">Home</a></li>
                     <li><a href="about.html">About</a></li>
@@ -72,6 +140,7 @@
         <p id="verify-text"></p>
     </div>
 
+    <div id="welcome-message" class="welcome-message" style="display: none;"></div>
     <div id="profile">
         <h2>Welcome, <span id="user-name"></span></h2>
         <p>Email: <span id="user-email"></span></p>
@@ -291,7 +360,7 @@
             }
         });
 
-        // Update UI based on user authentication
+        // Update UI based on user authentication and role
         async function updateUI() {
             const token = localStorage.getItem('token');
             const profileSection = document.getElementById('profile');
@@ -299,6 +368,8 @@
             const loginLink = document.getElementById('login-link');
             const logoutLink = document.getElementById('logout-link');
             const adminLink = document.getElementById('admin-link');
+            const welcomeMessage = document.getElementById('welcome-message');
+            const nav = document.getElementById('main-nav');
             console.log('Updating UI, token exists:', !!token);
             if (token) {
                 try {
@@ -309,39 +380,50 @@
                     const user = await response.json();
                     if (response.ok) {
                         console.log('Profile fetched:', user);
+                        const isAdmin = user.email.includes('kevinakhondo9@gmail.com');
+                        // Set profile styling and welcome message
+                        profileSection.className = isAdmin ? 'admin-profile' : 'customer-profile';
                         profileSection.style.display = 'block';
                         document.getElementById('user-name').textContent = user.name;
                         document.getElementById('user-email').textContent = user.email;
+                        // Set welcome message
+                        welcomeMessage.style.display = 'block';
+                        welcomeMessage.className = `welcome-message ${isAdmin ? 'admin' : 'customer'}`;
+                        welcomeMessage.textContent = isAdmin
+                            ? `Welcome, Admin ${user.name}! Manage reviews from the Admin panel.`
+                            : `Welcome, ${user.name}! Explore our data solutions and share your feedback.`;
+                        // Update navigation
                         signupLink.style.display = 'none';
                         loginLink.style.display = 'none';
                         logoutLink.style.display = 'inline';
-                        adminLink.style.display = user.email.includes('kevinakhondo9@gmail.com') ? 'inline' : 'none';
+                        adminLink.style.display = isAdmin ? 'inline' : 'none';
+                        nav.className = isAdmin ? 'admin-nav' : '';
                         console.log('Admin link visibility:', adminLink.style.display);
                     } else {
                         console.error('Profile fetch failed:', user.error, response.status);
                         localStorage.removeItem('token');
-                        profileSection.style.display = 'none';
-                        signupLink.style.display = 'inline';
-                        loginLink.style.display = 'inline';
-                        logoutLink.style.display = 'none';
-                        adminLink.style.display = 'none';
+                        resetUI();
                     }
                 } catch (error) {
                     console.error('Profile fetch error:', error.message);
                     localStorage.removeItem('token');
-                    profileSection.style.display = 'none';
-                    signupLink.style.display = 'inline';
-                    loginLink.style.display = 'inline';
-                    logoutLink.style.display = 'none';
-                    adminLink.style.display = 'none';
+                    resetUI();
                 }
             } else {
                 console.log('No token, resetting UI');
+                resetUI();
+            }
+
+            function resetUI() {
+                profileSection.className = '';
                 profileSection.style.display = 'none';
+                welcomeMessage.style.display = 'none';
+                welcomeMessage.className = 'welcome-message';
                 signupLink.style.display = 'inline';
                 loginLink.style.display = 'inline';
                 logoutLink.style.display = 'none';
                 adminLink.style.display = 'none';
+                nav.className = '';
             }
         }
 
