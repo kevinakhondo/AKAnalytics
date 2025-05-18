@@ -30,71 +30,78 @@
         }
     </script>
     <style>
-        /* Profile styling for customer vs admin */
-        .customer-profile {
+        /* Dashboard styling */
+        .dashboard {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .customer-dashboard {
             background: #e6f4ea;
             border: 2px solid #28a745;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px auto;
-            max-width: 600px;
-            text-align: center;
         }
-        .admin-profile {
+        .admin-dashboard {
             background: #e6f0fa;
             border: 2px solid #007bff;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px auto;
-            max-width: 600px;
-            text-align: center;
         }
-        .customer-profile h2, .admin-profile h2 {
+        .dashboard h2 {
             color: #333;
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-        .customer-profile p, .admin-profile p {
-            color: #555;
-            font-size: 1rem;
-        }
-        /* Welcome message styling */
-        .welcome-message {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
             text-align: center;
-            margin: 20px auto;
+        }
+        .dashboard .profile, .dashboard .activity, .dashboard .summary {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .dashboard .profile p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .dashboard .activity-grid, .dashboard .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .dashboard .activity-item, .dashboard .summary-item {
             padding: 10px;
-            max-width: 600px;
-            font-size: 1.2rem;
+            background: #f9f9f9;
             border-radius: 4px;
         }
-        .welcome-message.customer {
+        .dashboard .activity-item .rating {
+            color: #f4b400;
+        }
+        .dashboard .cta {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .dashboard .cta a {
+            display: inline-block;
+            padding: 10px 20px;
             background: #28a745;
             color: #fff;
-        }
-        .welcome-message.admin {
-            background: #007bff;
-            color: #fff;
-        }
-        /* Admin navigation styling */
-        .admin-nav {
-            background: #007bff;
-            padding: 10px;
             border-radius: 4px;
+            text-decoration: none;
         }
-        .admin-nav ul li a {
-            color: #fff !important;
+        .dashboard .cta a.admin-link {
+            background: #007bff;
         }
-        .admin-nav #admin-link {
-            font-weight: bold;
-            text-decoration: underline;
+        .dashboard .cta a:hover {
+            opacity: 0.9;
         }
         @media (max-width: 768px) {
-            .customer-profile, .admin-profile {
+            .dashboard {
                 padding: 10px;
             }
-            .welcome-message {
-                font-size: 1rem;
-                margin: 10px;
+            .dashboard h2 {
+                font-size: 1.5rem;
+            }
+            .activity-grid, .summary-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -126,13 +133,6 @@
                 </ul>
             </nav>
         </header>
-        <div class="content">
-            <h1 class="headline">Taking Your Business to the Next Level</h1>
-            <div class="intro">
-                <p>We provide data-driven solutions to help your business grow. Let us help you achieve your goals</p>
-                <a href="industries.html"><button class="read-more">Read More</button></a>
-            </div>
-        </div>
     </section>
 
     <div id="verify-message">
@@ -140,96 +140,137 @@
         <p id="verify-text"></p>
     </div>
 
-    <div id="welcome-message" class="welcome-message" style="display: none;"></div>
-    <div id="profile">
-        <h2>Welcome, <span id="user-name"></span></h2>
-        <p>Email: <span id="user-email"></span></p>
+    <div id="public-content">
+        <section class="hero-section">
+            <div class="content">
+                <h1 class="headline">Taking Your Business to the Next Level</h1>
+                <div class="intro">
+                    <p>We provide data-driven solutions to help your business grow. Let us help you achieve your goals</p>
+                    <a href="industries.html"><button class="read-more">Read More</button></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="features-header">
+                <h2>Our Solutions</h2>
+                <p>Discover how A & K Analytics can empower your business with cutting-edge data solutions.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Data Visualization</h3>
+                    <p>Transform raw data into actionable insights with interactive and intuitive dashboards.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Predictive Analytics</h3>
+                    <p>Leverage advanced models to forecast trends and make informed decisions.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Business Intelligence</h3>
+                    <p>Unlock the full potential of your data with comprehensive BI tools.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="testimonials-section">
+            <div class="testimonials-header">
+                <h2>What Our Clients Say</h2>
+                <p>Share your experience with A & K Analytics or read what others have said.</p>
+            </div>
+            <div class="review-form">
+                <h3>Submit Your Review</h3>
+                <form id="review-form" class="review-form-content">
+                    <div class="form-group">
+                        <label for="review-name">Your Name</label>
+                        <input type="text" id="review-name" name="review-name" placeholder="Your Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="review-text">Your Review</label>
+                        <textarea id="review-text" name="review-text" placeholder="Share your experience..." rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Rating</label>
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5" required>
+                            <label for="star5"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star4" name="rating" value="4">
+                            <label for="star4"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star3" name="rating" value="3">
+                            <label for="star3"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star2" name="rating" value="2">
+                            <label for="star2"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star1" name="rating" value="1">
+                            <label for="star1"><i class="fas fa-star"></i></label>
+                        </div>
+                    </div>
+                    <button type="submit" class="submit-review-btn">Submit Review</button>
+                </form>
+                <div class="review-message" style="display: none; color: green; margin-top: 10px;"></div>
+            </div>
+            <div class="testimonials-grid" id="reviews-container"></div>
+        </section>
+
+        <section class="contact-section">
+            <div class="contact-header">
+                <h2>Contact Us</h2>
+                <p>Ready to transform your business with data? Get in touch with our team today.</p>
+            </div>
+            <div class="form-message" style="display: none; color: red; margin-bottom: 10px;"></div>
+            <form action="https://formspree.io/f/mwpoaazq" method="POST" class="contact-form">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Your Email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" placeholder="Your Message" rows="5" required></textarea>
+                </div>
+                <input type="text" name="_gotcha" style="display:none" />
+                <input type="hidden" name="_next" value="https://akaana.netlify.app/thanks.html" />
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+            <div class="contact-info">
+                <p>Email us directly at: <a href="mailto:info@akanalytics.com">info@akanalytics.com</a></p>
+            </div>
+        </section>
     </div>
 
-    <section class="features-section">
-        <div class="features-header">
-            <h2>Our Solutions</h2>
-            <p>Discover how A & K Analytics can empower your business with cutting-edge data solutions.</p>
+    <section id="customer-dashboard" class="dashboard customer-dashboard" style="display: none;">
+        <h2>Welcome, <span id="customer-name"></span>!</h2>
+        <div class="profile">
+            <p><strong>Name:</strong> <span id="customer-name-profile"></span></p>
+            <p><strong>Email:</strong> <span id="customer-email"></span></p>
         </div>
-        <div class="features-grid">
-            <div class="feature-card">
-                <h3>Data Visualization</h3>
-                <p>Transform raw data into actionable insights with interactive and intuitive dashboards.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Predictive Analytics</h3>
-                <p>Leverage advanced models to forecast trends and make informed decisions.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Business Intelligence</h3>
-                <p>Unlock the full potential of your data with comprehensive BI tools.</p>
-            </div>
+        <div class="activity">
+            <h3>Your Recent Reviews</h3>
+            <div class="activity-grid" id="customer-reviews"></div>
+        </div>
+        <div class="cta">
+            <a href="book-online.html">Book a Consultation</a>
         </div>
     </section>
 
-    <section class="testimonials-section">
-        <div class="testimonials-header">
-            <h2>What Our Clients Say</h2>
-            <p>Share your experience with A & K Analytics or read what others have said.</p>
+    <section id="admin-dashboard" class="dashboard admin-dashboard" style="display: none;">
+        <h2>Welcome, Admin <span id="admin-name"></span>!</h2>
+        <div class="profile">
+            <p><strong>Name:</strong> <span id="admin-name-profile"></span></p>
+            <p><strong>Email:</strong> <span id="admin-email"></span></p>
         </div>
-        <div class="review-form">
-            <h3>Submit Your Review</h3>
-            <form id="review-form" class="review-form-content">
-                <div class="form-group">
-                    <label for="review-name">Your Name</label>
-                    <input type="text" id="review-name" name="review-name" placeholder="Your Name" required>
+        <div class="summary">
+            <h3>Admin Overview</h3>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <p><strong>Pending Reviews:</strong> <span id="pending-reviews">0</span></p>
                 </div>
-                <div class="form-group">
-                    <label for="review-text">Your Review</label>
-                    <textarea id="review-text" name="review-text" placeholder="Share your experience..." rows="4" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Rating</label>
-                    <div class="star-rating">
-                        <input type="radio" id="star5" name="rating" value="5" required>
-                        <label for="star5"><i class="fas fa-star"></i></label>
-                        <input type="radio" id="star4" name="rating" value="4">
-                        <label for="star4"><i class="fas fa-star"></i></label>
-                        <input type="radio" id="star3" name="rating" value="3">
-                        <label for="star3"><i class="fas fa-star"></i></label>
-                        <input type="radio" id="star2" name="rating" value="2">
-                        <label for="star2"><i class="fas fa-star"></i></label>
-                        <input type="radio" id="star1" name="rating" value="1">
-                        <label for="star1"><i class="fas fa-star"></i></label>
-                    </div>
-                </div>
-                <button type="submit" class="submit-review-btn">Submit Review</button>
-            </form>
-            <div class="review-message" style="display: none; color: green; margin-top: 10px;"></div>
+            </div>
         </div>
-        <div class="testimonials-grid" id="reviews-container"></div>
-    </section>
-
-    <section class="contact-section">
-        <div class="contact-header">
-            <h2>Contact Us</h2>
-            <p>Ready to transform your business with data? Get in touch with our team today.</p>
-        </div>
-        <div class="form-message" style="display: none; color: red; margin-bottom: 10px;"></div>
-        <form action="https://formspree.io/f/mwpoaazq" method="POST" class="contact-form">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" id="name" name="name" placeholder="Your Name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="Your Email" required>
-            </div>
-            <div class="form-group">
-                <label for="message">Message</label>
-                <textarea id="message" name="message" placeholder="Your Message" rows="5" required></textarea>
-            </div>
-            <input type="text" name="_gotcha" style="display:none" />
-            <input type="hidden" name="_next" value="https://akaana.netlify.app/thanks.html" />
-            <button type="submit" class="submit-btn">Send Message</button>
-        </form>
-        <div class="contact-info">
-            <p>Email us directly at: <a href="mailto:info@akanalytics.com">info@akanalytics.com</a></p>
+        <div class="cta">
+            <a href="/admin.html" class="admin-link">Manage Reviews</a>
+            <a href="#" onclick="alert('User management coming soon!')">Manage Users</a>
         </div>
     </section>
 
@@ -360,16 +401,50 @@
             }
         });
 
+        // Fetch user's reviews for customer dashboard
+        async function fetchUserReviews(email, token) {
+            try {
+                console.log('Fetching user reviews for:', email);
+                const response = await fetch(`https://a-k-analytics-backend.onrender.com/api/reviews/user/${encodeURIComponent(email)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const reviews = await response.json();
+                if (!response.ok) throw new Error(reviews.error || 'Failed to fetch reviews');
+                console.log('User reviews fetched:', reviews.length);
+                return reviews;
+            } catch (error) {
+                console.error('User reviews fetch error:', error.message);
+                return [];
+            }
+        }
+
+        // Fetch pending reviews count for admin dashboard
+        async function fetchPendingReviews(token) {
+            try {
+                console.log('Fetching pending reviews');
+                const response = await fetch('https://a-k-analytics-backend.onrender.com/api/reviews/pending', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to fetch pending reviews');
+                console.log('Pending reviews count:', data.count);
+                return data.count;
+            } catch (error) {
+                console.error('Pending reviews fetch error:', error.message);
+                return 0;
+            }
+        }
+
         // Update UI based on user authentication and role
         async function updateUI() {
             const token = localStorage.getItem('token');
-            const profileSection = document.getElementById('profile');
+            const publicContent = document.getElementById('public-content');
+            const customerDashboard = document.getElementById('customer-dashboard');
+            const adminDashboard = document.getElementById('admin-dashboard');
             const signupLink = document.getElementById('signup-link');
             const loginLink = document.getElementById('login-link');
             const logoutLink = document.getElementById('logout-link');
             const adminLink = document.getElementById('admin-link');
-            const welcomeMessage = document.getElementById('welcome-message');
-            const nav = document.getElementById('main-nav');
             console.log('Updating UI, token exists:', !!token);
             if (token) {
                 try {
@@ -381,24 +456,47 @@
                     if (response.ok) {
                         console.log('Profile fetched:', user);
                         const isAdmin = user.email.includes('kevinakhondo9@gmail.com');
-                        // Set profile styling and welcome message
-                        profileSection.className = isAdmin ? 'admin-profile' : 'customer-profile';
-                        profileSection.style.display = 'block';
-                        document.getElementById('user-name').textContent = user.name;
-                        document.getElementById('user-email').textContent = user.email;
-                        // Set welcome message
-                        welcomeMessage.style.display = 'block';
-                        welcomeMessage.className = `welcome-message ${isAdmin ? 'admin' : 'customer'}`;
-                        welcomeMessage.textContent = isAdmin
-                            ? `Welcome, Admin ${user.name}! Manage reviews from the Admin panel.`
-                            : `Welcome, ${user.name}! Explore our data solutions and share your feedback.`;
-                        // Update navigation
+                        publicContent.style.display = 'none';
                         signupLink.style.display = 'none';
                         loginLink.style.display = 'none';
                         logoutLink.style.display = 'inline';
                         adminLink.style.display = isAdmin ? 'inline' : 'none';
-                        nav.className = isAdmin ? 'admin-nav' : '';
-                        console.log('Admin link visibility:', adminLink.style.display);
+                        if (isAdmin) {
+                            // Show admin dashboard
+                            customerDashboard.style.display = 'none';
+                            adminDashboard.style.display = 'block';
+                            document.getElementById('admin-name').textContent = user.name;
+                            document.getElementById('admin-name-profile').textContent = user.name;
+                            document.getElementById('admin-email').textContent = user.email;
+                            const pendingCount = await fetchPendingReviews(token);
+                            document.getElementById('pending-reviews').textContent = pendingCount;
+                        } else {
+                            // Show customer dashboard
+                            adminDashboard.style.display = 'none';
+                            customerDashboard.style.display = 'block';
+                            document.getElementById('customer-name').textContent = user.name;
+                            document.getElementById('customer-name-profile').textContent = user.name;
+                            document.getElementById('customer-email').textContent = user.email;
+                            const reviews = await fetchUserReviews(user.email, token);
+                            const reviewsContainer = document.getElementById('customer-reviews');
+                            reviewsContainer.innerHTML = '';
+                            if (reviews.length === 0) {
+                                reviewsContainer.innerHTML = '<p>No reviews submitted yet.</p>';
+                            } else {
+                                reviews.forEach(review => {
+                                    const item = document.createElement('div');
+                                    item.className = 'activity-item';
+                                    const stars = '<i class="fas fa-star"></i>'.repeat(review.rating) +
+                                                 '<i class="far fa-star"></i>'.repeat(5 - review.rating);
+                                    item.innerHTML = `
+                                        <p><strong>Review:</strong> ${review.text}</p>
+                                        <p class="rating">${stars}</p>
+                                        <p><strong>Status:</strong> ${review.approved ? 'Approved' : 'Pending'}</p>
+                                    `;
+                                    reviewsContainer.appendChild(item);
+                                });
+                            }
+                        }
                     } else {
                         console.error('Profile fetch failed:', user.error, response.status);
                         localStorage.removeItem('token');
@@ -415,15 +513,13 @@
             }
 
             function resetUI() {
-                profileSection.className = '';
-                profileSection.style.display = 'none';
-                welcomeMessage.style.display = 'none';
-                welcomeMessage.className = 'welcome-message';
+                publicContent.style.display = 'block';
+                customerDashboard.style.display = 'none';
+                adminDashboard.style.display = 'none';
                 signupLink.style.display = 'inline';
                 loginLink.style.display = 'inline';
                 logoutLink.style.display = 'none';
                 adminLink.style.display = 'none';
-                nav.className = '';
             }
         }
 
@@ -465,16 +561,16 @@
         }
 
         // Handle read more button
-        document.querySelector('.read-more').addEventListener('click', () => {
+        document.querySelector('.read-more')?.addEventListener('click', () => {
             alert('Learn More about how A & K Analytics can help your business!');
         });
 
         // Handle contact form submission
-        document.querySelector('.submit-btn').addEventListener('click', (e) => {
+        document.querySelector('.submit-btn')?.addEventListener('click', (e) => {
             e.preventDefault();
-            const name = document.querySelector('#name').value;
-            const email = document.querySelector('#email').value;
-            const message = document.querySelector('#message').value;
+            const name = document.querySelector('#name')?.value;
+            const email = document.querySelector('#email')?.value;
+            const message = document.querySelector('#message')?.value;
             const formMessage = document.querySelector('.form-message');
 
             if (name && email && message) {
@@ -489,7 +585,7 @@
         });
 
         // Handle review submission
-        document.querySelector('#review-form').addEventListener('submit', async (e) => {
+        document.querySelector('#review-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.querySelector('#review-name').value;
             const text = document.querySelector('#review-text').value;
