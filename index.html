@@ -30,11 +30,6 @@
         }
     </script>
     <style>
-        /* Hero section with background image */
-        /* Remove background for logged-in users */
-        .no-background .hero-section {
-            background: none;
-        }
         /* Dashboard styling */
         .dashboard {
             max-width: 1200px;
@@ -145,7 +140,7 @@
                 </ul>
             </nav>
         </header>
-        <div class="content">
+        <div id="hero-content" class="content">
             <h1 class="headline">Taking Your Business to the Next Level</h1>
             <div class="intro">
                 <p>We provide data-driven solutions to help your business grow. Let us help you achieve your goals</p>
@@ -454,6 +449,7 @@
             const loginLink = document.getElementById('login-link');
             const logoutLink = document.getElementById('logout-link');
             const adminLink = document.getElementById('admin-link');
+            const heroContent = document.getElementById('hero-content');
             console.log('Updating UI, token exists:', !!token);
             if (token) {
                 try {
@@ -465,6 +461,7 @@
                     if (response.ok) {
                         console.log('Profile fetched:', user);
                         document.body.classList.add('no-background'); // Remove background image
+                        heroContent.style.display = 'none'; // Hide hero content
                         const isAdmin = user.email.includes('kevinakhondo9@gmail.com');
                         publicContent.style.display = 'none';
                         signupLink.style.display = 'none';
@@ -524,6 +521,7 @@
 
             function resetUI() {
                 document.body.classList.remove('no-background'); // Restore background image
+                heroContent.style.display = 'block'; // Show hero content
                 publicContent.style.display = 'block';
                 customerDashboard.style.display = 'none';
                 adminDashboard.style.display = 'none';
