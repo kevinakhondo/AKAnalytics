@@ -30,149 +30,69 @@
         }
     </script>
     <style>
-        /* Hero section with background image */
-        .hero-section {
-            background: url('assets/hero-bg.jpg') no-repeat center/cover;
-            height: 100vh;
-            min-height: 600px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-            color: #fff;
-            text-align: center;
-        }
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4); /* Optional overlay for readability */
-            z-index: -1;
-        }
-        /* Remove background for logged-in users */
-        .no-background .hero-section {
-            background: none;
-        }
         /* Dashboard styling */
         .dashboard {
             max-width: 1200px;
             margin: 20px auto;
             padding: 20px;
             border-radius: 8px;
-            background: none;
+            background: none; /* Ensure no background image */
             min-height: auto;
         }
         .customer-dashboard {
             background: #e6f4ea;
             border: 2px solid #28a745;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
         }
-        .customer-dashboard h2 {
+        .admin-dashboard {
+            background: #e6f0fa;
+            border: 2px solid #007bff;
+        }
+        .dashboard h2 {
             color: #333;
             font-size: 1.8rem;
             margin-bottom: 15px;
+            text-align: center;
         }
-        .customer-dashboard .profile {
-            background: #fff;
-            padding: 15px;
-            border-radius: 4px;
+        .dashboard .profile, .dashboard .activity, .dashboard .summary {
             margin-bottom: 20px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .customer-dashboard .profile p {
+        .dashboard .profile p {
             margin: 5px 0;
             color: #555;
-            font-size: 1rem;
         }
-        .customer-dashboard .activity {
-            background: #fff;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-        .customer-dashboard .activity-grid {
+        .dashboard .activity-grid, .dashboard .summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
         }
-        .customer-dashboard .activity-item {
+        .dashboard .activity-item, .dashboard .summary-item {
             padding: 10px;
             background: #f9f9f9;
             border-radius: 4px;
         }
-        .customer-dashboard .activity-item .rating {
+        .dashboard .activity-item .rating {
             color: #f4b400;
         }
-        .customer-dashboard .cta a {
+        .dashboard .cta {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .dashboard .cta a {
             display: inline-block;
             padding: 10px 20px;
             background: #28a745;
             color: #fff;
             border-radius: 4px;
             text-decoration: none;
-            font-size: 1rem;
         }
-        .customer-dashboard .cta a:hover {
-            opacity: 0.9;
-        }
-        .admin-dashboard {
-            background: #e6f0fa;
-            border: 2px solid #007bff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .admin-dashboard h2 {
-            color: #333;
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-        }
-        .admin-dashboard .profile {
-            background: #fff;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-        .admin-dashboard .profile p {
-            margin: 5px 0;
-            color: #555;
-            font-size: 1rem;
-        }
-        .admin-dashboard .summary {
-            background: #fff;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-        .admin-dashboard .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-        }
-        .admin-dashboard .summary-item {
-            padding: 10px;
-            background: #f9f9f9;
-            border-radius: 4px;
-        }
-        .admin-dashboard .cta a {
-            display: inline-block;
-            padding: 10px 20px;
+        .dashboard .cta a.admin-link {
             background: #007bff;
-            color: #fff;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 1rem;
-            margin: 0 5px;
         }
-        .admin-dashboard .cta a:hover {
+        .dashboard .cta a:hover {
             opacity: 0.9;
         }
         @media (max-width: 768px) {
@@ -181,13 +101,13 @@
                 min-height: 500px;
                 padding: 20px;
             }
-            .customer-dashboard, .admin-dashboard {
+            .dashboard {
                 padding: 10px;
             }
-            .customer-dashboard h2, .admin-dashboard h2 {
+            .dashboard h2 {
                 font-size: 1.5rem;
             }
-            .customer-dashboard .activity-grid, .admin-dashboard .summary-grid {
+            .activity-grid, .summary-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -522,7 +442,6 @@
         // Update UI based on user authentication and role
         async function updateUI() {
             const token = localStorage.getItem('token');
-            const heroSection = document.querySelector('.hero-section');
             const publicContent = document.getElementById('public-content');
             const customerDashboard = document.getElementById('customer-dashboard');
             const adminDashboard = document.getElementById('admin-dashboard');
@@ -542,13 +461,12 @@
                     if (response.ok) {
                         console.log('Profile fetched:', user);
                         document.body.classList.add('no-background'); // Remove background image
-                        heroSection.style.display = 'none'; // Hide hero section
                         heroContent.style.display = 'none'; // Hide hero content
+                        const isAdmin = user.email.includes('kevinakhondo9@gmail.com');
                         publicContent.style.display = 'none';
                         signupLink.style.display = 'none';
                         loginLink.style.display = 'none';
                         logoutLink.style.display = 'inline';
-                        const isAdmin = user.email.includes('kevinakhondo9@gmail.com');
                         adminLink.style.display = isAdmin ? 'inline' : 'none';
                         if (isAdmin) {
                             // Show admin dashboard
@@ -603,7 +521,6 @@
 
             function resetUI() {
                 document.body.classList.remove('no-background'); // Restore background image
-                heroSection.style.display = 'block'; // Show hero section
                 heroContent.style.display = 'block'; // Show hero content
                 publicContent.style.display = 'block';
                 customerDashboard.style.display = 'none';
