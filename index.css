@@ -27,10 +27,6 @@ body {
     z-index: 0;
 }
 
-/* Remove background for logged-in users */
-.no-background .hero-section {
-    background: none;
-}
 
 /* Styling the header */
 header {
