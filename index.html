@@ -9,6 +9,7 @@
     <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -31,6 +32,9 @@
     </script>
 </head>
 <body>
+    <noscript>
+        <p>This site requires JavaScript for full functionality. Please enable it in your browser settings.</p>
+    </noscript>
     <section class="hero-section">
         <header>
             <div class="logo">
@@ -38,8 +42,8 @@
                 <span>Data Solutions</span>
             </div>
             <div class="search-bar">
-                <input type="text" id="search-input" placeholder="Search...">
-                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Search..." aria-label="Search site content">
+                <i class="fas fa-search" aria-hidden="true"></i>
             </div>
             <nav id="main-nav">
                 <ul>
@@ -66,9 +70,13 @@
         </div>
     </section>
 
-    <div id="verify-message">
+    <div id="verify-message" style="display: none;">
         <h2>Email Verification</h2>
         <p id="verify-text"></p>
+    </div>
+
+    <div id="loading" style="display: none; text-align: center; padding: 20px;">
+        <p>Loading...</p>
     </div>
 
     <div id="public-content">
@@ -111,24 +119,26 @@
                     </div>
                     <div class="form-group">
                         <label>Rating</label>
-                        <div class="star-rating">
-                            <input type="radio" id="star5" name="rating" value="5" required>
-                            <label for="star5"><i class="fas fa-star"></i></label>
-                            <input type="radio" id="star4" name="rating" value="4">
-                            <label for="star4"><i class="fas fa-star"></i></label>
-                            <input type="radio" id="star3" name="rating" value="3">
-                            <label for="star3"><i class="fas fa-star"></i></label>
-                            <input type="radio" id="star2" name="rating" value="2">
-                            <label for="star2"><i class="fas fa-star"></i></label>
-                            <input type="radio" id="star1" name="rating" value="1">
-                            <label for="star1"><i class="fas fa-star"></i></label>
+                        <div class="star-rating" role="radiogroup" aria-label="Rating">
+                            <input type="radio" id="star5" name="rating" value="5" required aria-label="5 stars">
+                            <label for="star5"><i class="fas fa-star" aria-hidden="true"></i></label>
+                            <input type="radio" id="star4" name="rating" value="4" aria-label="4 stars">
+                            <label for="star4"><i class="fas fa-star" aria-hidden="true"></i></label>
+                            <input type="radio" id="star3" name="rating" value="3" aria-label="3 stars">
+                            <label for="star3"><i class="fas fa-star" aria-hidden="true"></i></label>
+                            <input type="radio" id="star2" name="rating" value="2" aria-label="2 stars">
+                            <label for="star2"><i class="fas fa-star" aria-hidden="true"></i></label>
+                            <input type="radio" id="star1" name="rating" value="1" aria-label="1 star">
+                            <label for="star1"><i class="fas fa-star" aria-hidden="true"></i></label>
                         </div>
                     </div>
+                    <div class="review-message" style="display: none; margin-top: 10px;"></div>
                     <button type="submit" class="submit-review-btn">Submit Review</button>
                 </form>
-                <div class="review-message" style="display: none; color: green; margin-top: 10px;"></div>
             </div>
-            <div class="testimonials-grid" id="reviews-container"></div>
+            <div class="testimonials-grid" id="reviews-container">
+                <p>Loading reviews...</p>
+            </div>
         </section>
 
         <section class="contact-section">
@@ -161,6 +171,24 @@
     </div>
 
     <section id="customer-dashboard" class="dashboard customer-dashboard" style="display: none;">
+        <header>
+            <div class="logo">
+                A & K Analytics
+                <span>Data Solutions</span>
+            </div>
+            <nav id="customer-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="industries.html">Industries</a></li>
+                    <li><a href="insights.html">Insights</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="book-online.html">Book Online</a></li>
+                    <li><a href="#" onclick="logout()">Logout</a></li>
+                </ul>
+            </nav>
+        </header>
         <h2>Welcome, <span id="customer-name"></span>!</h2>
         <div class="profile">
             <p><strong>Name:</strong> <span id="customer-name-profile"></span></p>
@@ -197,6 +225,25 @@
     </section>
 
     <section id="admin-dashboard" class="dashboard admin-dashboard" style="display: none;">
+        <header>
+            <div class="logo">
+                A & K Analytics
+                <span>Data Solutions</span>
+            </div>
+            <nav id="admin-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="industries.html">Industries</a></li>
+                    <li><a href="insights.html">Insights</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="book-online.html">Book Online</a></li>
+                    <li><a href="/admin.html">Admin</a></li>
+                    <li><a href="#" onclick="logout()">Logout</a></li>
+                </ul>
+            </nav>
+        </header>
         <h2>Welcome, <span id="admin-name"></span>!</h2>
         <div class="profile">
             <p><strong>Name:</strong> <span id="admin-name-profile"></span></p>
@@ -209,6 +256,10 @@
                     <p><strong>Pending Reviews:</strong> <span id="pending-reviews">0</span></p>
                 </div>
             </div>
+        </div>
+        <div class="bookings-chart">
+            <h3>Bookings by Status</h3>
+            <canvas id="bookingsChart"></canvas>
         </div>
         <div class="bookings">
             <h3>Available Bookings</h3>
@@ -245,10 +296,10 @@
                 </ul>
             </nav>
             <div class="footer-social">
-                <a href="https://facebook.com/akanalytics" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                <a href="https://twitter.com/akanalytics" class="social-icon"><i class="fab fa-twitter"></i></a>
-                <a href="https://linkedin.com/company/akanalytics" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
-                <a href="https://instagram.com/akanalytics" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="https://facebook.com/akanalytics" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com/akanalytics" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://linkedin.com/company/akanalytics" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://instagram.com/akanalytics" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
             </div>
             <div class="footer-copyright">
                 <p>© 2025 A & K Analytics. All rights reserved.</p>
@@ -256,10 +307,11 @@
         </div>
     </footer>
 
-    <div id="signup-modal" class="modal">
+    <div id="signup-modal" class="modal" role="dialog" aria-labelledby="signup-title">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('signup-modal')">×</span>
-            <h2>Sign Up</h2>
+            <span class="close" onclick="closeModal('signup-modal')" aria-label="Close">×</span>
+            <h2 id="signup-title">Sign Up</h2>
+            <div class="error-message" style="display: none; color: red; margin-bottom: 10px;"></div>
             <form id="signup-form">
                 <div class="form-group">
                     <label for="signup-name">Name</label>
@@ -278,10 +330,11 @@
         </div>
     </div>
 
-    <div id="login-modal" class="modal">
+    <div id="login-modal" class="modal" role="dialog" aria-labelledby="login-title">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('login-modal')">×</span>
-            <h2>Login</h2>
+            <span class="close" onclick="closeModal('login-modal')" aria-label="Close">×</span>
+            <h2 id="login-title">Login</h2>
+            <div class="error-message" style="display: none; color: red; margin-bottom: 10px;"></div>
             <form id="login-form">
                 <div class="form-group">
                     <label for="login-email">Email</label>
@@ -297,22 +350,98 @@
     </div>
 
     <script>
-        // Show/hide modals
-        function showModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
+        // Logging utility
+        const log = typeof process !== 'undefined' && process.env.NODE_ENV === 'production' ? () => {} : console.log;
+
+        // Input sanitization (basic XSS prevention)
+        function sanitizeInput(input) {
+            if (typeof input !== 'string') return '';
+            const div = document.createElement('div');
+            div.textContent = input;
+            return div.innerHTML;
         }
+
+        // Show/hide modals with focus trapping
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'block';
+            modal.setAttribute('aria-hidden', 'false');
+            trapFocus(modal);
+            const firstInput = modal.querySelector('input');
+            if (firstInput) firstInput.focus();
+        }
+
         function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+            const mainNav = document.querySelector('#main-nav');
+            if (mainNav) mainNav.focus();
+        }
+
+        function trapFocus(modal) {
+            const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            const firstElement = focusableElements[0];
+            const lastElement = focusableElements[focusableElements.length - 1];
+            modal.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab') {
+                    if (e.shiftKey && document.activeElement === firstElement) {
+                        e.preventDefault();
+                        lastElement.focus();
+                    } else if (!e.shiftKey && document.activeElement === lastElement) {
+                        e.preventDefault();
+                        firstElement.focus();
+                    }
+                } else if (e.key === 'Escape') {
+                    closeModal(modal.id);
+                }
+            });
+        }
+
+        // Form validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+
+        function validateEmail(email) {
+            return emailRegex.test(email);
+        }
+
+        function validatePassword(password) {
+            return passwordRegex.test(password);
+        }
+
+        // Show error message
+        function showError(containerId, message, color = 'red') {
+            const container = document.getElementById(containerId) || document.querySelector(`#${containerId}`);
+            const errorDiv = container.querySelector('.error-message') || document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.style.display = 'block';
+            errorDiv.style.color = color;
+            errorDiv.textContent = message;
+            if (!container.querySelector('.error-message')) container.prepend(errorDiv);
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
         }
 
         // Handle signup
         document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = document.getElementById('signup-name').value;
+            const name = sanitizeInput(document.getElementById('signup-name').value);
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
+
+            if (!validateEmail(email)) {
+                showError('signup-form', 'Please enter a valid email address.');
+                return;
+            }
+            if (!validatePassword(password)) {
+                showError('signup-form', 'Password must be 8+ characters with at least one uppercase, lowercase, and number.');
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'block';
             try {
-                console.log('Attempting signup:', { name, email });
                 const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -320,13 +449,14 @@
                 });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Signup failed');
-                console.log('Signup successful:', data);
-                alert('Sign up successful! Please check your email to verify your account.');
+                localStorage.setItem('token', data.token); // Fallback for demo; use HttpOnly cookie in production
+                showError('signup-form', 'Sign up successful! Please check your email to verify your account.', 'green');
                 closeModal('signup-modal');
                 document.getElementById('signup-form').reset();
             } catch (error) {
-                console.error('Signup error:', error.message, response?.status);
-                alert('Sign up failed: ' + error.message);
+                showError('signup-form', 'Sign up failed: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
             }
         });
 
@@ -335,8 +465,14 @@
             e.preventDefault();
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
+
+            if (!validateEmail(email)) {
+                showError('login-form', 'Please enter a valid email address.');
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'block';
             try {
-                console.log('Attempting login:', { email });
                 const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -344,30 +480,32 @@
                 });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Login failed');
-                console.log('Login successful:', data);
-                localStorage.setItem('token', data.token);
-                alert('Login successful!');
+                localStorage.setItem('token', data.token); // Fallback for demo
+                showError('login-form', 'Login successful!', 'green');
                 closeModal('login-modal');
                 updateUI();
             } catch (error) {
-                console.error('Login error:', error.message, response?.status);
-                alert('Login failed: ' + error.message);
+                showError('login-form', 'Login failed: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
             }
         });
 
         // Fetch user's reviews for customer dashboard
         async function fetchUserReviews(name, token) {
             try {
-                console.log('Fetching user reviews for:', name);
+                const cachedReviews = localStorage.getItem(`reviews_${name}`);
+                if (cachedReviews) {
+                    return JSON.parse(cachedReviews);
+                }
                 const response = await fetch(`https://a-k-analytics-backend.onrender.com/api/reviews/user/${encodeURIComponent(name)}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const reviews = await response.json();
                 if (!response.ok) throw new Error(reviews.error || 'Failed to fetch reviews');
-                console.log('User reviews fetched:', reviews.length);
+                localStorage.setItem(`reviews_${name}`, JSON.stringify(reviews));
                 return reviews;
             } catch (error) {
-                console.error('User reviews fetch error:', error.message);
                 return [];
             }
         }
@@ -375,16 +513,13 @@
         // Fetch pending reviews count for admin dashboard
         async function fetchPendingReviews(token) {
             try {
-                console.log('Fetching pending reviews');
                 const response = await fetch('https://a-k-analytics-backend.onrender.com/api/reviews/pending', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Failed to fetch pending reviews');
-                console.log('Pending reviews count:', data.count);
                 return data.count;
             } catch (error) {
-                console.error('Pending reviews fetch error:', error.message);
                 return 0;
             }
         }
@@ -392,16 +527,13 @@
         // Fetch consultation progress for customer dashboard
         async function fetchConsultationProgress(email, token) {
             try {
-                console.log('Fetching consultation progress for:', email);
                 const response = await fetch(`https://a-k-analytics-backend.onrender.com/api/bookings/status/${encodeURIComponent(email)}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.error || 'Failed to fetch consultation status');
-                console.log('Consultation status fetched:', data);
-                return data.status || 'none'; // Expected: none, booked, confirmed, in-progress, completed
+                if (!response.ok) throw new Error(data.error || '杯Failed to fetch consultation status');
+                return data.status || 'none';
             } catch (error) {
-                console.error('Consultation status fetch error:', error.message);
                 return 'none';
             }
         }
@@ -410,17 +542,14 @@
         let allBookings = [];
         async function fetchBookings(token) {
             try {
-                console.log('Fetching bookings');
                 const response = await fetch('https://a-k-analytics-backend.onrender.com/api/bookings', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Failed to fetch bookings');
-                console.log('Bookings fetched:', data.length);
                 allBookings = data;
                 return data;
             } catch (error) {
-                console.error('Bookings fetch error:', error.message);
                 return [];
             }
         }
@@ -428,6 +557,7 @@
         // Filter bookings based on status
         function filterBookings(status) {
             const bookingList = document.getElementById('booking-list');
+            if (!bookingList) return;
             bookingList.innerHTML = '';
             const filteredBookings = status === 'all' ? allBookings : allBookings.filter(booking => booking.status === status);
             if (filteredBookings.length === 0) {
@@ -437,11 +567,11 @@
                     const item = document.createElement('div');
                     item.className = 'booking-item';
                     item.innerHTML = `
-                        <p><strong>Name:</strong> ${booking.name}</p>
-                        <p><strong>Email:</strong> ${booking.email}</p>
-                        <p><strong>Date:</strong> ${booking.date}</p>
-                        <p><strong>Time:</strong> ${booking.time}</p>
-                        <p><strong>Status:</strong> ${booking.status}</p>
+                        <p><strong>Name:</strong> ${sanitizeInput(booking.name)}</p>
+                        <p><strong>Email:</strong> ${sanitizeInput(booking.email)}</p>
+                        <p><strong>Date:</strong> ${sanitizeInput(booking.date)}</p>
+                        <p><strong>Time:</strong> ${sanitizeInput(booking.time)}</p>
+                        <p><strong>Status:</strong> ${sanitizeInput(booking.status)}</p>
                         ${booking.status === 'pending' ? `<button onclick="confirmBooking('${booking._id}', localStorage.getItem('token'))">Confirm</button>` : ''}
                     `;
                     bookingList.appendChild(item);
@@ -451,8 +581,8 @@
 
         // Confirm booking
         async function confirmBooking(bookingId, token) {
+            document.getElementById('loading').style.display = 'block';
             try {
-                console.log('Confirming booking:', bookingId);
                 const response = await fetch(`https://a-k-analytics-backend.onrender.com/api/bookings/confirm/${bookingId}`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -460,17 +590,17 @@
                 });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Failed to confirm booking');
-                console.log('Booking confirmed:', data);
                 updateUI();
             } catch (error) {
-                console.error('Booking confirmation error:', error.message);
-                alert('Failed to confirm booking: ' + error.message);
+                showError('admin-dashboard', 'Failed to confirm booking: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
             }
         }
 
         // Update UI based on user authentication and role
         async function updateUI() {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('token'); // Fallback; ideally use cookie
             const heroSection = document.querySelector('.hero-section');
             const publicContent = document.getElementById('public-content');
             const customerDashboard = document.getElementById('customer-dashboard');
@@ -480,16 +610,15 @@
             const logoutLink = document.getElementById('logout-link');
             const adminLink = document.getElementById('admin-link');
             const heroContent = document.getElementById('hero-content');
-            console.log('Updating UI, token exists:', !!token);
+
+            document.getElementById('loading').style.display = 'block';
             if (token) {
                 try {
-                    console.log('Fetching profile with token:', token.slice(0, 20) + '...');
                     const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/profile', {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     const user = await response.json();
                     if (response.ok) {
-                        console.log('Profile fetched:', user);
                         document.body.classList.add('no-background');
                         heroSection.style.display = 'none';
                         heroContent.style.display = 'none';
@@ -497,24 +626,71 @@
                         signupLink.style.display = 'none';
                         loginLink.style.display = 'none';
                         logoutLink.style.display = 'inline';
-                        const isAdmin = user.email.includes('kevinakhondo9@gmail.com');
+                        const isAdmin = user.role === 'admin'; // Assumes backend returns role
                         adminLink.style.display = isAdmin ? 'inline' : 'none';
                         if (isAdmin) {
                             customerDashboard.style.display = 'none';
                             adminDashboard.style.display = 'block';
-                            document.getElementById('admin-name').textContent = user.name;
-                            document.getElementById('admin-name-profile').textContent = user.name;
-                            document.getElementById('admin-email').textContent = user.email;
+                            document.getElementById('admin-name').textContent = sanitizeInput(user.name);
+                            document.getElementById('admin-name-profile').textContent = sanitizeInput(user.name);
+                            document.getElementById('admin-email').textContent = sanitizeInput(user.email);
                             const pendingCount = await fetchPendingReviews(token);
                             document.getElementById('pending-reviews').textContent = pendingCount;
                             const bookings = await fetchBookings(token);
                             filterBookings('all');
+
+                            // Render bookings chart
+                            const statusCounts = {
+                                pending: bookings.filter(b => b.status === 'pending').length,
+                                confirmed: bookings.filter(b => b.status === 'confirmed').length,
+                                completed: bookings.filter(b => b.status === 'completed').length
+                            };
+                            const ctx = document.getElementById('bookingsChart').getContext('2d');
+                            new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: ['Pending', 'Confirmed', 'Completed'],
+                                    datasets: [{
+                                        label: 'Bookings',
+                                        data: [statusCounts.pending, statusCounts.confirmed, statusCounts.completed],
+                                        backgroundColor: ['#3498db', '#2ecc71', '#e74c3c'],
+                                        borderColor: ['#2980b9', '#27ae60', '#c0392b'],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            title: {
+                                                display: true,
+                                                text: 'Number of Bookings'
+                                            }
+                                        },
+                                        x: {
+                                            title: {
+                                                display: true,
+                                                text: 'Status'
+                                            }
+                                        }
+                                    },
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: 'Bookings by Status'
+                                        }
+                                    }
+                                }
+                            });
                         } else {
                             adminDashboard.style.display = 'none';
                             customerDashboard.style.display = 'block';
-                            document.getElementById('customer-name').textContent = user.name;
-                            document.getElementById('customer-name-profile').textContent = user.name;
-                            document.getElementById('customer-email').textContent = user.email;
+                            document.getElementById('customer-name').textContent = sanitizeInput(user.name);
+                            document.getElementById('customer-name-profile').textContent = sanitizeInput(user.name);
+                            document.getElementById('customer-email').textContent = sanitizeInput(user.email);
                             const reviews = await fetchUserReviews(user.name, token);
                             const reviewsContainer = document.getElementById('customer-reviews');
                             reviewsContainer.innerHTML = '';
@@ -527,7 +703,7 @@
                                     const stars = '<i class="fas fa-star"></i>'.repeat(review.rating) +
                                                  '<i class="far fa-star"></i>'.repeat(5 - review.rating);
                                     item.innerHTML = `
-                                        <p><strong>Review:</strong> ${review.text}</p>
+                                        <p><strong>Review:</strong> ${sanitizeInput(review.text)}</p>
                                         <p class="rating">${stars}</p>
                                         <p><strong>Status:</strong> ${review.approved ? 'Approved' : 'Pending'}</p>
                                     `;
@@ -536,8 +712,7 @@
                             }
                             const consultationStatus = await fetchConsultationProgress(user.email, token);
                             const steps = ['booked', 'confirmed', 'in-progress', 'completed'];
-                            const progressSteps = document.querySelectorAll('#consultation-progress .progress-step');
-                            progressSteps.forEach(step => {
+                            const progress/>\n                            progressSteps.forEach(step => {
                                 step.classList.remove('active');
                                 if (consultationStatus === 'none') return;
                                 const stepValue = step.getAttribute('data-step');
@@ -549,17 +724,14 @@
                             });
                         }
                     } else {
-                        console.error('Profile fetch failed:', user.error, response.status);
                         localStorage.removeItem('token');
                         resetUI();
                     }
                 } catch (error) {
-                    console.error('Profile fetch error:', error.message);
                     localStorage.removeItem('token');
                     resetUI();
                 }
             } else {
-                console.log('No token, resetting UI');
                 resetUI();
             }
 
@@ -575,13 +747,14 @@
                 logoutLink.style.display = 'none';
                 adminLink.style.display = 'none';
             }
+
+            document.getElementById('loading').style.display = 'none';
         }
 
         // Handle logout
         function logout() {
-            console.log('Logging out');
             localStorage.removeItem('token');
-            alert('Logged out successfully');
+            showError('public-content', 'Logged out successfully', 'green');
             updateUI();
         }
 
@@ -590,128 +763,157 @@
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('verify');
             if (token) {
+                document.getElementById('loading').style.display = 'block';
                 try {
-                    console.log('Verifying email with token:', token.slice(0, 20) + '...');
                     const response = await fetch(`https://a-k-analytics-backend.onrender.com/api/users/verify/${token}`);
                     const data = await response.json();
                     if (response.ok) {
-                        console.log('Verification successful:', data);
                         localStorage.setItem('token', data.token);
                         document.getElementById('verify-message').style.display = 'block';
                         document.getElementById('verify-text').textContent = 'Email verified successfully! You are now logged in.';
                         updateUI();
                     } else {
-                        console.error('Verification failed:', data.error, response.status);
                         document.getElementById('verify-message').style.display = 'block';
                         document.getElementById('verify-text').textContent = 'Verification failed: ' + data.error;
                     }
                 } catch (error) {
-                    console.error('Verification error:', error.message);
                     document.getElementById('verify-message').style.display = 'block';
                     document.getElementById('verify-text').textContent = 'Verification failed: ' + error.message;
+                } finally {
+                    document.getElementById('loading').style.display = 'none';
                 }
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         }
 
-        // Handle read more button
-        document.querySelector('.read-more')?.addEventListener('click', () => {
-            alert('Learn More about how A & K Analytics can help your business!');
+        // Handle search
+        document.querySelector('#search-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = sanitizeInput(e.target.value.trim());
+                if (query) {
+                    window.location.href = `/search.html?q=${encodeURIComponent(query)}`;
+                }
+            }
         });
+
+        // Handle read more button
+        const readMoreButton = document.querySelector('.read-more');
+        if (readMoreButton) {
+            readMoreButton.addEventListener('click', () => {
+                window.location.href = 'industries.html';
+            });
+        }
 
         // Handle contact form submission
-        document.querySelector('.submit-btn')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            const name = document.querySelector('#name')?.value;
-            const email = document.querySelector('#email')?.value;
-            const message = document.querySelector('#message')?.value;
-            const formMessage = document.querySelector('.form-message');
+        const contactFormButton = document.querySelector('.submit-btn');
+        if (contactFormButton) {
+            contactFormButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                const name = sanitizeInput(document.querySelector('#name')?.value || '');
+                const email = document.querySelector('#email')?.value || '';
+                const message = sanitizeInput(document.querySelector('#message')?.value || '');
+                const formMessage = document.querySelector('.form-message');
 
-            if (name && email && message) {
-                console.log('Submitting contact form:', { name, email });
-                formMessage.style.display = 'none';
-                document.querySelector('.contact-form').submit();
-            } else {
-                console.log('Contact form validation failed');
-                formMessage.style.display = 'block';
-                formMessage.textContent = 'Please fill in all fields.';
-            }
-        });
+                if (name && validateEmail(email) && message) {
+                    formMessage.style.display = 'none';
+                    document.querySelector('.contact-form').submit();
+                } else {
+                    formMessage.style.display = 'block';
+                    formMessage.textContent = 'Please fill in all fields with valid data.';
+                }
+            });
+        }
 
         // Handle review submission
-        document.querySelector('#review-form')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.querySelector('#review-name').value;
-            const text = document.querySelector('#review-text').value;
-            const rating = document.querySelector('input[name="rating"]:checked')?.value;
-            const reviewMessage = document.querySelector('.review-message');
+        const reviewForm = document.querySelector('#review-form');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = sanitizeInput(document.querySelector('#review-name').value);
+                const text = sanitizeInput(document.querySelector('#review-text').value);
+                const rating = document.querySelector('input[name="rating"]:checked')?.value;
+                const reviewMessage = document.querySelector('.review-message');
 
-            if (name && text && rating) {
-                try {
-                    console.log('Submitting review:', { name, rating });
-                    const response = await fetch('https://a-k-analytics-backend.onrender.com/api/reviews', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, text, rating })
-                    });
-                    if (response.ok) {
-                        console.log('Review submitted successfully');
+                if (name && text && rating) {
+                    document.getElementById('loading').style.display = 'block';
+                    try {
+                        const response = await fetch('https://a-k-analytics-backend.onrender.com/api/reviews', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name, text, rating })
+                        });
+                        if (response.ok) {
+                            reviewMessage.style.display = 'block';
+                            reviewMessage.style.color = 'green';
+                            reviewMessage.textContent = 'Thank you for your review! It will appear after approval.';
+                            document.querySelector('#review-form').reset();
+                            localStorage.removeItem(`reviews_${name}`); // Clear cache
+                            setTimeout(() => {
+                                reviewMessage.style.display = 'none';
+                            }, 3000);
+                        } else {
+                            throw new Error('Submission failed');
+                        }
+                    } catch (error) {
                         reviewMessage.style.display = 'block';
-                        reviewMessage.style.color = 'green';
-                        reviewMessage.textContent = 'Thank you for your review! It will appear after approval.';
-                        document.querySelector('#review-form').reset();
-                        setTimeout(() => {
-                            reviewMessage.style.display = 'none';
-                        }, 3000);
-                    } else {
-                        throw new Error('Submission failed');
+                        reviewMessage.style.color = 'red';
+                        reviewMessage.textContent = 'Failed to submit review. Please try again.';
+                    } finally {
+                        document.getElementById('loading').style.display = 'none';
                     }
-                } catch (error) {
-                    console.error('Review submission error:', error.message, response?.status);
+                } else {
                     reviewMessage.style.display = 'block';
                     reviewMessage.style.color = 'red';
-                    reviewMessage.textContent = 'Failed to submit review. Please try again.';
+                    reviewMessage.textContent = 'Please fill in all fields and select a rating.';
                 }
-            } else {
-                console.log('Review form validation failed');
-                reviewMessage.style.display = 'block';
-                reviewMessage.style.color = 'red';
-                reviewMessage.textContent = 'Please fill in all fields and select a rating.';
-            }
-        });
+            });
+        }
 
         // Display approved reviews
         async function displayReviews() {
             const reviewsContainer = document.querySelector('#reviews-container');
+            if (!reviewsContainer) return;
             try {
-                console.log('Fetching reviews');
+                const cachedReviews = localStorage.getItem('public_reviews');
+                if (cachedReviews) {
+                    renderReviews(JSON.parse(cachedReviews));
+                    return;
+                }
+                document.getElementById('loading').style.display = 'block';
                 const response = await fetch('https://a-k-analytics-backend.onrender.com/api/reviews');
                 if (!response.ok) throw new Error('Failed to fetch reviews');
                 const reviews = await response.json();
-                console.log('Reviews fetched:', reviews.length);
-                reviewsContainer.innerHTML = '';
+                localStorage.setItem('public_reviews', JSON.stringify(reviews));
+                renderReviews(reviews);
+            } catch (error) {
+                reviewsContainer.innerHTML = '<p>Unable to load reviews at this time.</p>';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
 
+            function renderReviews(reviews) {
+                reviewsContainer.innerHTML = '';
+                if (reviews.length === 0) {
+                    reviewsContainer.innerHTML = '<p>No reviews available.</p>';
+                    return;
+                }
                 reviews.forEach(review => {
                     const reviewCard = document.createElement('div');
                     reviewCard.className = 'testimonial-card';
-                    const stars = '<i class="fas fa-star"></i>'.repeat(review.rating) +
-                                 '<i class="far fa-star"></i>'.repeat(5 - review.rating);
+                    const stars = '<i class="fas fa-star" aria-hidden="true"></i>'.repeat(review.rating) +
+                                 '<i class="far fa-star" aria-hidden="true"></i>'.repeat(5 - review.rating);
                     reviewCard.innerHTML = `
-                        <blockquote>${review.text}</blockquote>
-                        <p class="author">— ${review.name}</p>
-                        <div class="rating">${stars}</div>
+                        <blockquote>${sanitizeInput(review.text)}</blockquote>
+                        <p class="author">— ${sanitizeInput(review.name)}</p>
+                        <div class="rating" aria-label="${review.rating} out of 5 stars">${stars}</div>
                     `;
                     reviewsContainer.appendChild(reviewCard);
                 });
-            } catch (error) {
-                console.error('Reviews fetch error:', error.message);
-                reviewsContainer.innerHTML = '<p>Unable to load reviews at this time.</p>';
             }
         }
 
         // Initialize page
         window.onload = () => {
-            console.log('Page loaded, initializing');
             updateUI();
             handleVerification();
             displayReviews();
