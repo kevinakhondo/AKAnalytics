@@ -172,8 +172,37 @@
 
     <section id="customer-dashboard" class="dashboard customer-dashboard" style="display: none;">
         <h2>Welcome, <span id="customer-name"></span>!</h2>
+        <div class="profile">
+            <p><strong>Name:</strong> <span id="customer-name-profile"></span></p>
+            <p><strong>Email:</strong> <span id="customer-email"></span></p>
+        </div>
+        <div class="activity">
+            <h3>Your Recent Activities</h3>
+            <div class="activity-grid" id="customer-reviews"></div>
+        </div>
         <div class="cta">
-            <a href="book-online.html"><button class="book-consultation-btn">Book Consultation</button></a>
+            <a href="book-online.html">Book a Consultation</a>
+        </div>
+        <div class="progress">
+            <h3>Consultation Progress</h3>
+            <div class="progress-timeline" id="consultation-progress">
+                <div class="progress-step" data-step="booked">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Booked</div>
+                </div>
+                <div class="progress-step" data-step="confirmed">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Confirmed</div>
+                </div>
+                <div class="progress-step" data-step="in-progress">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">In Progress</div>
+                </div>
+                <div class="progress-step" data-step="completed">
+                    <div class="step-circle">4</div>
+                    <div class="step-label">Completed</div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -425,6 +454,25 @@
             }
         });
 
+        // Fetch user's reviews for customer dashboard
+        async function fetchUserReviews(name, token) {
+            try {
+                const cachedReviews = localStorage.getItem(`reviews_${name}`);
+                if (cachedReviews) {
+                    return JSON.parse(cachedReviews);
+                }
+                const response = await fetch(`https://a-k-analytics-backend.onrender.com/api/reviews/user/${encodeURIComponent(name)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const reviews = await response.json();
+                if (!response.ok) throw new Error(reviews.error || 'Failed to fetch reviews');
+                localStorage.setItem(`reviews_${name}`, JSON.stringify(reviews));
+                return reviews;
+            } catch (error) {
+                return [];
+            }
+        }
+
         // Fetch pending reviews count for admin dashboard
         async function fetchPendingReviews(token) {
             try {
@@ -436,6 +484,20 @@
                 return data.count;
             } catch (error) {
                 return 0;
+            }
+        }
+
+        // Fetch consultation progress for customer dashboard
+        async function fetchConsultationProgress(email, token) {
+            try {
+                const response = await fetch(`https://a-k-analytics-backend.onrender.com/api/bookings/status/${encodeURIComponent(email)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to fetch consultation status');
+                return data.status || 'none';
+            } catch (error) {
+                return 'none';
             }
         }
 
@@ -528,7 +590,7 @@
                         signupLink.style.display = 'none';
                         loginLink.style.display = 'none';
                         logoutLink.style.display = 'inline';
-                        const isAdmin = user.email.includes('kevinakhondo9@gmail.com');
+                        const isAdmin = user.email.includes('kevinakhondo9@gmail.com'); // Fallback since role isn't provided
                         adminLink.style.display = isAdmin ? 'inline' : 'none';
                         if (isAdmin) {
                             adminDashboard.style.display = 'block';
@@ -589,6 +651,40 @@
                         } else {
                             customerDashboard.style.display = 'block';
                             document.getElementById('customer-name').textContent = sanitizeInput(user.name);
+                            document.getElementById('customer-name-profile').textContent = sanitizeInput(user.name);
+                            document.getElementById('customer-email').textContent = sanitizeInput(user.email);
+                            const reviews = await fetchUserReviews(user.name, token);
+                            const reviewsContainer = document.getElementById('customer-reviews');
+                            reviewsContainer.innerHTML = '';
+                            if (reviews.length === 0) {
+                                reviewsContainer.innerHTML = '<p>No recent activities yet.</p>';
+                            } else {
+                                reviews.forEach(review => {
+                                    const item = document.createElement('div');
+                                    item.className = 'activity-item';
+                                    const stars = '<i class="fas fa-star"></i>'.repeat(review.rating) +
+                                                 '<i class="far fa-star"></i>'.repeat(5 - review.rating);
+                                    item.innerHTML = `
+                                        <p><strong>Review:</strong> ${sanitizeInput(review.text)}</p>
+                                        <p class="rating">${stars}</p>
+                                        <p><strong>Status:</strong> ${review.approved ? 'Approved' : 'Pending'}</p>
+                                    `;
+                                    reviewsContainer.appendChild(item);
+                                });
+                            }
+                            const consultationStatus = await fetchConsultationProgress(user.email, token);
+                            const steps = ['booked', 'confirmed', 'in-progress', 'completed'];
+                            const progressSteps = document.querySelectorAll('#consultation-progress .progress-step');
+                            progressSteps.forEach(step => {
+                                step.classList.remove('active');
+                                if (consultationStatus === 'none') return;
+                                const stepValue = step.getAttribute('data-step');
+                                const currentStepIndex = steps.indexOf(consultationStatus);
+                                const stepIndex = steps.indexOf(stepValue);
+                                if (stepIndex <= currentStepIndex) {
+                                    step.classList.add('active');
+                                }
+                            });
                         }
                     } else {
                         localStorage.removeItem('token');
