@@ -15,7 +15,6 @@
             "@type": "Organization",
             "name": "A & K Analytics",
             "url": "https://akaana.netlify.app",
-            "logo": "https://akanalytics.com/logo.png",
             "sameAs": [
                 "https://facebook.com/akanalytics",
                 "https://twitter.com/akanalytics",
@@ -44,24 +43,24 @@
             </div>
             <nav>
                 <ul>
-                   <li><a href="index.html">Home</a></li>
-                   <li><a href="about.html">About</a></li>
-                   <li><a href="industries.html">Industries</a></li>
-                   <li><a href="insights.html">Insights</a></li>
-                   <li><a href="index.html#contact">Contact</a></li>
-                   <li><a href="blog.html">Blog</a></li>
-                   <li><a href="book-online.html">Book Online</a></li>
-                   <li><a href="#" onclick="showModal('signup-modal')">Sign Up</a></li>
-                   <li><a href="#" onclick="showModal('login-modal')">Login</a></li>
-                   <li><a href="#" onclick="logout()" id="logout-link" style="display: none;">Logout</a></li>
-                   <li><a href="/admin.html" id="admin-link" style="display: none;">Admin</a></li>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="industries.html">Industries</a></li>
+                    <li><a href="insights.html">Insights</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="book-online.html">Book Online</a></li>
+                    <li><a href="#" onclick="showModal('signup-modal')" id="signup-link">Sign Up</a></li>
+                    <li><a href="#" onclick="showModal('login-modal')" id="login-link">Login</a></li>
+                    <li><a href="#" onclick="logout()" id="logout-link" style="display: none;">Logout</a></li>
+                    <li><a href="/admin.html" id="admin-link" style="display: none;">Admin</a></li>
                 </ul>
             </nav>
         </header>
         <div class="content">
             <h1 class="headline">Taking Your Business to the Next Level</h1>
             <div class="intro">
-                <p>We provide data-driven solutions to help your business grow. Let us help you achieve your goals </p>
+                <p>We provide data-driven solutions to help your business grow. Let us help you achieve your goals</p>
                 <a href="industries.html"><button class="read-more">Read More</button></a>
             </div>
         </div>
@@ -156,7 +155,7 @@
                 <textarea id="message" name="message" placeholder="Your Message" rows="5" required></textarea>
             </div>
             <input type="text" name="_gotcha" style="display:none" />
-            <input type="hidden" name="_next" value="https://akanalytics.com/thanks.html" />
+            <input type="hidden" name="_next" value="https://akaana.netlify.app/thanks.html" />
             <button type="submit" class="submit-btn">Send Message</button>
         </form>
         <div class="contact-info">
@@ -233,6 +232,7 @@
     </div>
 
     <script>
+        // Show/hide modals
         function showModal(modalId) {
             document.getElementById(modalId).style.display = 'block';
         }
@@ -240,117 +240,140 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
+        // Handle signup
         document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('signup-name').value;
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
             try {
+                console.log('Attempting signup:', { name, email });
                 const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, password })
                 });
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.error);
+                if (!response.ok) throw new Error(data.error || 'Signup failed');
+                console.log('Signup successful:', data);
                 alert('Sign up successful! Please check your email to verify your account.');
                 closeModal('signup-modal');
                 document.getElementById('signup-form').reset();
             } catch (error) {
+                console.error('Signup error:', error.message, response?.status);
                 alert('Sign up failed: ' + error.message);
             }
         });
 
+        // Handle login
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             try {
+                console.log('Attempting login:', { email });
                 const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.error);
+                if (!response.ok) throw new Error(data.error || 'Login failed');
+                console.log('Login successful:', data);
                 localStorage.setItem('token', data.token);
                 alert('Login successful!');
                 closeModal('login-modal');
                 updateUI();
             } catch (error) {
+                console.error('Login error:', error.message, response?.status);
                 alert('Login failed: ' + error.message);
             }
         });
 
-      async function updateUI() {
-    const token = localStorage.getItem('token');
-    const profileSection = document.getElementById('profile');
-    const signupLink = document.querySelector('a[onclick="showModal(\'signup-modal\')]');
-    const loginLink = document.querySelector('a[onclick="showModal(\'login-modal\')]');
-    const logoutLink = document.getElementById('logout-link');
-    const adminLink = document.getElementById('admin-link');
-    if (token) {
-        try {
-            const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/profile', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const user = await response.json();
-            if (response.ok) {
-                profileSection.style.display = 'block';
-                document.getElementById('user-name').textContent = user.name;
-                document.getElementById('user-email').textContent = user.email;
-                signupLink.style.display = 'none';
-                loginLink.style.display = 'none';
-                logoutLink.style.display = 'inline';
-                adminLink.style.display = user.email.includes('kevinakhondo9@gmail.com') ? 'inline' : 'none';
+        // Update UI based on user authentication
+        async function updateUI() {
+            const token = localStorage.getItem('token');
+            const profileSection = document.getElementById('profile');
+            const signupLink = document.getElementById('signup-link');
+            const loginLink = document.getElementById('login-link');
+            const logoutLink = document.getElementById('logout-link');
+            const adminLink = document.getElementById('admin-link');
+            console.log('Updating UI, token exists:', !!token);
+            if (token) {
+                try {
+                    console.log('Fetching profile with token:', token.slice(0, 20) + '...');
+                    const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/profile', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const user = await response.json();
+                    if (response.ok) {
+                        console.log('Profile fetched:', user);
+                        profileSection.style.display = 'block';
+                        document.getElementById('user-name').textContent = user.name;
+                        document.getElementById('user-email').textContent = user.email;
+                        signupLink.style.display = 'none';
+                        loginLink.style.display = 'none';
+                        logoutLink.style.display = 'inline';
+                        adminLink.style.display = user.email.includes('kevinakhondo9@gmail.com') ? 'inline' : 'none';
+                        console.log('Admin link visibility:', adminLink.style.display);
+                    } else {
+                        console.error('Profile fetch failed:', user.error, response.status);
+                        localStorage.removeItem('token');
+                        profileSection.style.display = 'none';
+                        signupLink.style.display = 'inline';
+                        loginLink.style.display = 'inline';
+                        logoutLink.style.display = 'none';
+                        adminLink.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Profile fetch error:', error.message);
+                    localStorage.removeItem('token');
+                    profileSection.style.display = 'none';
+                    signupLink.style.display = 'inline';
+                    loginLink.style.display = 'inline';
+                    logoutLink.style.display = 'none';
+                    adminLink.style.display = 'none';
+                }
             } else {
-                localStorage.removeItem('token');
+                console.log('No token, resetting UI');
                 profileSection.style.display = 'none';
                 signupLink.style.display = 'inline';
                 loginLink.style.display = 'inline';
                 logoutLink.style.display = 'none';
                 adminLink.style.display = 'none';
             }
-        } catch (error) {
-            localStorage.removeItem('token');
-            profileSection.style.display = 'none';
-            signupLink.style.display = 'inline';
-            loginLink.style.display = 'inline';
-            logoutLink.style.display = 'none';
-            adminLink.style.display = 'none';
         }
-    } else {
-        profileSection.style.display = 'none';
-        signupLink.style.display = 'inline';
-        loginLink.style.display = 'inline';
-        logoutLink.style.display = 'none';
-        adminLink.style.display = 'none';
-    }
-}
 
+        // Handle logout
         function logout() {
+            console.log('Logging out');
             localStorage.removeItem('token');
             alert('Logged out successfully');
             updateUI();
         }
 
+        // Handle email verification
         async function handleVerification() {
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('verify');
             if (token) {
                 try {
+                    console.log('Verifying email with token:', token.slice(0, 20) + '...');
                     const response = await fetch(`https://a-k-analytics-backend.onrender.com/api/users/verify/${token}`);
                     const data = await response.json();
                     if (response.ok) {
+                        console.log('Verification successful:', data);
                         localStorage.setItem('token', data.token);
                         document.getElementById('verify-message').style.display = 'block';
                         document.getElementById('verify-text').textContent = 'Email verified successfully! You are now logged in.';
                         updateUI();
                     } else {
+                        console.error('Verification failed:', data.error, response.status);
                         document.getElementById('verify-message').style.display = 'block';
                         document.getElementById('verify-text').textContent = 'Verification failed: ' + data.error;
                     }
                 } catch (error) {
+                    console.error('Verification error:', error.message);
                     document.getElementById('verify-message').style.display = 'block';
                     document.getElementById('verify-text').textContent = 'Verification failed: ' + error.message;
                 }
@@ -358,10 +381,12 @@
             }
         }
 
+        // Handle read more button
         document.querySelector('.read-more').addEventListener('click', () => {
             alert('Learn More about how A & K Analytics can help your business!');
         });
 
+        // Handle contact form submission
         document.querySelector('.submit-btn').addEventListener('click', (e) => {
             e.preventDefault();
             const name = document.querySelector('#name').value;
@@ -370,14 +395,17 @@
             const formMessage = document.querySelector('.form-message');
 
             if (name && email && message) {
+                console.log('Submitting contact form:', { name, email });
                 formMessage.style.display = 'none';
                 document.querySelector('.contact-form').submit();
             } else {
+                console.log('Contact form validation failed');
                 formMessage.style.display = 'block';
                 formMessage.textContent = 'Please fill in all fields.';
             }
         });
 
+        // Handle review submission
         document.querySelector('#review-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.querySelector('#review-name').value;
@@ -387,12 +415,14 @@
 
             if (name && text && rating) {
                 try {
+                    console.log('Submitting review:', { name, rating });
                     const response = await fetch('https://a-k-analytics-backend.onrender.com/api/reviews', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name, text, rating })
                     });
                     if (response.ok) {
+                        console.log('Review submitted successfully');
                         reviewMessage.style.display = 'block';
                         reviewMessage.style.color = 'green';
                         reviewMessage.textContent = 'Thank you for your review! It will appear after approval.';
@@ -404,23 +434,28 @@
                         throw new Error('Submission failed');
                     }
                 } catch (error) {
+                    console.error('Review submission error:', error.message, response?.status);
                     reviewMessage.style.display = 'block';
                     reviewMessage.style.color = 'red';
                     reviewMessage.textContent = 'Failed to submit review. Please try again.';
                 }
             } else {
+                console.log('Review form validation failed');
                 reviewMessage.style.display = 'block';
                 reviewMessage.style.color = 'red';
                 reviewMessage.textContent = 'Please fill in all fields and select a rating.';
             }
         });
 
+        // Display approved reviews
         async function displayReviews() {
             const reviewsContainer = document.querySelector('#reviews-container');
             try {
+                console.log('Fetching reviews');
                 const response = await fetch('https://a-k-analytics-backend.onrender.com/api/reviews');
                 if (!response.ok) throw new Error('Failed to fetch reviews');
                 const reviews = await response.json();
+                console.log('Reviews fetched:', reviews.length);
                 reviewsContainer.innerHTML = '';
 
                 reviews.forEach(review => {
@@ -436,11 +471,14 @@
                     reviewsContainer.appendChild(reviewCard);
                 });
             } catch (error) {
+                console.error('Reviews fetch error:', error.message);
                 reviewsContainer.innerHTML = '<p>Unable to load reviews at this time.</p>';
             }
         }
 
+        // Initialize page
         window.onload = () => {
+            console.log('Page loaded, initializing');
             updateUI();
             handleVerification();
             displayReviews();
