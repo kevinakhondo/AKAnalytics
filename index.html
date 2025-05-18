@@ -30,69 +30,236 @@
         }
     </script>
     <style>
+        /* Hero section with background image */
+        .hero-section {
+            background: url('assets/hero-bg.jpg') no-repeat center/cover;
+            height: 100vh;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            color: #fff;
+            text-align: center;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: -1;
+        }
+        /* Remove background for logged-in users */
+        .no-background .hero-section {
+            background: none;
+        }
         /* Dashboard styling */
         .dashboard {
             max-width: 1200px;
             margin: 20px auto;
             padding: 20px;
             border-radius: 8px;
-            background: none; /* Ensure no background image */
+            background: none;
             min-height: auto;
         }
         .customer-dashboard {
             background: #e6f4ea;
             border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
-        .admin-dashboard {
-            background: #e6f0fa;
-            border: 2px solid #007bff;
-        }
-        .dashboard h2 {
+        .customer-dashboard h2 {
             color: #333;
             font-size: 1.8rem;
             margin-bottom: 15px;
-            text-align: center;
         }
-        .dashboard .profile, .dashboard .activity, .dashboard .summary {
-            margin-bottom: 20px;
-            padding: 15px;
+        .customer-dashboard .profile {
             background: #fff;
+            padding: 15px;
             border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
-        .dashboard .profile p {
+        .customer-dashboard .profile p {
             margin: 5px 0;
             color: #555;
+            font-size: 1rem;
         }
-        .dashboard .activity-grid, .dashboard .summary-grid {
+        .customer-dashboard .activity {
+            background: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .customer-dashboard .activity-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
         }
-        .dashboard .activity-item, .dashboard .summary-item {
+        .customer-dashboard .activity-item {
             padding: 10px;
             background: #f9f9f9;
             border-radius: 4px;
         }
-        .dashboard .activity-item .rating {
+        .customer-dashboard .activity-item .rating {
             color: #f4b400;
         }
-        .dashboard .cta {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .dashboard .cta a {
+        .customer-dashboard .cta a {
             display: inline-block;
             padding: 10px 20px;
             background: #28a745;
             color: #fff;
             border-radius: 4px;
             text-decoration: none;
+            font-size: 1rem;
         }
-        .dashboard .cta a.admin-link {
+        .customer-dashboard .progress {
+            background: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .customer-dashboard .progress h3 {
+            color: #333;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .customer-dashboard .progress-timeline {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 20px 0;
+        }
+        .customer-dashboard .progress-timeline::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ddd;
+            z-index: 0;
+        }
+        .customer-dashboard .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            width: 25%;
+        }
+        .customer-dashboard .progress-step .step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        .customer-dashboard .progress-step.active .step-circle {
+            background: #28a745;
+        }
+        .customer-dashboard .progress-step .step-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .customer-dashboard .progress-step.active .step-label {
+            color: #28a745;
+        }
+        .customer-dashboard .cta a:hover {
+            opacity: 0.9;
+        }
+        .admin-dashboard {
+            background: #e6f0fa;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .admin-dashboard h2 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        .admin-dashboard .profile {
+            background: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .admin-dashboard .profile p {
+            margin: 5px 0;
+            color: #555;
+            font-size: 1rem;
+        }
+        .admin-dashboard .summary {
+            background: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .admin-dashboard .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .admin-dashboard .summary-item {
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        .admin-dashboard .bookings {
+            background: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .admin-dashboard .bookings .filter {
+            margin-bottom: 15px;
+        }
+        .admin-dashboard .bookings .filter select {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .admin-dashboard .bookings .booking-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .admin-dashboard .bookings button {
+            padding: 5px 10px;
             background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
         }
-        .dashboard .cta a:hover {
+        .admin-dashboard .bookings button:hover {
+            opacity: 0.9;
+        }
+        .admin-dashboard .cta a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: #fff;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 1rem;
+            margin: 0 5px;
+        }
+        .admin-dashboard .cta a:hover {
             opacity: 0.9;
         }
         @media (max-width: 768px) {
@@ -101,14 +268,34 @@
                 min-height: 500px;
                 padding: 20px;
             }
-            .dashboard {
+            .customer-dashboard, .admin-dashboard {
                 padding: 10px;
             }
-            .dashboard h2 {
+            .customer-dashboard h2, .admin-dashboard h2 {
                 font-size: 1.5rem;
             }
-            .activity-grid, .summary-grid {
+            .customer-dashboard .activity-grid, .admin-dashboard .summary-grid {
                 grid-template-columns: 1fr;
+            }
+            .customer-dashboard .progress-timeline {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .customer-dashboard .progress-timeline::before {
+                left: 15px;
+                width: 2px;
+                height: 100%;
+                top: 0;
+                bottom: 0;
+            }
+            .customer-dashboard .progress-step {
+                flex-direction: row;
+                width: 100%;
+                margin: 10px 0;
+            }
+            .customer-dashboard .progress-step .step-circle {
+                margin-right: 10px;
+                margin-bottom: 0;
             }
         }
     </style>
@@ -250,11 +437,32 @@
             <p><strong>Email:</strong> <span id="customer-email"></span></p>
         </div>
         <div class="activity">
-            <h3>Your Recent Reviews</h3>
+            <h3>Your Recent Activities</h3>
             <div class="activity-grid" id="customer-reviews"></div>
         </div>
         <div class="cta">
             <a href="book-online.html">Book a Consultation</a>
+        </div>
+        <div class="progress">
+            <h3>Consultation Progress</h3>
+            <div class="progress-timeline" id="consultation-progress">
+                <div class="progress-step" data-step="booked">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Booked</div>
+                </div>
+                <div class="progress-step" data-step="confirmed">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Confirmed</div>
+                </div>
+                <div class="progress-step" data-step="in-progress">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">In Progress</div>
+                </div>
+                <div class="progress-step" data-step="completed">
+                    <div class="step-circle">4</div>
+                    <div class="step-label">Completed</div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -272,8 +480,20 @@
                 </div>
             </div>
         </div>
+        <div class="bookings">
+            <h3>Available Bookings</h3>
+            <div class="filter">
+                <label for="booking-filter">Filter by Status: </label>
+                <select id="booking-filter" onchange="filterBookings(this.value)">
+                    <option value="all">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                </select>
+            </div>
+            <div id="booking-list"></div>
+        </div>
         <div class="cta">
-            <a href="/admin.html" class="admin-link">Manage Reviews</a>
+            <a href="/admin.html">Manage Reviews</a>
             <a href="#" onclick="alert('User management coming soon!')">Manage Users</a>
         </div>
     </section>
@@ -439,9 +659,89 @@
             }
         }
 
+        // Fetch consultation progress for customer dashboard
+        async function fetchConsultationProgress(email, token) {
+            try {
+                console.log('Fetching consultation progress for:', email);
+                const response = await fetch(`https://a-k-analytics-backend.onrender.com/api/bookings/status/${encodeURIComponent(email)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to fetch consultation status');
+                console.log('Consultation status fetched:', data);
+                return data.status || 'none'; // Expected: none, booked, confirmed, in-progress, completed
+            } catch (error) {
+                console.error('Consultation status fetch error:', error.message);
+                return 'none';
+            }
+        }
+
+        // Fetch available bookings for admin dashboard
+        let allBookings = []; // Store all bookings for filtering
+        async function fetchBookings(token) {
+            try {
+                console.log('Fetching bookings');
+                const response = await fetch('https://a-k-analytics-backend.onrender.com/api/bookings', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to fetch bookings');
+                console.log('Bookings fetched:', data.length);
+                allBookings = data;
+                return data;
+            } catch (error) {
+                console.error('Bookings fetch error:', error.message);
+                return [];
+            }
+        }
+
+        // Filter bookings based on status
+        function filterBookings(status) {
+            const bookingList = document.getElementById('booking-list');
+            bookingList.innerHTML = '';
+            const filteredBookings = status === 'all' ? allBookings : allBookings.filter(booking => booking.status === status);
+            if (filteredBookings.length === 0) {
+                bookingList.innerHTML = '<p>No bookings available for this status.</p>';
+            } else {
+                filteredBookings.forEach(booking => {
+                    const item = document.createElement('div');
+                    item.className = 'booking-item';
+                    item.innerHTML = `
+                        <p><strong>Name:</strong> ${booking.name}</p>
+                        <p><strong>Email:</strong> ${booking.email}</p>
+                        <p><strong>Date:</strong> ${booking.date}</p>
+                        <p><strong>Time:</strong> ${booking.time}</p>
+                        <p><strong>Status:</strong> ${booking.status}</p>
+                        ${booking.status === 'pending' ? `<button onclick="confirmBooking('${booking._id}', localStorage.getItem('token'))">Confirm</button>` : ''}
+                    `;
+                    bookingList.appendChild(item);
+                });
+            }
+        }
+
+        // Confirm booking
+        async function confirmBooking(bookingId, token) {
+            try {
+                console.log('Confirming booking:', bookingId);
+                const response = await fetch(`https://a-k-analytics-backend.onrender.com/api/bookings/confirm/${bookingId}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'confirmed' })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to confirm booking');
+                console.log('Booking confirmed:', data);
+                updateUI();
+            } catch (error) {
+                console.error('Booking confirmation error:', error.message);
+                alert('Failed to confirm booking: ' + error.message);
+            }
+        }
+
         // Update UI based on user authentication and role
         async function updateUI() {
             const token = localStorage.getItem('token');
+            const heroSection = document.querySelector('.hero-section');
             const publicContent = document.getElementById('public-content');
             const customerDashboard = document.getElementById('customer-dashboard');
             const adminDashboard = document.getElementById('admin-dashboard');
@@ -460,16 +760,16 @@
                     const user = await response.json();
                     if (response.ok) {
                         console.log('Profile fetched:', user);
-                        document.body.classList.add('no-background'); // Remove background image
-                        heroContent.style.display = 'none'; // Hide hero content
-                        const isAdmin = user.email.includes('kevinakhondo9@gmail.com');
+                        document.body.classList.add('no-background');
+                        heroSection.style.display = 'none';
+                        heroContent.style.display = 'none';
                         publicContent.style.display = 'none';
                         signupLink.style.display = 'none';
                         loginLink.style.display = 'none';
                         logoutLink.style.display = 'inline';
+                        const isAdmin = user.email.includes('kevinakhondo9@gmail.com');
                         adminLink.style.display = isAdmin ? 'inline' : 'none';
                         if (isAdmin) {
-                            // Show admin dashboard
                             customerDashboard.style.display = 'none';
                             adminDashboard.style.display = 'block';
                             document.getElementById('admin-name').textContent = user.name;
@@ -477,8 +777,9 @@
                             document.getElementById('admin-email').textContent = user.email;
                             const pendingCount = await fetchPendingReviews(token);
                             document.getElementById('pending-reviews').textContent = pendingCount;
+                            const bookings = await fetchBookings(token);
+                            filterBookings('all'); // Default filter
                         } else {
-                            // Show customer dashboard
                             adminDashboard.style.display = 'none';
                             customerDashboard.style.display = 'block';
                             document.getElementById('customer-name').textContent = user.name;
@@ -488,7 +789,7 @@
                             const reviewsContainer = document.getElementById('customer-reviews');
                             reviewsContainer.innerHTML = '';
                             if (reviews.length === 0) {
-                                reviewsContainer.innerHTML = '<p>No reviews submitted yet.</p>';
+                                reviewsContainer.innerHTML = '<p>No recent activities yet.</p>';
                             } else {
                                 reviews.forEach(review => {
                                     const item = document.createElement('div');
@@ -503,6 +804,19 @@
                                     reviewsContainer.appendChild(item);
                                 });
                             }
+                            const consultationStatus = await fetchConsultationProgress(user.email, token);
+                            const steps = ['booked', 'confirmed', 'in-progress', 'completed'];
+                            const progressSteps = document.querySelectorAll('#consultation-progress .progress-step');
+                            progressSteps.forEach(step => {
+                                step.classList.remove('active');
+                                if (consultationStatus === 'none') return;
+                                const stepValue = step.getAttribute('data-step');
+                                const currentStepIndex = steps.indexOf(consultationStatus);
+                                const stepIndex = steps.indexOf(stepValue);
+                                if (stepIndex <= currentStepIndex) {
+                                    step.classList.add('active');
+                                }
+                            });
                         }
                     } else {
                         console.error('Profile fetch failed:', user.error, response.status);
@@ -520,8 +834,9 @@
             }
 
             function resetUI() {
-                document.body.classList.remove('no-background'); // Restore background image
-                heroContent.style.display = 'block'; // Show hero content
+                document.body.classList.remove('no-background');
+                heroSection.style.display = 'block';
+                heroContent.style.display = 'block';
                 publicContent.style.display = 'block';
                 customerDashboard.style.display = 'none';
                 adminDashboard.style.display = 'none';
