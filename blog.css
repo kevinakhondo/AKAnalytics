@@ -294,7 +294,7 @@ nav ul li a:hover::after {
 /* Responsive Design for Tablets and Phones */
 @media (max-width: 768px) {
     body {
-        padding-top: 250px;
+        padding-top: 180px;
     }
 
     header {
