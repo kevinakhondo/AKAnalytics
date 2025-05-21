@@ -119,47 +119,6 @@
         </div>
     </footer>
 
-    <div id="signup-modal" class="modal" role="dialog" aria-labelledby="signup-title">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('signup-modal')" aria-label="Close">×</span>
-            <h2 id="signup-title">Sign Up</h2>
-            <div class="error-message" style="display: none; color: red; margin-bottom: 10px;"></div>
-            <form id="signup-form">
-                <div class="form-group">
-                    <label for="signup-name">Name</label>
-                    <input type="text" id="signup-name" placeholder="Your Name" required>
-                </div>
-                <div class="form-group">
-                    <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" placeholder="Your Email" required>
-                </div>
-                <div class="form-group">
-                    <label for="signup-password">Password</label>
-                    <input type="password" id="signup-password" placeholder="Password (8+ characters)" minlength="8" required>
-                </div>
-                <button type="submit">Sign Up</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="login-modal" class="modal" role="dialog" aria-labelledby="login-title">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('login-modal')" aria-label="Close">×</span>
-            <h2 id="login-title">Login</h2>
-            <div class="error-message" style="display: none; color: red; margin-bottom: 10px;"></div>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="login-email">Email</label>
-                    <input type="email" id="login-email" placeholder="Your Email" required>
-                </div>
-                <div class="form-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" placeholder="Password" required>
-                </div>
-                <button type="submit">Login</button>
-            </form>
-        </div>
-    </div>
 
     <script>
         // Input sanitization (basic XSS prevention)
