@@ -3,495 +3,389 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Login - A & K Analytics</title>
-    <meta name="description" content="Login to your A & K Analytics customer account to access your personalized dashboard.">
-    <meta name="keywords" content="customer login, A & K Analytics, data analytics">
+    <title>Customer Dashboard - A & K Analytics</title>
+    <meta name="description" content="Access your personalized A & K Analytics dashboard with projects, bookings, analytics, and more.">
+    <meta name="keywords" content="customer dashboard, A & K Analytics, data analytics">
     <meta name="robots" content="noindex, nofollow">
-    <link rel="stylesheet" href="index.css">
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.22.5/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.4.0/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: #f5f5f5;
-        }
-        .login-form {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-        .login-form h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 24px;
-            color: #333;
-        }
-        .login-form .form-group {
-            margin-bottom: 20px;
-        }
-        .login-form label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .login-form input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        .login-form button {
-            width: 100%;
-            padding: 10px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .login-form button:hover {
-            background: #2980b9;
-        }
-        .error-message {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .dashboard-container {
-            padding: 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-            font-family: Arial, sans-serif;
-            display: none;
-        }
-        .dashboard-header, .dashboard-section {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .dashboard-header h2 {
-            font-size: 28px;
-            margin: 0 0 10px;
-        }
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .dashboard-section h3 {
-            font-size: 18px;
-            margin-top: 0;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 5px;
-        }
-        .dashboard-item {
-            margin: 10px 0;
-        }
-        .dashboard-item button {
-            padding: 5px 10px;
-            margin-left: 10px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        .dashboard-item button:hover {
-            background: #2980b9;
-        }
-        .dashboard-item .cancel-btn {
-            background: #e74c3c;
-        }
-        .dashboard-item .cancel-btn:hover {
-            background: #c0392b;
-        }
-        .dashboard-item button:disabled, .dashboard-item .disabled-btn {
-            background: #cccccc;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        .dashboard-item button:disabled:hover, .dashboard-item .disabled-btn:hover {
-            background: #cccccc;
-        }
-        .progress-bar {
-            width: 100%;
+        .loading-spinner {
+            display: inline-block;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
             height: 20px;
-            background: #f0f0f0;
-            border-radius: 10px;
-            overflow: hidden;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
         }
-        .progress {
-            height: 100%;
-            background: #3498db;
-            text-align: center;
-            color: white;
-            line-height: 20px;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        .kanban-board {
-            display: flex;
-            gap: 10px;
+        #calendar {
+            max-width: 900px;
+            margin: 0 auto;
         }
-        .kanban-column {
-            flex: 1;
-            background: #f9f9f9;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        iframe {
-            width: 100%;
-            height: 300px;
-            border: none;
-        }
-        .logout-btn {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .logout-btn:hover {
-            background: #c0392b;
-        }
-        @media (max-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            .kanban-board {
-                flex-direction: column;
-            }
+        canvas {
+            max-width: 100%;
         }
     </style>
 </head>
 <body>
-    <div id="login-container" class="login-container">
-        <div class="login-form">
-            <h2>Customer Login</h2>
-            <div class="error-message" style="display: none; color: red;"></div>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="login-email">Email</label>
-                    <input type="email" id="login-email" placeholder="Your Email" required>
-                </div>
-                <div class="form-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" placeholder="Password" required>
-                </div>
-                <button type="submit">Login</button>
-            </form>
-        </div>
-    </div>
+    <div id="root"></div>
 
-    <div id="dashboard-container" class="dashboard-container">
-        <div class="dashboard-header">
-            <h2>Personalized Welcome Panel</h2>
-            <p id="welcome-summary">Loading summary...</p>
-            <div>Profile Completion: <span id="profile-completion">0%</span></div>
-            <div class="progress-bar">
-                <div id="progress-fill" class="progress" style="width: 0%;">0%</div>
-            </div>
-        </div>
-        <div class="dashboard-grid">
-            <div class="dashboard-section">
-                <h3>Current Projects & Status Tracker</h3>
-                <div id="projects-tracker" class="kanban-board">
-                    <div class="kanban-column" id="in-progress-column">
-                        <h4>In Progress</h4>
-                        <div id="in-progress-projects"></div>
-                    </div>
-                    <div class="kanban-column" id="awaiting-column">
-                        <h4>Awaiting Data</h4>
-                        <div id="awaiting-projects"></div>
-                    </div>
-                    <div class="kanban-column" id="completed-column">
-                        <h4>Completed</h4>
-                        <div id="completed-projects"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="dashboard-section">
-                <h3>Interactive Analytics Preview</h3>
-                <div id="analytics-preview" class="dashboard-item">
-                    <p>Loading previews...</p>
-                </div>
-            </div>
-            <div class="dashboard-section">
-                <h3>Service Booking & History</h3>
-                <div id="bookings-list" class="dashboard-item">
-                    <button class="disabled-btn" disabled>Book a New Service</button>
-                    <p>Loading bookings...</p>
-                </div>
-            </div>
-            <div class="dashboard-section">
-                <h3>Support & Communication Panel</h3>
-                <div id="support-panel" class="dashboard-item">
-                    <button class="disabled-btn" disabled>📬 Chat with Analyst</button>
-                    <button class="disabled-btn" disabled>📂 Upload Datasets</button>
-                    <div id="ticket-history">Loading ticket history...</div>
-                    <button class="disabled-btn" disabled>📞 Schedule Support Call</button>
-                </div>
-            </div>
-            <div class="dashboard-section">
-                <h3>Billing & Invoices</h3>
-                <div id="billing-panel" class="dashboard-item">
-                    <p>Loading invoices...</p>
-                </div>
-            </div>
-            <div class="dashboard-section">
-                <h3>Resource Center</h3>
-                <div id="resources-list" class="dashboard-item">
-                    <p>- <a href="#">What is Predictive Analytics?</a></p>
-                    <p>- <a href="#">How to Interpret a Dashboard</a></p>
-                    <p>- <a href="#">Video Tutorials</a></p>
-                    <p>- <a href="#">Case Studies</a></p>
-                </div>
-            </div>
-            <div class="dashboard-section">
-                <h3>Notifications Panel</h3>
-                <div id="notifications-panel" class="dashboard-item">
-                    <p>Loading notifications...</p>
-                </div>
-            </div>
-            <div class="dashboard-section">
-                <h3>Profile & Preferences</h3>
-                <div id="profile-panel" class="dashboard-item">
-                    <p>Loading profile...</p>
-                </div>
-            </div>
-        </div>
-        <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-    <script>
-        // Input sanitization
-        function sanitizeInput(input) {
-            if (typeof input !== 'string') return '';
-            const div = document.createElement('div');
-            div.textContent = input;
-            return div.innerHTML;
-        }
+        const API_BASE_URL = 'https://a-k-analytics-backend.onrender.com/api';
 
-        // Form validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const App = () => {
+            const [token, setToken] = useState(localStorage.getItem('token') || '');
+            const [user, setUser] = useState(null);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+            const chartRef = useRef(null);
+            const chartInstanceRef = useRef(null);
 
-        function validateEmail(email) {
-            return emailRegex.test(email);
-        }
-
-        // Show error message
-        function showError(message, color = 'red') {
-            const errorDiv = document.querySelector('.error-message');
-            errorDiv.style.display = 'block';
-            errorDiv.style.color = color;
-            errorDiv.textContent = message;
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
-        }
-
-        // Handle login
-        const loginForm = document.getElementById('login-form');
-        if (loginForm) {
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const emailInput = document.getElementById('login-email');
-                const passwordInput = document.getElementById('login-password');
-
-                if (!emailInput || !passwordInput) {
-                    showError('Form elements are missing. Please refresh the page.');
-                    return;
-                }
-
-                const email = emailInput.value;
-                const password = passwordInput.value;
-
-                if (!validateEmail(email)) {
-                    showError('Please enter a valid email address.');
-                    return;
-                }
-
+            const fetchUserData = async () => {
+                if (!token) return;
+                setLoading(true);
+                setError('');
                 try {
-                    const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, password })
+                    const response = await axios.get(`${API_BASE_URL}/users/profile`, {
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        timeout: 10000 // 10s timeout
                     });
-                    const data = await response.json();
-                    if (!response.ok) {
-                        throw new Error(data.error || 'Login failed');
-                    }
-                    console.log('Login successful, token:', data.token); // Debug log
-                    localStorage.setItem('token', data.token);
-                    showError('Login successful!', 'green');
-                    loginForm.reset();
-                    await updateUI(); // Ensure async update
-                } catch (error) {
-                    console.error('Login error:', error); // Debug log
-                    showError(`Login failed: ${error.message || 'Please try again later.'}`);
-                }
-            });
-        }
-
-        // Update UI based on authentication
-        async function updateUI() {
-            const token = localStorage.getItem('token');
-            const loginContainer = document.getElementById('login-container');
-            const dashboardContainer = document.getElementById('dashboard-container');
-
-            console.log('Token found:', token); // Debug log
-
-            if (token) {
-                try {
-                    const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/profile', {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    console.log('Profile response status:', response.status); // Debug log
-                    const user = await response.json();
-                    if (response.ok) {
-                        loginContainer.style.display = 'none';
-                        dashboardContainer.style.display = 'block';
-
-                        // Personalized Welcome Panel
-                        document.getElementById('customer-name').textContent = `${sanitizeInput(user.name)} 👋`;
-                        document.getElementById('welcome-summary').textContent = `Welcome back! Your profile is tailored to your data journey.`;
-                        const completion = user.profileCompletion || 0;
-                        const progressFill = document.getElementById('progress-fill');
-                        progressFill.style.width = `${completion}%`;
-                        progressFill.textContent = `${completion}%`;
-                        document.getElementById('profile-completion').textContent = `${completion}%`;
-
-                        // Current Projects & Status Tracker
-                        const projectsTracker = {
-                            'in-progress': document.getElementById('in-progress-projects'),
-                            'awaiting': document.getElementById('awaiting-projects'),
-                            'completed': document.getElementById('completed-projects')
-                        };
-                        Object.keys(projectsTracker).forEach(status => projectsTracker[status].innerHTML = '');
-                        if (user.projects && user.projects.length > 0) {
-                            user.projects.forEach(p => {
-                                const column = projectsTracker[p.status.toLowerCase().replace(' ', '-')];
-                                if (column) {
-                                    column.innerHTML += `
-                                        <p>${sanitizeInput(p.name)}<br>
-                                        🗓️ ${sanitizeInput(p.startDate)} - ${sanitizeInput(p.deadline)}<br>
-                                        ⏳ ${sanitizeInput(p.status)}<br>
-                                        <button class="disabled-btn" disabled>📁 Download Deliverables</button></p>
-                                    `;
-                                }
-                            });
-                        } else {
-                            Object.values(projectsTracker).forEach(el => el.innerHTML = '<p>No projects available.</p>');
-                        }
-
-                        // Interactive Analytics Preview
-                        const analyticsPreview = document.getElementById('analytics-preview');
-                        if (user.analytics && user.analytics.length > 0) {
-                            analyticsPreview.innerHTML = user.analytics.map(a => `
-                                <div><h4>${sanitizeInput(a.title)}</h4>
-                                <iframe src="${sanitizeInput(a.previewUrl)}"></iframe>
-                                <p>${sanitizeInput(a.kpis)}</p></div>
-                            `).join('');
-                        } else {
-                            analyticsPreview.innerHTML = '<p>No analytics previews available.</p>';
-                        }
-
-                        // Service Booking & History
-                        const bookingsList = document.getElementById('bookings-list');
-                        if (user.bookings && user.bookings.length > 0) {
-                            bookingsList.innerHTML = user.bookings.map(b => `
-                                <p>${sanitizeInput(b.title)} - ${sanitizeInput(b.date)}<br>
-                                Status: ${sanitizeInput(b.status)}
-                                <button class="disabled-btn" disabled>Reschedule</button>
-                                <button class="disabled-btn cancel-btn" disabled>Cancel</button></p>
-                            `).join('');
-                        } else {
-                            bookingsList.innerHTML = '<p>No bookings available.</p>';
-                        }
-
-                        // Support & Communication Panel
-                        const supportPanel = document.getElementById('support-panel');
-                        const ticketHistory = document.getElementById('ticket-history');
-                        if (user.supportTickets && user.supportTickets.length > 0) {
-                            ticketHistory.innerHTML = user.supportTickets.map(t => `
-                                <p>${sanitizeInput(t.subject)} - ${sanitizeInput(t.status)}</p>
-                            `).join('');
-                        } else {
-                            ticketHistory.innerHTML = '<p>No ticket history available.</p>';
-                        }
-
-                        // Billing & Invoices
-                        const billingPanel = document.getElementById('billing-panel');
-                        if (user.invoices && user.invoices.length > 0) {
-                            billingPanel.innerHTML = user.invoices.map(i => `
-                                <p>${sanitizeInput(i.amount)} - ${sanitizeInput(i.date)}
-                                <button class="disabled-btn" disabled>Download PDF</button></p>
-                            `).join('');
-                        } else {
-                            billingPanel.innerHTML = '<p>No invoices available.</p>';
-                        }
-
-                        // Notifications Panel
-                        const notificationsPanel = document.getElementById('notifications-panel');
-                        if (user.notifications && user.notifications.length > 0) {
-                            notificationsPanel.innerHTML = user.notifications.map(n => `
-                                <p>${sanitizeInput(n.message)} - ${sanitizeInput(n.date)}</p>
-                            `).join('');
-                        } else {
-                            notificationsPanel.innerHTML = '<p>No notifications available.</p>';
-                        }
-
-                        // Profile & Preferences
-                        const profilePanel = document.getElementById('profile-panel');
-                        if (user.preferences) {
-                            profilePanel.innerHTML = `
-                                <p>Name: ${sanitizeInput(user.preferences.name)}<br>
-                                Email: ${sanitizeInput(user.preferences.email)}<br>
-                                Company: ${sanitizeInput(user.preferences.company)}</p>
-                                <p>Notification Channels: ${sanitizeInput(user.preferences.notificationChannels.join(', '))}</p>
-                            `;
-                        } else {
-                            profilePanel.innerHTML = '<p>No profile data available.</p>';
-                        }
-                    } else {
-                        console.error('Profile fetch failed:', response.statusText); // Debug log
-                        localStorage.removeItem('token');
-                        resetUI();
-                    }
-                } catch (error) {
-                    console.error('Profile fetch error:', error); // Debug log
+                    setUser(response.data);
+                } catch (err) {
+                    console.error('Fetch user error:', err);
+                    setError(err.response?.data?.error || 'Failed to load data. Please try again.');
+                    setToken('');
                     localStorage.removeItem('token');
-                    resetUI();
+                } finally {
+                    setLoading(false);
                 }
-            } else {
-                resetUI();
+            };
+
+            useEffect(() => {
+                if (token) fetchUserData();
+            }, [token]);
+
+            const handleLogin = async (email, password) => {
+                setLoading(true);
+                setError('');
+                try {
+                    const response = await axios.post(`${API_BASE_URL}/users/login`, { email, password });
+                    const newToken = response.data.token;
+                    localStorage.setItem('token', newToken);
+                    setToken(newToken);
+                } catch (err) {
+                    console.error('Login error:', err);
+                    setError(err.response?.data?.error || 'Login failed. Please try again.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handleLogout = () => {
+                setToken('');
+                setUser(null);
+                localStorage.removeItem('token');
+            };
+
+            if (!token || !user) {
+                return (
+                    <LoginForm
+                        onLogin={handleLogin}
+                        error={error}
+                        loading={loading}
+                    />
+                );
             }
 
-            function resetUI() {
-                loginContainer.style.display = 'flex';
-                dashboardContainer.style.display = 'none';
-            }
-        }
-
-        // Handle logout
-        function logout() {
-            localStorage.removeItem('token');
-            updateUI();
-        }
-
-        // Initialize page
-        window.onload = () => {
-            updateUI();
+            return (
+                <Dashboard
+                    user={user}
+                    onLogout={handleLogout}
+                    loading={loading}
+                    error={error}
+                    chartRef={chartRef}
+                    chartInstanceRef={chartInstanceRef}
+                />
+            );
         };
+
+        const LoginForm = ({ onLogin, error, loading }) => {
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onLogin(email, password);
+            };
+
+            return (
+                <div className="flex items-center justify-center min-h-screen bg-gray-100">
+                    <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+                        <h2 className="text-2xl font-bold text-center mb-6">Customer Login</h2>
+                        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 mb-2">Email</label>
+                                <input
+                                    type="email"
+                                    className="w-full p-2 border rounded"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-6">
+                                <label className="block text-gray-700 mb-2">Password</label>
+                                <input
+                                    type="password"
+                                    className="w-full p-2 border rounded"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
+                                disabled={loading}
+                            >
+                                {loading ? 'Logging in...' : 'Login'}
+                                {loading && <span className="loading-spinner"></span>}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        const Dashboard = ({ user, onLogout, loading, error, chartRef, chartInstanceRef }) => {
+            useEffect(() => {
+                const calendarEl = document.getElementById('calendar');
+                if (calendarEl) {
+                    const calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth',
+                        events: user.bookings?.map(booking => ({
+                            title: booking.title,
+                            start: booking.date,
+                            extendedProps: { status: booking.status }
+                        })) || [],
+                        eventContent: (info) => (
+                            `<div>${info.event.title} (${info.event.extendedProps.status})</div>`
+                        )
+                    });
+                    calendar.render();
+                }
+
+                if (chartRef.current && user.analytics?.length > 0) {
+                    if (chartInstanceRef.current) {
+                        chartInstanceRef.current.destroy();
+                    }
+                    chartInstanceRef.current = new Chart(chartRef.current, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Accuracy', 'Revenue', 'Churn'],
+                            datasets: [{
+                                label: 'KPIs',
+                                data: [93, 120000, 5], // Placeholder KPI data
+                                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    });
+                }
+
+                return () => {
+                    if (chartInstanceRef.current) {
+                        chartInstanceRef.current.destroy();
+                    }
+                };
+            }, [user]);
+
+            return (
+                <div className="p-8 max-w-7xl mx-auto">
+                    <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+                        <h2 className="text-2xl font-bold mb-2">Welcome, {user.name} 👋</h2>
+                        <p className="mb-2">Profile Completion: {user.profileCompletion || 0}%</p>
+                        <div className="w-full bg-gray-200 rounded-full h-4">
+                            <div
+                                className="bg-blue-500 h-4 rounded-full"
+                                style={{ width: `${user.profileCompletion || 0}%` }}
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 className="text-xl font-semibold mb-4">My Projects</h3>
+                            {loading ? (
+                                <p>Loading projects... <span className="loading-spinner"></span></p>
+                            ) : error ? (
+                                <p className="text-red-500">{error}</p>
+                            ) : (
+                                <div className="flex space-x-4">
+                                    <div className="flex-1 bg-gray-50 p-4 rounded">
+                                        <h4 className="font-medium">In Progress</h4>
+                                        {user.projects?.filter(p => p.status === 'In Progress').map(p => (
+                                            <div key={p.name} className="mt-2">
+                                                <p>{p.name}</p>
+                                                <p>🗓️ {p.startDate} - {p.deadline}</p>
+                                                <button className="text-gray-500 cursor-not-allowed" disabled>📁 Download</button>
+                                            </div>
+                                        )) || <p>No projects.</p>}
+                                    </div>
+                                    <div className="flex-1 bg-gray-50 p-4 rounded">
+                                        <h4 className="font-medium">Awaiting Data</h4>
+                                        {user.projects?.filter(p => p.status === 'Awaiting Data').map(p => (
+                                            <div key={p.name} className="mt-2">
+                                                <p>{p.name}</p>
+                                                <p>🗓️ {p.startDate} - {p.deadline}</p>
+                                                <button className="text-gray-500 cursor-not-allowed" disabled>📁 Download</button>
+                                            </div>
+                                        )) || <p>No projects.</p>}
+                                    </div>
+                                    <div className="flex-1 bg-gray-50 p-4 rounded">
+                                        <h4 className="font-medium">Completed</h4>
+                                        {user.projects?.filter(p => p.status === 'Completed').map(p => (
+                                            <div key={p.name} className="mt-2">
+                                                <p>{p.name}</p>
+                                                <p>🗓️ {p.startDate} - {p.deadline}</p>
+                                                <button className="text-gray-500 cursor-not-allowed" disabled>📁 Download</button>
+                                            </div>
+                                        )) || <p>No projects.</p>}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 className="text-xl font-semibold mb-4">Analytics Summary</h3>
+                            {loading ? (
+                                <p>Loading analytics... <span className="loading-spinner"></span></p>
+                            ) : user.analytics?.length > 0 ? (
+                                <canvas ref={chartRef}></canvas>
+                            ) : (
+                                <p>No analytics available.</p>
+                            )}
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 className="text-xl font-semibold mb-4">Service Booking & History</h3>
+                            <button className="bg-gray-400 text-white p-2 rounded mb-4 cursor-not-allowed" disabled>
+                                Book a New Service
+                            </button>
+                            <div id="calendar"></div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 className="text-xl font-semibold mb-4">Support & Communication</h3>
+                            <button className="bg-gray-400 text-white p-2 rounded mb-2 w-full cursor-not-allowed" disabled>
+                                📬 Chat with Analyst
+                            </button>
+                            <button className="bg-gray-400 text-white p-2 rounded mb-2 w-full cursor-not-allowed" disabled>
+                                📂 Upload Datasets
+                            </button>
+                            <div>
+                                <h4 className="font-medium mb-2">Ticket History</h4>
+                                {loading ? (
+                                    <p>Loading tickets... <span className="loading-spinner"></span></p>
+                                ) : user.supportTickets?.length > 0 ? (
+                                    user.supportTickets.map(t => (
+                                        <p key={t.id}>{t.subject} - {t.status}</p>
+                                    ))
+                                ) : (
+                                    <p>No tickets.</p>
+                                )}
+                            </div>
+                            <button className="bg-gray-400 text-white p-2 rounded mt-2 w-full cursor-not-allowed" disabled>
+                                📞 Schedule Support Call
+                            </button>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 className="text-xl font-semibold mb-4">Billing & Invoices</h3>
+                            {loading ? (
+                                <p>Loading invoices... <span className="loading-spinner"></span></p>
+                            ) : user.invoices?.length > 0 ? (
+                                user.invoices.map(i => (
+                                    <div key={i.id} className="mb-2">
+                                        <p>{i.amount} - {i.date}</p>
+                                        <button className="bg-gray-400 text-white p-1 rounded cursor-not-allowed" disabled>
+                                            Download PDF
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>No invoices.</p>
+                            )}
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 className="text-xl font-semibold mb-4">Resource Center</h3>
+                            <p><a href="#" className="text-blue-500">What is Predictive Analytics?</a></p>
+                            <p><a href="#" className="text-blue-500">How to Interpret a Dashboard</a></p>
+                            <p><a href="#" className="text-blue-500">Video Tutorials</a></p>
+                            <p><a href="#" className="text-blue-500">Case Studies</a></p>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 className="text-xl font-semibold mb-4">Notifications</h3>
+                            {loading ? (
+                                <p>Loading notifications... <span className="loading-spinner"></span></p>
+                            ) : user.notifications?.length > 0 ? (
+                                user.notifications.map(n => (
+                                    <p key={n.date}>{n.message} - {n.date}</p>
+                                ))
+                            ) : (
+                                <p>No notifications.</p>
+                            )}
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 className="text-xl font-semibold mb-4">Profile & Preferences</h3>
+                            {loading ? (
+                                <p>Loading profile... <span className="loading-spinner"></span></p>
+                            ) : user.preferences ? (
+                                <div>
+                                    <p>Name: {user.preferences.name}</p>
+                                    <p>Email: {user.preferences.email}</p>
+                                    <p>Company: {user.preferences.company}</p>
+                                    <p>Notifications: {user.preferences.notificationChannels.join(', ')}</p>
+                                </div>
+                            ) : (
+                                <p>No profile data.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    <button
+                        onClick={onLogout}
+                        className="mt-6 mx-auto block bg-red-500 text-white p-3 rounded hover:bg-red-600"
+                    >
+                        Logout
+                    </button>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
 </html>
