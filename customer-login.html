@@ -37,6 +37,31 @@
         canvas {
             max-width: 100%;
         }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+        }
+        .chat-container {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -62,7 +87,7 @@
                 try {
                     const response = await axios.get(`${API_BASE_URL}/users/profile`, {
                         headers: { 'Authorization': `Bearer ${token}` },
-                        timeout: 10000 // 10s timeout
+                        timeout: 10000
                     });
                     setUser(response.data);
                 } catch (err) {
@@ -119,6 +144,7 @@
                     error={error}
                     chartRef={chartRef}
                     chartInstanceRef={chartInstanceRef}
+                    fetchUserData={fetchUserData}
                 />
             );
         };
@@ -172,14 +198,268 @@
             );
         };
 
-        const Dashboard = ({ user, onLogout, loading, error, chartRef, chartInstanceRef }) => {
+        const BookingModal = ({ isOpen, onClose, onSubmit, loading, error }) => {
+            const [date, setDate] = useState('');
+            const [time, setTime] = useState('');
+            const [service, setService] = useState('');
+
+            if (!isOpen) return null;
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onSubmit({ date, time, service });
+            };
+
+            return (
+                <div className="modal">
+                    <div className="modal-content">
+                        <h2 className="text-xl font-bold mb-4">Book a New Service</h2>
+                        {error && <p className="text-red-500 mb-4">{error}</p>}
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 mb-2">Date</label>
+                                <input
+                                    type="date"
+                                    className="w-full p-2 border rounded"
+                                    value={date}
+                                    onChange={(e) => setDate(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 mb-2">Time</label>
+                                <input
+                                    type="time"
+                                    className="w-full p-2 border rounded"
+                                    value={time}
+                                    onChange={(e) => setTime(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 mb-2">Service</label>
+                                <select
+                                    className="w-full p-2 border rounded"
+                                    value={service}
+                                    onChange={(e) => setService(e.target.value)}
+                                    required
+                                >
+                                    <option value="">Select a service</option>
+                                    <option value="Predictive Analytics">Predictive Analytics</option>
+                                    <option value="Data Visualization">Data Visualization</option>
+                                    <option value="Consultation">Consultation</option>
+                                </select>
+                            </div>
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="bg-gray-300 text-black p-2 rounded hover:bg-gray-400"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Booking...' : 'Book'}
+                                    {loading && <span className="loading-spinner"></span>}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        const ChatModal = ({ isOpen, onClose }) => {
+            const [messages, setMessages] = useState([]);
+            const [newMessage, setNewMessage] = useState('');
+
+            if (!isOpen) return null;
+
+            const handleSendMessage = (e) => {
+                e.preventDefault();
+                if (!newMessage.trim()) return;
+                setMessages([...messages, { text: newMessage, sender: 'user', timestamp: new Date().toLocaleTimeString() }]);
+                // Simulate analyst response
+                setTimeout(() => {
+                    setMessages(prev => [...prev, { text: 'Thanks for your message! An analyst will respond soon.', sender: 'analyst', timestamp: new Date().toLocaleTimeString() }]);
+                }, 1000);
+                setNewMessage('');
+            };
+
+            return (
+                <div className="modal">
+                    <div className="modal-content">
+                        <h2 className="text-xl font-bold mb-4">Chat with Analyst</h2>
+                        <div className="chat-container">
+                            {messages.map((msg, index) => (
+                                <div key={index} className={`mb-2 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
+                                    <p className={`inline-block p-2 rounded ${msg.sender === 'user' ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                                        {msg.text} <span className="text-xs text-gray-500">({msg.timestamp})</span>
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                        <form onSubmit={handleSendMessage}>
+                            <div className="flex space-x-2">
+                                <input
+                                    type="text"
+                                    className="w-full p-2 border rounded"
+                                    value={newMessage}
+                                    onChange={(e) => setNewMessage(e.target.value)}
+                                    placeholder="Type your message..."
+                                />
+                                <button
+                                    type="submit"
+                                    className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+                                >
+                                    Send
+                                </button>
+                            </div>
+                        </form>
+                        <button
+                            onClick={onClose}
+                            className="mt-4 bg-gray-300 text-black p-2 rounded hover:bg-gray-400 w-full"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const UploadModal = ({ isOpen, onClose }) => {
+            const [file, setFile] = useState(null);
+
+            if (!isOpen) return null;
+
+            const handleFileChange = (e) => {
+                setFile(e.target.files[0]);
+            };
+
+            const handleUpload = (e) => {
+                e.preventDefault();
+                if (!file) return;
+                // Simulate file upload
+                console.log('Uploading file:', file.name);
+                alert('File upload simulated! File: ' + file.name);
+                setFile(null);
+                onClose();
+            };
+
+            return (
+                <div className="modal">
+                    <div className="modal-content">
+                        <h2 className="text-xl font-bold mb-4">Upload Datasets</h2>
+                        <form onSubmit={handleUpload}>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 mb-2">Select File</label>
+                                <input
+                                    type="file"
+                                    className="w-full p-2 border rounded"
+                                    onChange={handleFileChange}
+                                />
+                            </div>
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="bg-gray-300 text-black p-2 rounded hover:bg-gray-400"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
+                                    disabled={!file}
+                                >
+                                    Upload
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        const ScheduleCallModal = ({ isOpen, onClose, onSubmit, loading, error }) => {
+            const [date, setDate] = useState('');
+            const [time, setTime] = useState('');
+
+            if (!isOpen) return null;
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onSubmit({ date, time, service: 'Support Call' });
+            };
+
+            return (
+                <div className="modal">
+                    <div className="modal-content">
+                        <h2 className="text-xl font-bold mb-4">Schedule Support Call</h2>
+                        {error && <p className="text-red-500 mb-4">{error}</p>}
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 mb-2">Date</label>
+                                <input
+                                    type="date"
+                                    className="w-full p-2 border rounded"
+                                    value={date}
+                                    onChange={(e) => setDate(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 mb-2">Time</label>
+                                <input
+                                    type="time"
+                                    className="w-full p-2 border rounded"
+                                    value={time}
+                                    onChange={(e) => setTime(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="bg-gray-300 text-black p-2 rounded hover:bg-gray-400"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Scheduling...' : 'Schedule'}
+                                    {loading && <span className="loading-spinner"></span>}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        const Dashboard = ({ user, onLogout, loading, error, chartRef, chartInstanceRef, fetchUserData }) => {
+            const [isBookingModalOpen, setBookingModalOpen] = useState(false);
+            const [isChatModalOpen, setChatModalOpen] = useState(false);
+            const [isUploadModalOpen, setUploadModalOpen] = useState(false);
+            const [isScheduleCallModalOpen, setScheduleCallModalOpen] = useState(false);
+            const [modalLoading, setModalLoading] = useState(false);
+            const [modalError, setModalError] = useState('');
+
             useEffect(() => {
                 const calendarEl = document.getElementById('calendar');
                 if (calendarEl) {
                     const calendar = new FullCalendar.Calendar(calendarEl, {
                         initialView: 'dayGridMonth',
                         events: user.bookings?.map(booking => ({
-                            title: booking.title,
+                            title: booking.service,
                             start: booking.date,
                             extendedProps: { status: booking.status }
                         })) || [],
@@ -200,7 +480,7 @@
                             labels: ['Accuracy', 'Revenue', 'Churn'],
                             datasets: [{
                                 label: 'KPIs',
-                                data: [93, 120000, 5], // Placeholder KPI data
+                                data: [93, 120000, 5],
                                 backgroundColor: 'rgba(54, 162, 235, 0.5)',
                                 borderColor: 'rgba(54, 162, 235, 1)',
                                 borderWidth: 1
@@ -218,6 +498,50 @@
                     }
                 };
             }, [user]);
+
+            const handleBookingSubmit = async ({ date, time, service }) => {
+                setModalLoading(true);
+                setModalError('');
+                try {
+                    await axios.post(`${API_BASE_URL}/bookings`, {
+                        name: user.name,
+                        email: user.preferences.email,
+                        date,
+                        time,
+                        service
+                    }, {
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    });
+                    setBookingModalOpen(false);
+                    fetchUserData(); // Refresh user data to update bookings
+                } catch (err) {
+                    setModalError(err.response?.data?.error || 'Failed to create booking.');
+                } finally {
+                    setModalLoading(false);
+                }
+            };
+
+            const handleScheduleCallSubmit = async ({ date, time, service }) => {
+                setModalLoading(true);
+                setModalError('');
+                try {
+                    await axios.post(`${API_BASE_URL}/bookings`, {
+                        name: user.name,
+                        email: user.preferences.email,
+                        date,
+                        time,
+                        service
+                    }, {
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    });
+                    setScheduleCallModalOpen(false);
+                    fetchUserData(); // Refresh user data to update bookings
+                } catch (err) {
+                    setModalError(err.response?.data?.error || 'Failed to schedule call.');
+                } finally {
+                    setModalLoading(false);
+                }
+            };
 
             return (
                 <div className="p-8 max-w-7xl mx-auto">
@@ -288,18 +612,34 @@
 
                         <div className="bg-white p-6 rounded-lg shadow-lg">
                             <h3 className="text-xl font-semibold mb-4">Service Booking & History</h3>
-                            <button className="bg-gray-400 text-white p-2 rounded mb-4 cursor-not-allowed" disabled>
+                            <button
+                                onClick={() => setBookingModalOpen(true)}
+                                className="bg-blue-500 text-white p-2 rounded mb-4 hover:bg-blue-600"
+                            >
                                 Book a New Service
                             </button>
                             <div id="calendar"></div>
+                            <BookingModal
+                                isOpen={isBookingModalOpen}
+                                onClose={() => setBookingModalOpen(false)}
+                                onSubmit={handleBookingSubmit}
+                                loading={modalLoading}
+                                error={modalError}
+                            />
                         </div>
 
                         <div className="bg-white p-6 rounded-lg shadow-lg">
                             <h3 className="text-xl font-semibold mb-4">Support & Communication</h3>
-                            <button className="bg-gray-400 text-white p-2 rounded mb-2 w-full cursor-not-allowed" disabled>
+                            <button
+                                onClick={() => setChatModalOpen(true)}
+                                className="bg-blue-500 text-white p-2 rounded mb-2 w-full hover:bg-blue-600"
+                            >
                                 📬 Chat with Analyst
                             </button>
-                            <button className="bg-gray-400 text-white p-2 rounded mb-2 w-full cursor-not-allowed" disabled>
+                            <button
+                                onClick={() => setUploadModalOpen(true)}
+                                className="bg-blue-500 text-white p-2 rounded mb-2 w-full hover:bg-blue-600"
+                            >
                                 📂 Upload Datasets
                             </button>
                             <div>
@@ -314,9 +654,27 @@
                                     <p>No tickets.</p>
                                 )}
                             </div>
-                            <button className="bg-gray-400 text-white p-2 rounded mt-2 w-full cursor-not-allowed" disabled>
+                            <button
+                                onClick={() => setScheduleCallModalOpen(true)}
+                                className="bg-blue-500 text-white p-2 rounded mt-2 w-full hover:bg-blue-600"
+                            >
                                 📞 Schedule Support Call
                             </button>
+                            <ChatModal
+                                isOpen={isChatModalOpen}
+                                onClose={() => setChatModalOpen(false)}
+                            />
+                            <UploadModal
+                                isOpen={isUploadModalOpen}
+                                onClose={() => setUploadModalOpen(false)}
+                            />
+                            <ScheduleCallModal
+                                isOpen={isScheduleCallModalOpen}
+                                onClose={() => setScheduleCallModalOpen(false)}
+                                onSubmit={handleScheduleCallSubmit}
+                                loading={modalLoading}
+                                error={modalError}
+                            />
                         </div>
 
                         <div className="bg-white p-6 rounded-lg shadow-lg">
