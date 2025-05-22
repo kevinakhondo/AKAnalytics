@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Login - A & K Analytics</title>
-    <meta name="description" content="Login to your A & K Analytics customer account to access exclusive services and manage bookings.">
+    <meta name="description" content="Login to your A & K Analytics customer account to access your personalized dashboard.">
     <meta name="keywords" content="customer login, A & K Analytics, data analytics">
     <meta name="robots" content="noindex, nofollow">
     <link rel="stylesheet" href="index.css">
@@ -65,32 +65,84 @@
         }
         .dashboard-container {
             padding: 40px;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
+            font-family: Arial, sans-serif;
+            display: none;
         }
-        .dashboard-container h2 {
-            font-size: 28px;
+        .dashboard-header {
+            text-align: center;
             margin-bottom: 20px;
-        }
-        .dashboard-container h3 {
-            font-size: 20px;
-            margin: 20px 0 10px;
             border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .dashboard-header h2 {
+            font-size: 28px;
+            margin: 0;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .dashboard-section {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .dashboard-section h3 {
+            font-size: 18px;
+            margin-top: 0;
+            border-bottom: 1px solid #ddd;
             padding-bottom: 5px;
+        }
+        .dashboard-item {
+            margin: 10px 0;
+        }
+        .dashboard-item button {
+            padding: 5px 10px;
+            margin-left: 10px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .dashboard-item button:hover {
+            background: #2980b9;
+        }
+        .dashboard-item .cancel-btn {
+            background: #e74c3c;
+        }
+        .dashboard-item .cancel-btn:hover {
+            background: #c0392b;
+        }
+        .dashboard-item button:disabled, .dashboard-item .disabled-btn {
+            background: #cccccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .dashboard-item button:disabled:hover, .dashboard-item .disabled-btn:hover {
+            background: #cccccc;
         }
         .logout-btn {
             display: block;
-            margin: 20px 0;
+            margin: 20px auto;
             padding: 10px 20px;
             background: #e74c3c;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            text-align: center;
         }
         .logout-btn:hover {
             background: #c0392b;
+        }
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -113,39 +165,64 @@
         </div>
     </div>
 
-    <div id="dashboard-container" class="dashboard-container" style="display: none;">
-        <h2>Welcome, <span id="customer-name"></span>!</h2>
-        <button class="logout-btn" onclick="logout()">Logout</button>
-        <div class="services-bookings">
-            <h3>Book Our Services</h3>
-            <div class="services-grid">
-                <div class="service-item">
-                    <p><i class="fas fa-cogs"></i> Predictive Analytics</p>
-                    <button onclick="window.location.href='book-online.html'" class="book-now-btn">Book Now</button>
-                </div>
-                <div class="service-item">
-                    <p><i class="fas fa-chart-bar"></i> Data Dashboards</p>
-                    <button onclick="window.location.href='book-online.html'" class="book-now-btn">Book Now</button>
+    <div id="dashboard-container" class="dashboard-container">
+        <div class="dashboard-header">
+            <h2>Hello, <span id="customer-name">User 👋</span></h2>
+            <p>Here's a quick look at your data journey!</p>
+        </div>
+        <div class="dashboard-grid">
+            <div class="dashboard-section">
+                <h3><i class="fas fa-chart-pie"></i> Your Projects</h3>
+                <div id="projects-list" class="dashboard-item">
+                    <p>Loading projects...</p>
                 </div>
             </div>
-            <h3>My Bookings</h3>
-            <div class="bookings-list">
-                <div class="booking-item">
-                    <p><i class="fas fa-check"></i> BI Consultation — May 25, 10 AM</p>
-                    <div class="booking-actions">
-                        <button onclick="window.location.href='book-online.html'" class="action-btn">Reschedule</button>
-                        <button onclick="cancelBooking('bi-consultation')" class="action-btn cancel-btn">Cancel</button>
-                    </div>
+            <div class="dashboard-section">
+                <h3><i class="fas fa-calendar"></i> Upcoming Bookings</h3>
+                <div id="bookings-list" class="dashboard-item">
+                    <p>Loading bookings...</p>
                 </div>
-                <div class="booking-item">
-                    <p><i class="fas fa-clock"></i> Dashboard Setup — Scheduled: May 30, 3 PM</p>
-                    <div class="booking-actions">
-                        <button onclick="window.location.href='book-online.html'" class="action-btn">Reschedule</button>
-                        <button onclick="cancelBooking('dashboard-setup')" class="action-btn cancel-btn">Cancel</button>
-                    </div>
+            </div>
+            <div class="dashboard-section">
+                <h3><i class="fas fa-chart-line"></i> Analytics Snapshot</h3>
+                <div id="analytics-list" class="dashboard-item">
+                    <p>Loading analytics...</p>
+                </div>
+            </div>
+            <div class="dashboard-section">
+                <h3><i class="fas fa-bell"></i> Notifications</h3>
+                <div id="notifications-list" class="dashboard-item">
+                    <p>Loading notifications...</p>
+                </div>
+            </div>
+            <div class="dashboard-section">
+                <h3><i class="fas fa-folder"></i> Files & Docs</h3>
+                <div id="files-list" class="dashboard-item">
+                    <button class="disabled-btn" disabled>Uploads / Deliverables</button>
+                </div>
+            </div>
+            <div class="dashboard-section">
+                <h3><i class="fas fa-comments"></i> Chat/Support</h3>
+                <div id="support-list" class="dashboard-item">
+                    <button class="disabled-btn" disabled>Contact Analyst</button>
+                </div>
+            </div>
+            <div class="dashboard-section">
+                <h3><i class="fas fa-credit-card"></i> Billing</h3>
+                <div id="billing-list" class="dashboard-item">
+                    <button class="disabled-btn" disabled>View Invoices</button>
+                    <button class="disabled-btn" disabled>Download Receipts</button>
+                </div>
+            </div>
+            <div class="dashboard-section">
+                <h3><i class="fas fa-book"></i> Resources</h3>
+                <div id="resources-list" class="dashboard-item">
+                    <p>- Forecasting 101</p>
+                    <p>- Data Viz Tips</p>
                 </div>
             </div>
         </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
     <script>
@@ -231,7 +308,48 @@
                     if (response.ok) {
                         loginContainer.style.display = 'none';
                         dashboardContainer.style.display = 'block';
-                        document.getElementById('customer-name').textContent = sanitizeInput(user.name);
+
+                        // Update greeting
+                        document.getElementById('customer-name').textContent = `${sanitizeInput(user.name)} 👋`;
+
+                        // Update projects
+                        const projectsList = document.getElementById('projects-list');
+                        if (user.projects && user.projects.length > 0) {
+                            projectsList.innerHTML = user.projects.map(p => `
+                                <p>${sanitizeInput(p.name)} <button class="disabled-btn" disabled>[${sanitizeInput(p.status)}]</button></p>
+                            `).join('');
+                        } else {
+                            projectsList.innerHTML = '<p>No projects available.</p>';
+                        }
+
+                        // Update bookings
+                        const bookingsList = document.getElementById('bookings-list');
+                        if (user.bookings && user.bookings.length > 0) {
+                            bookingsList.innerHTML = user.bookings.map(b => `
+                                <p>${sanitizeInput(b.title)} ${sanitizeInput(b.date)} 
+                                    <button class="disabled-btn" disabled>Reschedule</button> 
+                                    <button class="disabled-btn cancel-btn" disabled>Cancel</button>
+                                </p>
+                            `).join('');
+                        } else {
+                            bookingsList.innerHTML = '<p>No bookings scheduled.</p>';
+                        }
+
+                        // Update analytics
+                        const analyticsList = document.getElementById('analytics-list');
+                        if (user.analytics && user.analytics.length > 0) {
+                            analyticsList.innerHTML = user.analytics.map(a => `<p>- ${sanitizeInput(a)}</p>`).join('');
+                        } else {
+                            analyticsList.innerHTML = '<p>No analytics available.</p>';
+                        }
+
+                        // Update notifications
+                        const notificationsList = document.getElementById('notifications-list');
+                        if (user.notifications && user.notifications.length > 0) {
+                            notificationsList.innerHTML = user.notifications.map(n => `<p>- ${sanitizeInput(n)}</p>`).join('');
+                        } else {
+                            notificationsList.innerHTML = '<p>No notifications.</p>';
+                        }
                     } else {
                         localStorage.removeItem('token');
                         resetUI();
@@ -254,12 +372,6 @@
         function logout() {
             localStorage.removeItem('token');
             updateUI();
-            showError('Logged out successfully', 'green');
-        }
-
-        // Cancel booking (placeholder function)
-        function cancelBooking(bookingId) {
-            alert(`Cancel booking ${bookingId} functionality coming soon!`);
         }
 
         // Initialize page
