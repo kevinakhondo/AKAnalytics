@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - A & K Analytics</title>
+    <meta name="description" content="Admin dashboard for A & K Analytics to manage customer reviews, bookings, support tickets, and profiles.">
+    <meta name="keywords" content="admin dashboard, A & K Analytics, data analytics">
+    <meta name="robots" content="noindex, nofollow">
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.22.5/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.4.0/dist/axios.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .loading-spinner {
+            display: inline-block;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const API_BASE_URL = 'https://a-k-analytics-backend.onrender.com/api';
+
+        const App = () => {
+            const [token, setToken] = useState(localStorage.getItem('adminToken') || '');
+            const [user, setUser] = useState(null);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+
+            const fetchUserData = async () => {
+                if (!token) return;
+                setLoading(true);
+                setError('');
+                try {
+                    const response = await axios.get(`${API_BASE_URL}/users/profile`, {
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        timeout: 10000
+                    });
+                    setUser(response.data);
+                } catch (err) {
+                    console.error('Fetch user error:', err);
+                    setError(err.response?.data?.error || 'Failed to load data. Please try again.');
+                    setToken('');
+                    localStorage.removeItem('adminToken');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            useEffect(() => {
+                if (token) fetchUserData();
+            }, [token]);
+
+            const handleLogin = async (email, password) => {
+                setLoading(true);
+                setError('');
+                try {
+                    const response = await axios.post(`${API_BASE_URL}/users/login`, { email, password });
+                    const newToken = response.data.token;
+                    localStorage.setItem('adminToken', newToken);
+                    setToken(newToken);
+                } catch (err) {
+                    console.error('Login error:', err);
+                    setError(err.response?.data?.error || 'Login failed. Please try again.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handleLogout = () => {
+                setToken('');
+                setUser(null);
+                localStorage.removeItem('adminToken');
+            };
+
+            if (!token || !user) {
+                return (
+                    <LoginForm
+                        onLogin={handleLogin}
+                        error={error}
+                        loading={loading}
+                    />
+                );
+            }
+
+            return (
+                <AdminDashboard
+                    user={user}
+                    token={token}
+                    onLogout={handleLogout}
+                    loading={loading}
+                    error={error}
+                />
+            );
+        };
+
+        const LoginForm = ({ onLogin, error, loading }) => {
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onLogin(email, password);
+            };
+
+            return (
+                <div className="flex items-center justify-center min-h-screen bg-gray-100">
+                    <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+                        <h2 className="text-2xl font-bold text-center mb-6">Admin Login</h2>
+                        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 mb-2">Email</label>
+                                <input
+                                    type="email"
+                                    className="w-full p-2 border rounded"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-6">
+                                <label className="block text-gray-700 mb-2">Password</label>
+                                <input
+                                    type="password"
+                                    className="w-full p-2 border rounded"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
+                                disabled={loading}
+                            >
+                                {loading ? 'Logging in...' : 'Login'}
+                                {loading && <span className="loading-spinner"></span>}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        const AdminDashboard = ({ user, token, onLogout, loading, error }) => {
+            const [reviews, setReviews] = useState([]);
+            const [bookings, setBookings] = useState([]);
+            const [supportTickets, setSupportTickets] = useState([]);
+            const [users, setUsers] = useState([]);
+            const [selectedUser, setSelectedUser] = useState(null);
+            const [fetchLoading, setFetchLoading] = useState(false);
+            const [fetchError, setFetchError] = useState('');
+
+            const fetchData = async () => {
+                setFetchLoading(true);
+                setFetchError('');
+                try {
+                    const [reviewsRes, bookingsRes, ticketsRes, usersRes] = await Promise.all([
+                        axios.get(`${API_BASE_URL}/reviews/all`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                        axios.get(`${API_BASE_URL}/bookings`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                        axios.get(`${API_BASE_URL}/support-tickets`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                        axios.get(`${API_BASE_URL}/users`, { headers: { 'Authorization': `Bearer ${token}` } })
+                    ]);
+                    setReviews(reviewsRes.data);
+                    setBookings(bookingsRes.data);
+                    setSupportTickets(ticketsRes.data);
+                    setUsers(usersRes.data);
+                } catch (err) {
+                    setFetchError(err.response?.data?.error || 'Failed to load admin data.');
+                } finally {
+                    setFetchLoading(false);
+                }
+            };
+
+            useEffect(() => {
+                fetchData();
+            }, []);
+
+            const handleApproveReview = async (reviewId, approved) => {
+                try {
+                    await axios.patch(`${API_BASE_URL}/reviews/${reviewId}`, { approved }, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    setReviews(reviews.map(r => r._id === reviewId ? { ...r, approved } : r));
+                } catch (err) {
+                    setFetchError(err.response?.data?.error || 'Failed to update review.');
+                }
+            };
+
+            const handleUpdateBooking = async (bookingId, status) => {
+                try {
+                    await axios.patch(`${API_BASE_URL}/bookings/${bookingId}`, { status }, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    setBookings(bookings.map(b => b._id === bookingId ? { ...b, status } : b));
+                } catch (err) {
+                    setFetchError(err.response?.data?.error || 'Failed to update booking.');
+                }
+            };
+
+            const handleUpdateTicket = async (ticketId, status) => {
+                try {
+                    await axios.patch(`${API_BASE_URL}/support-tickets/${ticketId}`, { status }, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    setSupportTickets(tickets => tickets.map(t => t._id === ticketId ? { ...t, status } : t));
+                } catch (err) {
+                    setFetchError(err.response?.data?.error || 'Failed to update ticket.');
+                }
+            };
+
+            const handleViewUser = (user) => {
+                setSelectedUser(user);
+            };
+
+            const closeUserModal = () => {
+                setSelectedUser(null);
+            };
+
+            return (
+                <div className="p-8 max-w-7xl mx-auto">
+                    <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+                        <h2 className="text-2xl font-bold mb-2">Admin Dashboard - Welcome, {user.name} 👋</h2>
+                        <p>Email: {user.preferences.email}</p>
+                    </div>
+
+                    {fetchError && <p className="text-red-500 mb-4">{fetchError}</p>}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {/* Reviews Management */}
+                        <div className="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 className="text-xl font-semibold mb-4">Manage Reviews</h3>
+                            {fetchLoading ? (
+                                <p>Loading reviews... <span className="loading-spinner"></span></p>
+                            ) : reviews.length > 0 ? (
+                                reviews.map(review => (
+                                    <div key={review._id} className="mb-4 p-4 bg-gray-50 rounded">
+                                        <p><strong>{review.name}</strong> ({review.rating}/5)</p>
+                                        <p>{review.text}</p>
+                                        <p>Status: {review.approved ? 'Approved' : 'Pending'}</p>
+                                        <div className="mt-2 space-x-2">
+                                            {!review.approved && (
+                                                <button
+                                                    onClick={() => handleApproveReview(review._id, true)}
+                                                    className="bg-green-500 text-white p-1 rounded hover:bg-green-600"
+                                                >
+                                                    Approve
+                                                </button>
+                                            )}
+                                            {review.approved && (
+                                                <button
+                                                    onClick={() => handleApproveReview(review._id, false)}
+                                                    className="bg-red-500 text-white p-1 rounded hover:bg-red-600"
+                                                >
+                                                    Disapprove
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>No reviews available.</p>
+                            )}
+                        </div>
+
+                        {/* Bookings Management */}
+                        <div className="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 className="text-xl font-semibold mb-4">Manage Bookings</h3>
+                            {fetchLoading ? (
+                                <p>Loading bookings... <span className="loading-spinner"></span></p>
+                            ) : bookings.length > 0 ? (
+                                bookings.map(booking => (
+                                    <div key={booking._id} className="mb-4 p-4 bg-gray-50 rounded">
+                                        <p><strong>{booking.service}</strong> by {booking.name}</p>
+                                        <p>Date: {booking.date} at {booking.time}</p>
+                                        <p>Status: {booking.status}</p>
+                                        <div className="mt-2 space-x-2">
+                                            {booking.status !== 'Confirmed' && (
+                                                <button
+                                                    onClick={() => handleUpdateBooking(booking._id, 'Confirmed')}
+                                                    className="bg-green-500 text-white p-1 rounded hover:bg-green-600"
+                                                >
+                                                    Confirm
+                                                </button>
+                                            )}
+                                            {booking.status !== 'pending' && (
+                                                <button
+                                                    onClick={() => handleUpdateBooking(booking._id, 'pending')}
+                                                    className="bg-yellow-500 text-white p-1 rounded hover:bg-yellow-600"
+                                                >
+                                                    Set Pending
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>No bookings available.</p>
+                            )}
+                        </div>
+
+                        {/* Support Tickets Management */}
+                        <div className="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 className="text-xl font-semibold mb-4">Manage Support Tickets</h3>
+                            {fetchLoading ? (
+                                <p>Loading tickets... <span className="loading-spinner"></span></p>
+                            ) : supportTickets.length > 0 ? (
+                                supportTickets.map(ticket => (
+                                    <div key={ticket._id} className="mb-4 p-4 bg-gray-50 rounded">
+                                        <p><strong>{ticket.subject}</strong></p>
+                                        <p>User: {ticket.user?.name} ({ticket.user?.email})</p>
+                                        <p>Status: {ticket.status}</p>
+                                        <p>Created: {new Date(ticket.createdAt).toLocaleDateString()}</p>
+                                        <div className="mt-2 space-x-2">
+                                            {ticket.status === 'Open' && (
+                                                <button
+                                                    onClick={() => handleUpdateTicket(ticket._id, 'Closed')}
+                                                    className="bg-green-500 text-white p-1 rounded hover:bg-green-600"
+                                                >
+                                                    Mark as Closed
+                                                </button>
+                                            )}
+                                            {ticket.status === 'Closed' && (
+                                                <button
+                                                    onClick={() => handleUpdateTicket(ticket._id, 'Open')}
+                                                    className="bg-yellow-500 text-white p-1 rounded hover:bg-yellow-600"
+                                                >
+                                                    Reopen
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>No support tickets available.</p>
+                            )}
+                        </div>
+
+                        {/* Customer Management */}
+                        <div className="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 className="text-xl font-semibold mb-4">Customer Management</h3>
+                            {fetchLoading ? (
+                                <p>Loading users... <span className="loading-spinner"></span></p>
+                            ) : users.length > 0 ? (
+                                users.map(user => (
+                                    <div key={user._id} className="mb-4 p-4 bg-gray-50 rounded">
+                                        <p><strong>{user.name}</strong> ({user.email})</p>
+                                        <p>Company: {user.company || 'N/A'}</p>
+                                        <button
+                                            onClick={() => handleViewUser(user)}
+                                            className="mt-2 bg-blue-500 text-white p-1 rounded hover:bg-blue-600"
+                                        >
+                                            View Details
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>No users available.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* User Details Modal */}
+                    {selectedUser && (
+                        <div className="modal">
+                            <div className="modal-content">
+                                <h2 className="text-xl font-bold mb-4">{selectedUser.name}'s Details</h2>
+                                <div className="mb-4">
+                                    <h3 className="font-semibold">Profile</h3>
+                                    <p>Email: {selectedUser.email}</p>
+                                    <p>Company: {selectedUser.company || 'N/A'}</p>
+                                    <p>Profile Completion: {selectedUser.profileCompletion}%</p>
+                                    <p>Notifications: {selectedUser.notificationChannels.join(', ')}</p>
+                                </div>
+                                <div className="mb-4">
+                                    <h3 className="font-semibold">Projects</h3>
+                                    {selectedUser.projects?.length > 0 ? (
+                                        selectedUser.projects.map(project => (
+                                            <p key={project._id}>{project.name} - {project.status}</p>
+                                        ))
+                                    ) : (
+                                        <p>No projects.</p>
+                                    )}
+                                </div>
+                                <div className="mb-4">
+                                    <h3 className="font-semibold">Bookings</h3>
+                                    {selectedUser.bookings?.length > 0 ? (
+                                        selectedUser.bookings.map(booking => (
+                                            <p key={booking._id}>{booking.service} - {booking.date} ({booking.status})</p>
+                                        ))
+                                    ) : (
+                                        <p>No bookings.</p>
+                                    )}
+                                </div>
+                                <div className="mb-4">
+                                    <h3 className="font-semibold">Support Tickets</h3>
+                                    {selectedUser.supportTickets?.length > 0 ? (
+                                        selectedUser.supportTickets.map(ticket => (
+                                            <p key={ticket._id}>{ticket.subject} - {ticket.status}</p>
+                                        ))
+                                    ) : (
+                                        <p>No support tickets.</p>
+                                    )}
+                                </div>
+                                <div className="mb-4">
+                                    <h3 className="font-semibold">Invoices</h3>
+                                    {selectedUser.invoices?.length > 0 ? (
+                                        selectedUser.invoices.map(invoice => (
+                                            <p key={invoice._id}>{invoice.amount} - {invoice.date}</p>
+                                        ))
+                                    ) : (
+                                        <p>No invoices.</p>
+                                    )}
+                                </div>
+                                <div className="mb-4">
+                                    <h3 className="font-semibold">Notifications</h3>
+                                    {selectedUser.notifications?.length > 0 ? (
+                                        selectedUser.notifications.map(notification => (
+                                            <p key={notification._id}>{notification.message} - {notification.date}</p>
+                                        ))
+                                    ) : (
+                                        <p>No notifications.</p>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={closeUserModal}
+                                    className="bg-gray-300 text-black p-2 rounded hover:bg-gray-400 w-full"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    <button
+                        onClick={onLogout}
+                        className="mt-6 mx-auto block bg-red-500 text-white p-3 rounded hover:bg-red-600"
+                    >
+                        Logout
+                    </button>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
