@@ -3,74 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A & K Analytics - Customer Portal</title>
-    <meta name="robots" content="noindex, follow">
+    <title>Customer Login - A & K Analytics</title>
+    <meta name="description" content="Login to your A & K Analytics customer account to access exclusive services and manage bookings.">
+    <meta name="keywords" content="customer login, A & K Analytics, data analytics">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: #f4f4f4; color: #333; min-height: 100vh; display: flex; flex-direction: column; }
-        header { background: #2e6da4; color: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; width: 100%; top: 0; z-index: 100; }
-        header .logo { font-size: 18px; font-weight: bold; }
-        header .welcome { font-size: 14px; }
-        nav { width: 200px; background: #fff; position: fixed; top: 50px; bottom: 0; border-right: 2px solid #27ae60; padding-top: 10px; }
-        nav ul { list-style: none; }
-        nav ul li { padding: 10px 20px; }
-        nav ul li a { color: #333; text-decoration: none; display: flex; align-items: center; }
-        nav ul li a i { margin-right: 10px; }
-        nav ul li a.active { background: #e0f7fa; color: #27ae60; }
-        nav ul li a:hover { color: #27ae60; }
-        main { margin-left: 220px; padding: 70px 20px 20px; flex: 1; }
-        .login-section, .dashboard { background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 4px; }
-        .login-section h1 { font-size: 20px; margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; }
-        .form-group input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-        .login-btn { background: #2e6da4; color: #fff; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
-        .login-btn:hover { background: #245a8b; }
-        .error-message { color: #e74c3c; margin-bottom: 10px; display: none; }
-        .dashboard h2 { font-size: 20px; margin-bottom: 20px; }
-        .features-table, .services-grid, .bookings-list { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .features-table th, .features-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        .features-table th { background: #f5f5f5; }
-        .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .service-item { background: #f9f9f9; padding: 10px; text-align: center; }
-        .bookings-list .booking-item { padding: 10px; border-bottom: 1px solid #ddd; }
-        .bookings-list .booking-item:last-child { border-bottom: none; }
-        .book-now-btn, .action-btn { background: #27ae60; color: #fff; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; }
-        .book-now-btn:hover, .action-btn:hover { background: #219653; }
-        .cancel-btn { background: #e74c3c; }
-        .cancel-btn:hover { background: #c0392b; }
-        .logout-btn { background: #e74c3c; color: #fff; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px; }
-        .logout-btn:hover { background: #c0392b; }
-        footer { background: #000; color: #2e6da4; text-align: center; padding: 10px; margin-top: auto; }
-        footer a { color: #2e6da4; margin: 0 5px; text-decoration: none; }
-        #loading { text-align: center; padding: 20px; display: none; }
-        @media (max-width: 768px) {
-            nav { width: 100%; position: static; border-right: none; border-bottom: 2px solid #27ae60; }
-            main { margin-left: 0; padding-top: 50px; }
-            .services-grid { grid-template-columns: 1fr; }
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f5f5f5;
+        }
+        .login-form {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-form h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+        .login-form .form-group {
+            margin-bottom: 20px;
+        }
+        .login-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .login-form input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .login-form button {
+            width: 100%;
+            padding: 10px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .login-form button:hover {
+            background: #2980b9;
+        }
+        .error-message {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .dashboard-container {
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .dashboard-container h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        .dashboard-container h3 {
+            font-size: 20px;
+            margin: 20px 0 10px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .logout-btn {
+            display: block;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">Customer Portal</div>
-        <div class="welcome" id="welcome">Welcome</div>
-    </header>
-    <nav>
-        <ul>
-            <li><a href="#" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-            <li><a href="#"><i class="fas fa-user"></i> Profile</a></li>
-            <li><a href="#"><i class="fas fa-briefcase"></i> Vacancies</a></li>
-            <li><a href="#"><i class="fas fa-file-alt"></i> My Applications</a></li>
-            <li><a href="#"><i class="fas fa-lock"></i> Change Password</a></li>
-            <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
-        </ul>
-    </nav>
-    <main>
-        <section id="login-section" class="login-section">
-            <h1>Customer Login</h1>
-            <div class="error-message" style="display: none;"></div>
-            <form id="login-form" class="login-form">
+    <div id="login-container" class="login-container">
+        <div class="login-form">
+            <h2>Customer Login</h2>
+            <div class="error-message" style="display: none; color: red;"></div>
+            <form id="login-form">
                 <div class="form-group">
                     <label for="login-email">Email</label>
                     <input type="email" id="login-email" placeholder="Your Email" required>
@@ -79,85 +108,48 @@
                     <label for="login-password">Password</label>
                     <input type="password" id="login-password" placeholder="Password" required>
                 </div>
-                <button type="submit" class="login-btn">Login</button>
+                <button type="submit">Login</button>
             </form>
-            <p>Don't have an account? <a href="index.html#signup">Sign Up</a></p>
-        </section>
-        <section id="customer-dashboard" class="dashboard" style="display: none;">
-            <h2>Welcome, <span id="customer-name"></span>!</h2>
-            <div class="features-status">
-                <h3>Features</h3>
-                <table class="features-table">
-                    <thead>
-                        <tr>
-                            <th>Feature</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Customer login portal</td>
-                            <td><i class="fas fa-check-circle" style="color: #27ae60;"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Dashboard with analytics access</td>
-                            <td><i class="fas fa-check-circle" style="color: #27ae60;"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Book-a-service form</td>
-                            <td><i class="fas fa-check-circle" style="color: #27ae60;"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Email & SMS booking confirmation</td>
-                            <td><i class="fas fa-check-circle" style="color: #27ae60;"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Calendar view of bookings</td>
-                            <td><i class="fas fa-check-circle" style="color: #27ae60;"></i></td>
-                        </tr>
-                    </tbody>
-                </table>
+        </div>
+    </div>
+
+    <div id="dashboard-container" class="dashboard-container" style="display: none;">
+        <h2>Welcome, <span id="customer-name"></span>!</h2>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+        <div class="services-bookings">
+            <h3>Book Our Services</h3>
+            <div class="services-grid">
+                <div class="service-item">
+                    <p><i class="fas fa-cogs"></i> Predictive Analytics</p>
+                    <button onclick="window.location.href='book-online.html'" class="book-now-btn">Book Now</button>
+                </div>
+                <div class="service-item">
+                    <p><i class="fas fa-chart-bar"></i> Data Dashboards</p>
+                    <button onclick="window.location.href='book-online.html'" class="book-now-btn">Book Now</button>
+                </div>
             </div>
-            <div class="services-bookings">
-                <h3>Book Our Services</h3>
-                <div class="services-grid">
-                    <div class="service-item">
-                        <p><i class="fas fa-cogs"></i> Predictive Analytics</p>
-                        <button class="book-now-btn" onclick="window.location.href='book-online.html'">Book Now</button>
-                    </div>
-                    <div class="service-item">
-                        <p><i class="fas fa-chart-bar"></i> Data Dashboards</p>
-                        <button class="book-now-btn" onclick="window.location.href='book-online.html'">Book Now</button>
+            <h3>My Bookings</h3>
+            <div class="bookings-list">
+                <div class="booking-item">
+                    <p><i class="fas fa-check"></i> BI Consultation — May 25, 10 AM</p>
+                    <div class="booking-actions">
+                        <button onclick="window.location.href='book-online.html'" class="action-btn">Reschedule</button>
+                        <button onclick="cancelBooking('bi-consultation')" class="action-btn cancel-btn">Cancel</button>
                     </div>
                 </div>
-                <h3>My Bookings</h3>
-                <div class="bookings-list">
-                    <div class="booking-item">
-                        <p><i class="fas fa-check"></i> BI Consultation — May 25, 10 AM</p>
-                        <div class="booking-actions">
-                            <button class="action-btn reschedule-btn" onclick="window.location.href='book-online.html'">Reschedule</button>
-                            <button class="action-btn cancel-btn" onclick="alert('Cancel booking functionality coming soon!')">Cancel</button>
-                        </div>
-                    </div>
-                    <div class="booking-item">
-                        <p><i class="fas fa-clock"></i> Dashboard Setup — Scheduled: May 30, 3 PM</p>
-                        <div class="booking-actions">
-                            <button class="action-btn reschedule-btn" onclick="window.location.href='book-online.html'">Reschedule</button>
-                            <button class="action-btn cancel-btn" onclick="alert('Cancel booking functionality coming soon!')">Cancel</button>
-                        </div>
+                <div class="booking-item">
+                    <p><i class="fas fa-clock"></i> Dashboard Setup — Scheduled: May 30, 3 PM</p>
+                    <div class="booking-actions">
+                        <button onclick="window.location.href='book-online.html'" class="action-btn">Reschedule</button>
+                        <button onclick="cancelBooking('dashboard-setup')" class="action-btn cancel-btn">Cancel</button>
                     </div>
                 </div>
             </div>
-            <button class="logout-btn" onclick="logout()">Sign Out</button>
-        </section>
-    </main>
-    <div id="loading" style="display: none;">Loading...</div>
-    <footer>
-        <p>Copyright © 2025, A & K Analytics</p>
-        <p>Follow us on: <a href="#">f</a> <a href="#">in</a></p>
-    </footer>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+        </div>
+    </div>
+
     <script>
+        // Input sanitization (basic XSS prevention)
         function sanitizeInput(input) {
             if (typeof input !== 'string') return '';
             const div = document.createElement('div');
@@ -165,69 +157,34 @@
             return div.innerHTML;
         }
 
+        // Form validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
         function validateEmail(email) {
             return emailRegex.test(email);
         }
 
-        function showError(containerId, message, color = '#e74c3c') {
-            const container = document.getElementById(containerId);
-            const errorDiv = container.querySelector('.error-message') || document.createElement('div');
-            errorDiv.className = 'error-message';
+        // Show error message
+        function showError(message, color = 'red') {
+            const errorDiv = document.querySelector('.error-message');
             errorDiv.style.display = 'block';
             errorDiv.style.color = color;
             errorDiv.textContent = message;
-            if (!container.querySelector('.error-message')) container.prepend(errorDiv);
-            setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
         }
 
-        async function fetchUserProfile(token) {
-            try {
-                const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/profile', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const user = await response.json();
-                if (!response.ok) throw new Error(user.error || 'Failed to fetch profile');
-                return user;
-            } catch (error) {
-                console.error('Profile fetch error:', error);
-                return null;
-            }
-        }
-
-        async function updateUI(user) {
-            const loginSection = document.getElementById('login-section');
-            const customerDashboard = document.getElementById('customer-dashboard');
-            const welcomeMessage = document.getElementById('welcome');
-
-            if (user && user.name) {
-                const sanitizedName = sanitizeInput(user.name);
-                welcomeMessage.textContent = `Welcome, ${sanitizedName}`;
-                document.getElementById('customer-name').textContent = sanitizedName;
-                loginSection.style.display = 'none';
-                customerDashboard.style.display = 'block';
-            } else {
-                resetUI();
-            }
-        }
-
-        function resetUI() {
-            document.getElementById('welcome').textContent = 'Welcome';
-            document.getElementById('login-section').style.display = 'block';
-            document.getElementById('customer-dashboard').style.display = 'none';
-        }
-
+        // Handle login
         const loginForm = document.getElementById('login-form');
         if (loginForm) {
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                console.log('Login form submitted');
                 const emailInput = document.getElementById('login-email');
                 const passwordInput = document.getElementById('login-password');
 
                 if (!emailInput || !passwordInput) {
-                    showError('login-section', 'Form elements are missing. Please refresh the page.');
-                    console.error('Login form elements not found');
+                    showError('Form elements are missing. Please refresh the page.');
                     return;
                 }
 
@@ -235,14 +192,11 @@
                 const password = passwordInput.value;
 
                 if (!validateEmail(email)) {
-                    showError('login-section', 'Please enter a valid email address.');
-                    console.log('Invalid email:', email);
+                    showError('Please enter a valid email address.');
                     return;
                 }
 
-                document.getElementById('loading').style.display = 'block';
                 try {
-                    console.log('Sending login request to backend');
                     const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/login', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -253,33 +207,31 @@
                         throw new Error(data.error || 'Login failed');
                     }
                     localStorage.setItem('token', data.token);
-                    showError('login-section', 'Login successful!', '#27ae60');
+                    showError('Login successful!', 'green');
                     loginForm.reset();
-                    await updateUI(data.user);
+                    updateUI();
                 } catch (error) {
-                    showError('login-section', `Login failed: ${error.message || 'Please try again later.'}`);
-                    console.error('Login error:', error);
-                } finally {
-                    document.getElementById('loading').style.display = 'none';
+                    showError(`Login failed: ${error.message || 'Please try again later.'}`);
                 }
             });
         }
 
-        function logout() {
-            localStorage.removeItem('token');
-            showError('customer-dashboard', 'Logged out successfully', '#27ae60');
-            resetUI();
-            setTimeout(() => { window.location.href = 'index.html'; }, 1000);
-        }
-
-        window.onload = async () => {
+        // Update UI based on authentication
+        async function updateUI() {
             const token = localStorage.getItem('token');
+            const loginContainer = document.getElementById('login-container');
+            const dashboardContainer = document.getElementById('dashboard-container');
+
             if (token) {
-                document.getElementById('loading').style.display = 'block';
                 try {
-                    const user = await fetchUserProfile(token);
-                    if (user && user.email) {
-                        await updateUI(user);
+                    const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/profile', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const user = await response.json();
+                    if (response.ok) {
+                        loginContainer.style.display = 'none';
+                        dashboardContainer.style.display = 'block';
+                        document.getElementById('customer-name').textContent = sanitizeInput(user.name);
                     } else {
                         localStorage.removeItem('token');
                         resetUI();
@@ -287,12 +239,32 @@
                 } catch (error) {
                     localStorage.removeItem('token');
                     resetUI();
-                } finally {
-                    document.getElementById('loading').style.display = 'none';
                 }
             } else {
                 resetUI();
             }
+
+            function resetUI() {
+                loginContainer.style.display = 'flex';
+                dashboardContainer.style.display = 'none';
+            }
+        }
+
+        // Handle logout
+        function logout() {
+            localStorage.removeItem('token');
+            updateUI();
+            showError('Logged out successfully', 'green');
+        }
+
+        // Cancel booking (placeholder function)
+        function cancelBooking(bookingId) {
+            alert(`Cancel booking ${bookingId} functionality coming soon!`);
+        }
+
+        // Initialize page
+        window.onload = () => {
+            updateUI();
         };
     </script>
 </body>
