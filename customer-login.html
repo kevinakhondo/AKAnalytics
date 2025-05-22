@@ -65,31 +65,26 @@
         }
         .dashboard-container {
             padding: 40px;
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             font-family: Arial, sans-serif;
             display: none;
         }
-        .dashboard-header {
-            text-align: center;
+        .dashboard-header, .dashboard-section {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
             margin-bottom: 20px;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
         }
         .dashboard-header h2 {
             font-size: 28px;
-            margin: 0;
+            margin: 0 0 10px;
         }
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
-        }
-        .dashboard-section {
-            background: white;
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 5px;
         }
         .dashboard-section h3 {
             font-size: 18px;
@@ -126,6 +121,35 @@
         .dashboard-item button:disabled:hover, .dashboard-item .disabled-btn:hover {
             background: #cccccc;
         }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background: #3498db;
+            text-align: center;
+            color: white;
+            line-height: 20px;
+        }
+        .kanban-board {
+            display: flex;
+            gap: 10px;
+        }
+        .kanban-column {
+            flex: 1;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        iframe {
+            width: 100%;
+            height: 300px;
+            border: none;
+        }
         .logout-btn {
             display: block;
             margin: 20px auto;
@@ -142,6 +166,9 @@
         @media (max-width: 768px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
+            }
+            .kanban-board {
+                flex-direction: column;
             }
         }
     </style>
@@ -167,58 +194,78 @@
 
     <div id="dashboard-container" class="dashboard-container">
         <div class="dashboard-header">
-            <h2>Hello, <span id="customer-name">User 👋</span></h2>
-            <p>Here's a quick look at your data journey!</p>
+            <h2>Personalized Welcome Panel</h2>
+            <p id="welcome-summary">Loading summary...</p>
+            <div>Profile Completion: <span id="profile-completion">0%</span></div>
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress" style="width: 0%;">0%</div>
+            </div>
         </div>
         <div class="dashboard-grid">
             <div class="dashboard-section">
-                <h3><i class="fas fa-chart-pie"></i> Your Projects</h3>
-                <div id="projects-list" class="dashboard-item">
-                    <p>Loading projects...</p>
+                <h3>Current Projects & Status Tracker</h3>
+                <div id="projects-tracker" class="kanban-board">
+                    <div class="kanban-column" id="in-progress-column">
+                        <h4>In Progress</h4>
+                        <div id="in-progress-projects"></div>
+                    </div>
+                    <div class="kanban-column" id="awaiting-column">
+                        <h4>Awaiting Data</h4>
+                        <div id="awaiting-projects"></div>
+                    </div>
+                    <div class="kanban-column" id="completed-column">
+                        <h4>Completed</h4>
+                        <div id="completed-projects"></div>
+                    </div>
                 </div>
             </div>
             <div class="dashboard-section">
-                <h3><i class="fas fa-calendar"></i> Upcoming Bookings</h3>
+                <h3>Interactive Analytics Preview</h3>
+                <div id="analytics-preview" class="dashboard-item">
+                    <p>Loading previews...</p>
+                </div>
+            </div>
+            <div class="dashboard-section">
+                <h3>Service Booking & History</h3>
                 <div id="bookings-list" class="dashboard-item">
+                    <button class="disabled-btn" disabled>Book a New Service</button>
                     <p>Loading bookings...</p>
                 </div>
             </div>
             <div class="dashboard-section">
-                <h3><i class="fas fa-chart-line"></i> Analytics Snapshot</h3>
-                <div id="analytics-list" class="dashboard-item">
-                    <p>Loading analytics...</p>
+                <h3>Support & Communication Panel</h3>
+                <div id="support-panel" class="dashboard-item">
+                    <button class="disabled-btn" disabled>📬 Chat with Analyst</button>
+                    <button class="disabled-btn" disabled>📂 Upload Datasets</button>
+                    <div id="ticket-history">Loading ticket history...</div>
+                    <button class="disabled-btn" disabled>📞 Schedule Support Call</button>
                 </div>
             </div>
             <div class="dashboard-section">
-                <h3><i class="fas fa-bell"></i> Notifications</h3>
-                <div id="notifications-list" class="dashboard-item">
+                <h3>Billing & Invoices</h3>
+                <div id="billing-panel" class="dashboard-item">
+                    <p>Loading invoices...</p>
+                </div>
+            </div>
+            <div class="dashboard-section">
+                <h3>Resource Center</h3>
+                <div id="resources-list" class="dashboard-item">
+                    <p>- <a href="#">What is Predictive Analytics?</a></p>
+                    <p>- <a href="#">How to Interpret a Dashboard</a></p>
+                    <p>- <a href="#">Video Tutorials</a></p>
+                    <p>- <a href="#">Case Studies</a></p>
+                </div>
+            </div>
+            <div class="dashboard-section">
+                <h3>Notifications Panel</h3>
+                <div id="notifications-panel" class="dashboard-item">
                     <p>Loading notifications...</p>
                 </div>
             </div>
             <div class="dashboard-section">
-                <h3><i class="fas fa-folder"></i> Files & Docs</h3>
-                <div id="files-list" class="dashboard-item">
-                    <button class="disabled-btn" disabled>Uploads / Deliverables</button>
-                </div>
-            </div>
-            <div class="dashboard-section">
-                <h3><i class="fas fa-comments"></i> Chat/Support</h3>
-                <div id="support-list" class="dashboard-item">
-                    <button class="disabled-btn" disabled>Contact Analyst</button>
-                </div>
-            </div>
-            <div class="dashboard-section">
-                <h3><i class="fas fa-credit-card"></i> Billing</h3>
-                <div id="billing-list" class="dashboard-item">
-                    <button class="disabled-btn" disabled>View Invoices</button>
-                    <button class="disabled-btn" disabled>Download Receipts</button>
-                </div>
-            </div>
-            <div class="dashboard-section">
-                <h3><i class="fas fa-book"></i> Resources</h3>
-                <div id="resources-list" class="dashboard-item">
-                    <p>- Forecasting 101</p>
-                    <p>- Data Viz Tips</p>
+                <h3>Profile & Preferences</h3>
+                <div id="profile-panel" class="dashboard-item">
+                    <p>Loading profile...</p>
                 </div>
             </div>
         </div>
@@ -226,7 +273,7 @@
     </div>
 
     <script>
-        // Input sanitization (basic XSS prevention)
+        // Input sanitization
         function sanitizeInput(input) {
             if (typeof input !== 'string') return '';
             const div = document.createElement('div');
@@ -309,46 +356,106 @@
                         loginContainer.style.display = 'none';
                         dashboardContainer.style.display = 'block';
 
-                        // Update greeting
+                        // Personalized Welcome Panel
                         document.getElementById('customer-name').textContent = `${sanitizeInput(user.name)} 👋`;
+                        document.getElementById('welcome-summary').textContent = `Welcome back! Your profile is tailored to your data journey.`;
+                        const completion = user.profileCompletion || 0;
+                        const progressFill = document.getElementById('progress-fill');
+                        progressFill.style.width = `${completion}%`;
+                        progressFill.textContent = `${completion}%`;
+                        document.getElementById('profile-completion').textContent = `${completion}%`;
 
-                        // Update projects
-                        const projectsList = document.getElementById('projects-list');
+                        // Current Projects & Status Tracker
+                        const projectsTracker = {
+                            'in-progress': document.getElementById('in-progress-projects'),
+                            'awaiting': document.getElementById('awaiting-projects'),
+                            'completed': document.getElementById('completed-projects')
+                        };
+                        Object.keys(projectsTracker).forEach(status => projectsTracker[status].innerHTML = '');
                         if (user.projects && user.projects.length > 0) {
-                            projectsList.innerHTML = user.projects.map(p => `
-                                <p>${sanitizeInput(p.name)} <button class="disabled-btn" disabled>[${sanitizeInput(p.status)}]</button></p>
-                            `).join('');
+                            user.projects.forEach(p => {
+                                const column = projectsTracker[p.status.toLowerCase().replace(' ', '-')];
+                                if (column) {
+                                    column.innerHTML += `
+                                        <p>${sanitizeInput(p.name)}<br>
+                                        🗓️ ${sanitizeInput(p.startDate)} - ${sanitizeInput(p.deadline)}<br>
+                                        ⏳ ${sanitizeInput(p.status)}<br>
+                                        <button class="disabled-btn" disabled>📁 Download Deliverables</button></p>
+                                    `;
+                                }
+                            });
                         } else {
-                            projectsList.innerHTML = '<p>No projects available.</p>';
+                            Object.values(projectsTracker).forEach(el => el.innerHTML = '<p>No projects available.</p>');
                         }
 
-                        // Update bookings
+                        // Interactive Analytics Preview
+                        const analyticsPreview = document.getElementById('analytics-preview');
+                        if (user.analytics && user.analytics.length > 0) {
+                            analyticsPreview.innerHTML = user.analytics.map(a => `
+                                <div><h4>${sanitizeInput(a.title)}</h4>
+                                <iframe src="${sanitizeInput(a.previewUrl)}"></iframe>
+                                <p>${sanitizeInput(a.kpis)}</p></div>
+                            `).join('');
+                        } else {
+                            analyticsPreview.innerHTML = '<p>No analytics previews available.</p>';
+                        }
+
+                        // Service Booking & History
                         const bookingsList = document.getElementById('bookings-list');
                         if (user.bookings && user.bookings.length > 0) {
                             bookingsList.innerHTML = user.bookings.map(b => `
-                                <p>${sanitizeInput(b.title)} ${sanitizeInput(b.date)} 
-                                    <button class="disabled-btn" disabled>Reschedule</button> 
-                                    <button class="disabled-btn cancel-btn" disabled>Cancel</button>
-                                </p>
+                                <p>${sanitizeInput(b.title)} - ${sanitizeInput(b.date)}<br>
+                                Status: ${sanitizeInput(b.status)}
+                                <button class="disabled-btn" disabled>Reschedule</button>
+                                <button class="disabled-btn cancel-btn" disabled>Cancel</button></p>
                             `).join('');
                         } else {
-                            bookingsList.innerHTML = '<p>No bookings scheduled.</p>';
+                            bookingsList.innerHTML = '<p>No bookings available.</p>';
                         }
 
-                        // Update analytics
-                        const analyticsList = document.getElementById('analytics-list');
-                        if (user.analytics && user.analytics.length > 0) {
-                            analyticsList.innerHTML = user.analytics.map(a => `<p>- ${sanitizeInput(a)}</p>`).join('');
+                        // Support & Communication Panel
+                        const supportPanel = document.getElementById('support-panel');
+                        const ticketHistory = document.getElementById('ticket-history');
+                        if (user.supportTickets && user.supportTickets.length > 0) {
+                            ticketHistory.innerHTML = user.supportTickets.map(t => `
+                                <p>${sanitizeInput(t.subject)} - ${sanitizeInput(t.status)}</p>
+                            `).join('');
                         } else {
-                            analyticsList.innerHTML = '<p>No analytics available.</p>';
+                            ticketHistory.innerHTML = '<p>No ticket history available.</p>';
                         }
 
-                        // Update notifications
-                        const notificationsList = document.getElementById('notifications-list');
+                        // Billing & Invoices
+                        const billingPanel = document.getElementById('billing-panel');
+                        if (user.invoices && user.invoices.length > 0) {
+                            billingPanel.innerHTML = user.invoices.map(i => `
+                                <p>${sanitizeInput(i.amount)} - ${sanitizeInput(i.date)}
+                                <button class="disabled-btn" disabled>Download PDF</button></p>
+                            `).join('');
+                        } else {
+                            billingPanel.innerHTML = '<p>No invoices available.</p>';
+                        }
+
+                        // Notifications Panel
+                        const notificationsPanel = document.getElementById('notifications-panel');
                         if (user.notifications && user.notifications.length > 0) {
-                            notificationsList.innerHTML = user.notifications.map(n => `<p>- ${sanitizeInput(n)}</p>`).join('');
+                            notificationsPanel.innerHTML = user.notifications.map(n => `
+                                <p>${sanitizeInput(n.message)} - ${sanitizeInput(n.date)}</p>
+                            `).join('');
                         } else {
-                            notificationsList.innerHTML = '<p>No notifications.</p>';
+                            notificationsPanel.innerHTML = '<p>No notifications available.</p>';
+                        }
+
+                        // Profile & Preferences
+                        const profilePanel = document.getElementById('profile-panel');
+                        if (user.preferences) {
+                            profilePanel.innerHTML = `
+                                <p>Name: ${sanitizeInput(user.preferences.name)}<br>
+                                Email: ${sanitizeInput(user.preferences.email)}<br>
+                                Company: ${sanitizeInput(user.preferences.company)}</p>
+                                <p>Notification Channels: ${sanitizeInput(user.preferences.notificationChannels.join(', '))}</p>
+                            `;
+                        } else {
+                            profilePanel.innerHTML = '<p>No profile data available.</p>';
                         }
                     } else {
                         localStorage.removeItem('token');
