@@ -1251,7 +1251,7 @@ nav ul li a:hover::after {
 /* Responsive Design for Phones */
 @media (max-width: 480px) {
     body {
-        padding-top: 150px;
+        padding-top: 200px;
     }
 
     header {
