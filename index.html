@@ -172,35 +172,66 @@
 
     <section id="customer-dashboard" class="dashboard customer-dashboard" style="display: none;">
         <h2>Welcome, <span id="customer-name"></span>!</h2>
-        <div class="profile">
-            <p><strong>Name:</strong> <span id="customer-name-profile"></span></p>
-            <p><strong>Email:</strong> <span id="customer-email"></span></p>
+        <div class="features-status">
+            <h3>Features</h3>
+            <table class="features-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Customer login portal</td>
+                        <td><i class="fas fa-check-circle" style="color: green;"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Dashboard with analytics access</td>
+                        <td><i class="fas fa-check-circle" style="color: green;"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Book-a-service form</td>
+                        <td><i class="fas fa-check-circle" style="color: green;"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Email & SMS booking confirmation</td>
+                        <td><i class="fas fa-check-circle" style="color: green;"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Calendar view of bookings</td>
+                        <td><i class="fas fa-check-circle" style="color: green;"></i></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="activity">
-            <h3>Your Recent Activities</h3>
-            <div class="activity-grid" id="customer-reviews"></div>
-        </div>
-        <div class="cta">
-            <a href="book-online.html">Book a Consultation</a>
-        </div>
-        <div class="progress">
-            <h3>Consultation Progress</h3>
-            <div class="progress-timeline" id="consultation-progress">
-                <div class="progress-step" data-step="booked">
-                    <div class="step-circle">1</div>
-                    <div class="step-label">Booked</div>
+        <div class="services-bookings">
+            <h3>Book Our Services</h3>
+            <div class="services-grid">
+                <div class="service-item">
+                    <p><i class="fas fa-cogs"></i> Predictive Analytics</p>
+                    <button onclick="window.location.href='book-online.html'" class="book-now-btn">Book Now</button>
                 </div>
-                <div class="progress-step" data-step="confirmed">
-                    <div class="step-circle">2</div>
-                    <div class="step-label">Confirmed</div>
+                <div class="service-item">
+                    <p><i class="fas fa-chart-bar"></i> Data Dashboards</p>
+                    <button onclick="window.location.href='book-online.html'" class="book-now-btn">Book Now</button>
                 </div>
-                <div class="progress-step" data-step="in-progress">
-                    <div class="step-circle">3</div>
-                    <div class="step-label">In Progress</div>
+            </div>
+            <h3>My Bookings</h3>
+            <div class="bookings-list">
+                <div class="booking-item">
+                    <p><i class="fas fa-check"></i> BI Consultation — May 25, 10 AM</p>
+                    <div class="booking-actions">
+                        <button onclick="window.location.href='book-online.html'" class="action-btn">Reschedule</button>
+                        <button onclick="cancelBooking('bi-consultation')" class="action-btn cancel-btn">Cancel</button>
+                    </div>
                 </div>
-                <div class="progress-step" data-step="completed">
-                    <div class="step-circle">4</div>
-                    <div class="step-label">Completed</div>
+                <div class="booking-item">
+                    <p><i class="fas fa-clock"></i> Dashboard Setup — Scheduled: May 30, 3 PM</p>
+                    <div class="booking-actions">
+                        <button onclick="window.location.href='book-online.html'" class="action-btn">Reschedule</button>
+                        <button onclick="cancelBooking('dashboard-setup')" class="action-btn cancel-btn">Cancel</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -624,6 +655,11 @@
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
+        }
+
+        // Cancel booking (placeholder function)
+        function cancelBooking(bookingId) {
+            alert(`Cancel booking ${bookingId} functionality coming soon!`);
         }
 
         // Update UI based on user authentication and role
