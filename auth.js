@@ -41,9 +41,9 @@ async function fetchUserProfile(token) {
     }
 }
 
-// Check if user is admin (replace with role check if available)
+// Check if user is admin (role-based check)
 function isAdmin(user) {
-    return user.email === 'kevinakhondo9@gmail.com';
+    return user.role === 'admin';
 }
 
 // Login function
