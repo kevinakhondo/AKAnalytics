@@ -12,6 +12,45 @@ function sanitizeInput(input) {
 function getToken() {
     return localStorage.getItem('token');
 }
+export function getToken() {
+    return localStorage.getItem('token');
+}
+
+export function setToken(token) {
+    localStorage.setItem('token', token);
+}
+
+export function removeToken() {
+    localStorage.removeItem('token');
+}
+
+export async function fetchUserProfile(token) {
+    const response = await fetch('https://a-k-analytics-backend.onrender.com/api/users/profile', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch profile');
+    return response.json();
+}
+
+export function isAdmin(user) {
+    return user.role === 'admin' || user.email === 'kevinakhondo9@gmail.com';
+}
+
+export function sanitizeInput(input) {
+    const div = document.createElement('div');
+    div.textContent = input;
+    return div.innerHTML;
+}
+
+export function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+export function validatePassword(password) {
+    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    return re.test(password);
+}
 
 // Store token in localStorage
 function setToken(token) {
