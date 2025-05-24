@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - A & K Analytics</title>
+    <meta name="description" content="Log in to access your A & K Analytics portal for data-driven solutions.">
+    <meta name="keywords" content="login, A & K Analytics, data analytics, business intelligence">
+    <meta name="robots" content="noindex, follow">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module" src="auth.js"></script>
+    <style>
+        .error { color: red; display: none; margin-bottom: 10px; text-align: center; }
+        .submit-btn { background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.25rem; width: 100%; }
+        .submit-btn:hover { background-color: #1e40af; }
+    </style>
+</head>
+<body>
+    <section class="hero-section">
+        <header>
+            <div class="logo">
+                A & K Analytics
+                <span>Data Solutions</span>
+            </div>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="about.html" class="nav-link">About</a></li>
+                    <li><a href="industries.html" class="nav-link">Industries</a></li>
+                    <li><a href="insights.html" class="nav-link">Insights</a></li>
+                    <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+                    <li><a href="blog.html" class="nav-link">Blog</a></li>
+                    <li><a href="book-online.html" class="nav-link">Book Online</a></li>
+                </ul>
+            </nav>
+        </header>
+    </section>
+    <div class="container mx-auto p-6 max-w-md">
+        <h1 class="text-3xl font-bold mb-6 text-center">Login</h1>
+        <div id="loading" style="display: none; text-align: center; padding: 20px;">
+            <p>Loading...</p>
+        </div>
+        <form id="login-form" class="bg-white p-6 rounded shadow-md">
+            <div class="form-group mb-4">
+                <label for="login-email" class="block text-gray-700">Email</label>
+                <input type="email" id="login-email" class="w-full p-2 border rounded" placeholder="Your Email" required>
+            </div>
+            <div class="form-group mb-4">
+                <label for="login-password" class="block text-gray-700">Password</label>
+                <input type="password" id="login-password" class="w-full p-2 border rounded" placeholder="Password" required>
+            </div>
+            <div class="error" id="error-message"></div>
+            <button type="submit" class="submit-btn">Login</button>
+        </form>
+        <p class="mt-4 text-center">Don't have an account? <a href="signup.html" class="text-blue-600 hover:underline">Sign Up</a></p>
+    </div>
+    <footer class="footer-section">
+        <div class="footer-content">
+            <div class="footer-logo">
+                A & K Analytics
+                <span>Data Solutions</span>
+            </div>
+            <nav class="footer-nav">
+                <ul>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="industries.html">Industries</a></li>
+                    <li><a href="insights.html">Insights</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="book-online.html">Book Online</a></li>
+                </ul>
+            </nav>
+            <div class="footer-social">
+                <a href="https://facebook.com/akanalytics" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com/akanalytics" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://linkedin.com/company/akanalytics" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://instagram.com/akanalytics" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+            <div class="footer-copyright">
+                <p>© 2025 A & K Analytics. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script type="module">
+        import { setToken, validateEmail, sanitizeInput } from '/auth.js';
+
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = sanitizeInput(document.getElementById('login-email').value);
+                const password = document.getElementById('login-password').value;
+                if (!validateEmail(email)) {
+                    document.getElementById('error-message').style.display = 'block';
+                    document.getElementById('error-message').textContent = 'Please enter a valid email address.';
+                    return;
+                }
+                document.getElementById('loading').style.display = 'block';
+                try {
+                    const response = await axios.post('https://a-k-analytics-backend.onrender.com/api/users/login', {
+                        email,
+                        password
+                    });
+                    setToken(response.data.token);
+                    const role = response.data.role;
+                    document.getElementById('loading').style.display = 'none';
+                    window.location.href = role === 'admin' ? 'admin-portal.html' : 'customer-portal.html';
+                } catch (error) {
+                    document.getElementById('error-message').style.display = 'block';
+                    document.getElementById('error-message').textContent = error.response?.data?.error || 'Login failed. Please try again.';
+                    document.getElementById('loading').style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
