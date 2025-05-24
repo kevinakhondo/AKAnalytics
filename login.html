@@ -84,7 +84,7 @@
         </div>
     </footer>
     <script type="module">
-        import { setToken, validateEmail, sanitizeInput } from '/auth.js';
+        import { setToken, validateEmail, sanitizeInput, login, isAdmin, fetchUserProfile } from '/auth.js';
 
         const loginForm = document.getElementById('login-form');
         if (loginForm) {
@@ -99,17 +99,14 @@
                 }
                 document.getElementById('loading').style.display = 'block';
                 try {
-                    const response = await axios.post('https://a-k-analytics-backend.onrender.com/api/users/login', {
-                        email,
-                        password
-                    });
-                    setToken(response.data.token);
-                    const role = response.data.role;
+                    const token = await login(email, password);
+                    setToken(token);
+                    const user = await fetchUserProfile(token);
                     document.getElementById('loading').style.display = 'none';
-                    window.location.href = role === 'admin' ? 'admin-portal.html' : 'customer-portal.html';
+                    window.location.href = isAdmin(user) ? 'admin-portal.html' : 'customer-portal.html';
                 } catch (error) {
                     document.getElementById('error-message').style.display = 'block';
-                    document.getElementById('error-message').textContent = error.response?.data?.error || 'Login failed. Please try again.';
+                    document.getElementById('error-message').textContent = error.message || 'Login failed. Please try again.';
                     document.getElementById('loading').style.display = 'none';
                 }
             });

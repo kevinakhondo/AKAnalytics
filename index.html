@@ -115,7 +115,7 @@
                 <p>Loading reviews...</p>
             </div>
             <div class="text-center mt-6">
-                <p>Want to share your experience? <a href="customer-portal.html" class="text-blue-600 hover:underline">Submit a review</a> in your portal.</p>
+                <p>Want to share your experience? <a href="customer-portal.html" class="text-blue-600 hover:underline">Submit a review</a> in your portal. </p>
             </div>
         </section>
 
@@ -381,9 +381,17 @@
             }
         });
 
+        // Debug link clicks
+        document.getElementById('signup-link').addEventListener('click', () => {
+            console.log('Sign Up link clicked');
+        });
+        document.getElementById('login-link').addEventListener('click', () => {
+            console.log('Login link clicked');
+        });
+
         // Initialize page
         window.onload = () => {
-            updateUI();
+            // updateUI(); // Temporarily disabled for testing
             handleVerification();
             displayReviews();
             document.querySelector('.footer-copyright p').textContent = `© ${new Date().getFullYear()} A & K Analytics. All rights reserved.`;
