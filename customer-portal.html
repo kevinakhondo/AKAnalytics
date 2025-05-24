@@ -8,13 +8,14 @@
     <meta name="robots" content="noindex, nofollow">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.development.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.production.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.5.0/dist/socket.io.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/babel-standalone@6/babel.min.js"></script>
-    <script src="https://cdn.calendly.com/1.13.0/calendly.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.calendly.com/1.13.0/calendly.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"></script>
+    <script src="https://assets.calendly.com/assets/external/widget.js"></script>
+    <link rel="stylesheet" href="https://assets.calendly.com/assets/external/widget.css">
+    <script type="module" src="auth.js"></script>
     <style>
         .hero-section { background: linear-gradient(to right, #2563eb, #1e40af); color: white; padding: 2rem; }
         .logo { font-size: 1.5rem; font-weight: bold; }
@@ -43,18 +44,28 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // Utility functions (from auth.js equivalent)
-        const getToken = () => localStorage.getItem('token');
-        const setToken = (token) => localStorage.setItem('token', token);
-        const removeToken = () => localStorage.removeItem('token');
-        const getUserId = () => localStorage.getItem('userId');
-        const setUserId = (id) => localStorage.setItem('userId', id);
-        const sanitizeInput = (input) => {
-            const div = document.createElement('div');
-            div.textContent = input;
-            return div.innerHTML;
-        };
-        const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        // Import auth utilities
+        import { getToken, setToken, removeToken, sanitizeInput, validateEmail, fetchUserProfile } from '/auth.js';
+
+        // Error Boundary Component
+        class ErrorBoundary extends React.Component {
+            state = { hasError: false, errorMessage: '' };
+            static getDerivedStateFromError(error) {
+                return { hasError: true, errorMessage: error.message };
+            }
+            render() {
+                if (this.state.hasError) {
+                    return (
+                        <div className="container mx-auto p-6">
+                            <h1 className="text-2xl font-bold text-red-600">Something went wrong</h1>
+                            <p>{this.state.errorMessage}</p>
+                            <p>Please try refreshing the page or <a href="login.html" className="text-blue-600">log in again</a>.</p>
+                        </div>
+                    );
+                }
+                return this.props.children;
+            }
+        }
 
         // Main App Component
         const CustomerPortal = () => {
@@ -74,14 +85,16 @@
 
             const fetchProfile = async (token) => {
                 try {
-                    const response = await axios.get('https://a-k-analytics-backend.onrender.com/api/users/profile', {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
-                    setUser(response.data);
-                    setUserId(response.data._id);
+                    const userData = await fetchUserProfile(token);
+                    setUser(userData);
+                    localStorage.setItem('userId', userData._id);
+                    localStorage.setItem('email', userData.email);
                 } catch (err) {
+                    console.error('Profile fetch error:', err.message);
                     setError('Session expired. Please log in again.');
                     removeToken();
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('email');
                     setTimeout(() => window.location.href = 'login.html', 2000);
                 } finally {
                     setLoading(false);
@@ -91,6 +104,7 @@
             const logout = () => {
                 removeToken();
                 localStorage.removeItem('userId');
+                localStorage.removeItem('email');
                 window.location.href = 'login.html';
             };
 
@@ -103,96 +117,110 @@
             }
 
             return (
-                <div>
-                    <section className="hero-section">
-                        <header className="container mx-auto flex justify-between items-center">
-                            <div className="logo">
-                                A & K Analytics
-                                <span>Data Solutions</span>
+                <ErrorBoundary>
+                    <div>
+                        <section className="hero-section">
+                            <header className="container mx-auto flex justify-between items-center">
+                                <div className="logo">
+                                    A & K Analytics
+                                    <span>Data Solutions</span>
+                                </div>
+                                <nav>
+                                    <ul className="flex space-x-4">
+                                        <li><a href="index.html" className="nav-link">Home</a></li>
+                                        <li><a href="book-online.html" className="nav-link">Book Services</a></li>
+                                        <li><a href="#" onClick={logout} className="nav-link">Logout</a></li>
+                                    </ul>
+                                </nav>
+                            </header>
+                        </section>
+                        <div className="container mx-auto p-6">
+                            <h1 className="text-3xl font-bold mb-6">
+                                Welcome, {user?.name || 'Customer'}!
+                            </h1>
+                            {error && <div className="error block">{error}</div>}
+                            {success && <div className="success block">{success}</div>}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <Dashboard setError={setError} />
+                                <ServiceBooking setSuccess={setSuccess} setError={setError} />
+                                <ScheduleCall />
+                                <LiveChat setError={setError} />
+                                <DataUpload setSuccess={setSuccess} setError={setError} />
+                                <DatabaseConnection setSuccess={setSuccess} setError={setError} />
                             </div>
-                            <nav>
-                                <ul className="flex space-x-4">
-                                    <li><a href="index.html" className="nav-link">Home</a></li>
-                                    <li><a href="book-online.html" className="nav-link">Book Services</a></li>
-                                    <li><a href="#" onClick={logout} className="nav-link">Logout</a></li>
-                                </ul>
-                            </nav>
-                        </header>
-                    </section>
-                    <div className="container mx-auto p-6">
-                        <h1 className="text-3xl font-bold mb-6">
-                            Welcome, {user?.name}!
-                        </h1>
-                        {error && <div className="error">{error}</div>}
-                        {success && <div className="success">{success}</div>}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <Dashboard />
-                            <ServiceBooking setSuccess={setSuccess} setError={setError} />
-                            <ScheduleCall />
-                            <LiveChat />
-                            <DataUpload setSuccess={setSuccess} setError={setError} />
-                            <DatabaseConnection setSuccess={setSuccess} setError={setError} />
                         </div>
+                        <footer className="footer-section">
+                            <div className="footer-content container mx-auto">
+                                <div className="footer-logo">
+                                    A & K Analytics
+                                    <span>Data Solutions</span>
+                                </div>
+                                <nav className="footer-nav">
+                                    <ul className="flex flex-wrap">
+                                        <li><a href="about.html">About</a></li>
+                                        <li><a href="industries.html">Industries</a></li>
+                                        <li><a href="insights.html">Insights</a></li>
+                                        <li><a href="index.html#contact">Contact</a></li>
+                                        <li><a href="blog.html">Blog</a></li>
+                                        <li><a href="book-online.html">Book Online</a></li>
+                                    </ul>
+                                </nav>
+                                <div className="footer-social">
+                                    <a href="https://facebook.com/akanalytics" className="social-icon" aria-label="Facebook"><i className="fab fa-facebook-f"></i></a>
+                                    <a href="https://twitter.com/akanalytics" className="social-icon" aria-label="Twitter"><i className="fab fa-twitter"></i></a>
+                                    <a href="https://linkedin.com/company/akanalytics" className="social-icon" aria-label="LinkedIn"><i className="fab fa-linkedin-in"></i></a>
+                                    <a href="https://instagram.com/akanalytics" className="social-icon" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
+                                </div>
+                                <div className="footer-copyright">
+                                    <p>© 2025 A & K Analytics. All rights reserved.</p>
+                                </div>
+                            </div>
+                        </footer>
                     </div>
-                    <footer className="footer-section">
-                        <div className="footer-content container mx-auto">
-                            <div className="footer-logo">
-                                A & K Analytics
-                                <span>Data Solutions</span>
-                            </div>
-                            <nav className="footer-nav">
-                                <ul className="flex flex-wrap">
-                                    <li><a href="about.html">About</a></li>
-                                    <li><a href="industries.html">Industries</a></li>
-                                    <li><a href="insights.html">Insights</a></li>
-                                    <li><a href="index.html#contact">Contact</a></li>
-                                    <li><a href="blog.html">Blog</a></li>
-                                    <li><a href="book-online.html">Book Online</a></li>
-                                </ul>
-                            </nav>
-                            <div className="footer-social">
-                                <a href="https://facebook.com/akanalytics" className="social-icon" aria-label="Facebook"><i className="fab fa-facebook-f"></i></a>
-                                <a href="https://twitter.com/akanalytics" className="social-icon" aria-label="Twitter"><i className="fab fa-twitter"></i></a>
-                                <a href="https://linkedin.com/company/akanalytics" className="social-icon" aria-label="LinkedIn"><i className="fab fa-linkedin-in"></i></a>
-                                <a href="https://instagram.com/akanalytics" className="social-icon" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
-                            </div>
-                            <div className="footer-copyright">
-                                <p>© 2025 A & K Analytics. All rights reserved.</p>
-                            </div>
-                        </div>
-                    </footer>
-                </div>
+                </ErrorBoundary>
             );
         };
 
         // Dashboard Component
-        const Dashboard = () => {
+        const Dashboard = ({ setError }) => {
             const [dashboardUrl, setDashboardUrl] = useState('');
             const [analytics, setAnalytics] = useState([]);
+            const [loading, setLoading] = useState(true);
 
             useEffect(() => {
                 const token = getToken();
-                axios.get('https://a-k-analytics-backend.onrender.com/api/customer/dashboard', {
-                    headers: { Authorization: `Bearer ${token}` }
-                }).then(res => {
-                    setDashboardUrl(res.data.dashboardUrl || 'https://public.tableau.com/views/sample-sales-dashboard');
-                }).catch(err => {
-                    console.error('Error loading dashboard:', err);
-                });
+                Promise.all([
+                    axios.get('https://a-k-analytics-backend.onrender.com/api/customer/dashboard', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }).then(res => {
+                        setDashboardUrl(res.data.dashboardUrl || 'https://public.tableau.com/views/sample-sales-dashboard');
+                    }).catch(err => {
+                        console.error('Dashboard fetch error:', err);
+                        setError('Failed to load dashboard.');
+                    }),
+                    axios.get('https://a-k-analytics-backend.onrender.com/api/customer/analytics', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }).then(res => {
+                        setAnalytics(res.data || []);
+                    }).catch(err => {
+                        console.error('Analytics fetch error:', err);
+                        setError('Failed to load analytics reports.');
+                    })
+                ]).finally(() => setLoading(false));
+            }, [setError]);
 
-                axios.get('https://a-k-analytics-backend.onrender.com/api/customer/analytics', {
-                    headers: { Authorization: `Bearer ${token}` }
-                }).then(res => {
-                    setAnalytics(res.data);
-                }).catch(err => {
-                    console.error('Error loading analytics:', err);
-                });
-            }, []);
+            if (loading) {
+                return <div className="card col-span-2"><p>Loading dashboard...</p></div>;
+            }
 
             return (
                 <div className="card col-span-2">
                     <h2 className="text-2xl font-bold mb-4">Personalized Dashboard</h2>
-                    <iframe src={dashboardUrl} width="100%" height="600px" className="border rounded"></iframe>
+                    {dashboardUrl ? (
+                        <iframe src={dashboardUrl} width="100%" height="600px" className="border rounded" title="Customer Dashboard"></iframe>
+                    ) : (
+                        <p>No dashboard available. Contact support for setup.</p>
+                    )}
                     <h3 className="text-xl font-bold mt-4 mb-2">Analytics Reports</h3>
                     {analytics.length ? (
                         <ul className="space-y-2">
@@ -200,7 +228,7 @@
                                 <li key={report._id} className="border-b py-2">
                                     <p><strong>{sanitizeInput(report.title)}</strong> - {sanitizeInput(report.status)}</p>
                                     {report.resultsUrl && (
-                                        <a href={report.resultsUrl} target="_blank" className="action-btn">View Report</a>
+                                        <a href={report.resultsUrl} target="_blank" rel="noopener noreferrer" className="action-btn">View Report</a>
                                     )}
                                 </li>
                             ))}
@@ -216,6 +244,7 @@
         const ServiceBooking = ({ setSuccess, setError }) => {
             const [bookings, setBookings] = useState([]);
             const [service, setService] = useState('');
+            const [loading, setLoading] = useState(true);
             const services = [
                 { value: 'basic_report', label: 'Basic Report (KES 15,000 / USD 115)' },
                 { value: 'advanced_forecasting', label: 'Advanced Forecasting (KES 50,000 / USD 385)' },
@@ -227,11 +256,12 @@
                 axios.get('https://a-k-analytics-backend.onrender.com/api/customer/bookings', {
                     headers: { Authorization: `Bearer ${token}` }
                 }).then(res => {
-                    setBookings(res.data);
+                    setBookings(res.data || []);
                 }).catch(err => {
-                    console.error('Error loading bookings:', err);
-                });
-            }, []);
+                    console.error('Bookings fetch error:', err);
+                    setError('Failed to load bookings.');
+                }).finally(() => setLoading(false));
+            }, [setError]);
 
             const handleBooking = async (e) => {
                 e.preventDefault();
@@ -252,7 +282,7 @@
                     setService('');
                 } catch (err) {
                     setError('Failed to book service.');
-                    console.error('Error booking service:', err);
+                    console.error('Booking error:', err);
                 }
             };
 
@@ -268,10 +298,14 @@
                         setError('');
                     } catch (err) {
                         setError('Failed to cancel booking.');
-                        console.error('Error cancelling booking:', err);
+                        console.error('Cancel booking error:', err);
                     }
                 }
             };
+
+            if (loading) {
+                return <div className="card"><p>Loading bookings...</p></div>;
+            }
 
             return (
                 <div className="card">
@@ -314,45 +348,65 @@
         // Schedule Call Component
         const ScheduleCall = () => {
             useEffect(() => {
-                Calendly.initInlineWidget({
-                    url: 'https://calendly.com/akanalytics/consultation',
-                    parentElement: document.getElementById('calendly-widget'),
-                    prefill: { email: localStorage.getItem('email') }
-                });
+                try {
+                    Calendly.initInlineWidget({
+                        url: 'https://calendly.com/akanalytics/consultation',
+                        parentElement: document.getElementById('calendly-widget'),
+                        prefill: { email: localStorage.getItem('email') || '' }
+                    });
+                } catch (err) {
+                    console.error('Calendly initialization error:', err);
+                }
             }, []);
 
             return (
                 <div className="card">
                     <h2 className="text-2xl font-bold mb-4">Schedule a Call</h2>
-                    <div id="calendly-widget" className="h-96"></div>
+                    <div id="calendly-widget" className="h-96">
+                        <p>Loading Calendly widget...</p>
+                    </div>
                 </div>
             );
         };
 
         // Live Chat Component
-        const LiveChat = () => {
+        const LiveChat = ({ setError }) => {
             const [messages, setMessages] = useState([]);
             const [message, setMessage] = useState('');
+            const [socket, setSocket] = useState(null);
 
             useEffect(() => {
-                const socket = io('https://a-k-analytics-backend.onrender.com');
-                socket.on('connect', () => {
-                    socket.emit('join', { userId: getUserId(), role: 'customer' });
+                const newSocket = io('https://a-k-analytics-backend.onrender.com', { transports: ['websocket'] });
+                newSocket.on('connect', () => {
+                    console.log('Socket connected');
+                    newSocket.emit('join', { userId: localStorage.getItem('userId'), role: 'customer' });
                 });
-                socket.on('message', (data) => {
+                newSocket.on('connect_error', (err) => {
+                    console.error('Socket connection error:', err);
+                    setError('Failed to connect to live chat.');
+                });
+                newSocket.on('message', (data) => {
                     setMessages(prev => [...prev, { sender: data.sender, text: data.text }]);
                     const chatMessages = document.getElementById('chat-messages');
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    if (chatMessages) {
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
                 });
-                return () => socket.disconnect();
-            }, []);
+                setSocket(newSocket);
+                return () => {
+                    newSocket.disconnect();
+                };
+            }, [setError]);
 
             const sendMessage = () => {
-                if (message.trim()) {
-                    const socket = io('https://a-k-analytics-backend.onrender.com');
+                if (message.trim() && socket) {
                     socket.emit('message', { text: message, sender: 'Customer' });
                     setMessages(prev => [...prev, { sender: 'Customer', text: message }]);
                     setMessage('');
+                    const chatMessages = document.getElementById('chat-messages');
+                    if (chatMessages) {
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
                 }
             };
 
@@ -360,9 +414,13 @@
                 <div className="card">
                     <h2 className="text-2xl font-bold mb-4">Talk to an Analyst</h2>
                     <div id="chat-messages" className="h-64 overflow-y-scroll bg-gray-50 p-4 rounded">
-                        {messages.map((msg, i) => (
-                            <p key={i}><strong>{sanitizeInput(msg.sender)}:</strong> {sanitizeInput(msg.text)}</p>
-                        ))}
+                        {messages.length ? (
+                            messages.map((msg, i) => (
+                                <p key={i}><strong>{sanitizeInput(msg.sender)}:</strong> {sanitizeInput(msg.text)}</p>
+                            ))
+                        ) : (
+                            <p>No messages yet.</p>
+                        )}
                     </div>
                     <div className="flex mt-2">
                         <input
@@ -400,7 +458,7 @@
                     e.target.reset();
                 } catch (err) {
                     setError('Data upload failed.');
-                    console.error('Error uploading data:', err);
+                    console.error('Upload error:', err);
                 }
             };
 
@@ -458,7 +516,7 @@
                     setPassword('');
                 } catch (err) {
                     setError('Database connection failed.');
-                    console.error('Error connecting to database:', err);
+                    console.error('Database connection error:', err);
                 }
             };
 
