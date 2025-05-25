@@ -198,7 +198,7 @@
                 es: {
                     translation: {
                         'Taking Your Business to the Next Level': 'Llevando tu negocio al siguiente nivel',
-                        'We provide data-driven solutions to help your negocio a crecer. Permítenos ayudarte a alcanzar tus metas.',
+                        'We provide data-driven solutions to help your business grow. Let us help you achieve your goals.': 'Proporcionamos soluciones basadas en datos para ayudar a tu negocio a crecer. Permítenos ayudarte a alcanzar tus metas.',
                         'Our Solutions': 'Nuestras Soluciones',
                         'Discover how A & K Analytics can empower your business with cutting-edge data solutions.': 'Descubre cómo A & K Analytics puede potenciar tu negocio con soluciones de datos de vanguardia.',
                         'What Our Clients Say': 'Lo que dicen nuestros clientes',
@@ -278,6 +278,8 @@
                 localStorage.clear();
                 resetUI();
                 showMessage('public-content', 'Session expired. Please log in again.', 'red');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
             }
 
             function resetUI() {
@@ -288,8 +290,6 @@
                 customerPortalLink.style.display = 'none';
                 adminPortalLink.style.display = 'none';
             }
-
-            document.getElementById('loading').style.display = 'none';
         }
 
         // Logout function
@@ -306,7 +306,7 @@
             if (token) {
                 document.getElementById('loading').style.display = 'block';
                 try {
-                    const response = await axios.get(`https://a-k-analytics-backend.onrender.com/api/users/verify?token=${token}`);
+                    const response = await axios.get(`https://a-k-analytics-backend.onrender.com/api/users/verify/${token}`);
                     if (response.status !== 200) throw new Error(response.data.error || 'Verification failed');
                     document.getElementById('verify-message').style.display = 'block';
                     document.getElementById('verify-text').textContent = 'Email verified successfully! You can now log in.';
@@ -314,8 +314,9 @@
                 } catch (error) {
                     document.getElementById('verify-message').style.display = 'block';
                     document.getElementById('verify-text').textContent = `Verification failed: ${error.message}`;
+                } finally {
+                    document.getElementById('loading').style.display = 'none';
                 }
-                document.getElementById('loading').style.display = 'none';
             }
         }
 
@@ -391,7 +392,7 @@
 
         // Initialize page
         window.onload = () => {
-            // updateUI(); // Temporarily disabled for testing
+            updateUI(); // Re-enabled for proper navigation
             handleVerification();
             displayReviews();
             document.querySelector('.footer-copyright p').textContent = `© ${new Date().getFullYear()} A & K Analytics. All rights reserved.`;
