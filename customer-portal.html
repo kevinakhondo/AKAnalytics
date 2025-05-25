@@ -32,7 +32,6 @@
         .footer-social a { color: white; margin-right: 1rem; }
         .error, .success { display: none; margin-bottom: 1rem; text-align: center; }
         .error { color: #dc2626; }
-        .success { color: #16a34a; }
         .error.block, .success.block { display: block; }
         .card { background: white; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 1.5rem; }
         @media (max-width: 768px) {
@@ -71,7 +70,6 @@
             const [user, setUser] = useState(null);
             const [loading, setLoading] = useState(true);
             const [error, setError] = useState('');
-            const [success, setSuccess] = useState('');
 
             useEffect(() => {
                 console.log('CustomerPortal useEffect triggered');
@@ -124,10 +122,12 @@
                 );
             }
 
-            if (!user) {
+            if (error || !user) {
                 return (
-                    <div className="text-center p-4">
-                        <p>No user data loaded. Please <a href="login.html" className="text-blue-600">log in again</a>.</p>
+                    <div className="container mx-auto p-6">
+                        <h1 className="text-2xl font-bold text-red-600">Authentication Error</h1>
+                        <p>{error || 'No user data loaded.'}</p>
+                        <p>Please <a href="login.html" className="text-blue-600">log in again</a>.</p>
                     </div>
                 );
             }
@@ -155,14 +155,13 @@
                                 Welcome, {user?.name || 'Customer'}!
                             </h1>
                             {error && <div className="error block">{error}</div>}
-                            {success && <div className="success block">{success}</div>}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <Dashboard setError={setError} />
-                                <ServiceBooking setSuccess={setSuccess} setError={setError} />
+                                <ServiceBooking setError={setError} />
                                 <ScheduleCall />
                                 <LiveChat setError={setError} />
-                                <DataUpload setSuccess={setSuccess} setError={setError} />
-                                <DatabaseConnection setSuccess={setSuccess} setError={setError} />
+                                <DataUpload setError={setError} />
+                                <DatabaseConnection setError={setError} />
                             </div>
                         </div>
                         <footer className="footer-section">
@@ -228,9 +227,7 @@
                 ]).finally(() => setLoading(false));
             }, [setError]);
 
-            if (loading) {
-                return <div className="card col-span-2"><p>Loading dashboard...</p></div>;
-            }
+            if (loading) return <div className="card col-span-2"><p>Loading dashboard...</p></div>;
 
             return (
                 <div className="card col-span-2">
@@ -259,7 +256,7 @@
             );
         };
 
-        const ServiceBooking = ({ setSuccess, setError }) => {
+        const ServiceBooking = ({ setError }) => {
             const [bookings, setBookings] = useState([]);
             const [service, setService] = useState('');
             const [loading, setLoading] = useState(true);
@@ -300,9 +297,7 @@
                     });
                     console.log('Booking response:', response.data);
                     setBookings([...bookings, response.data]);
-                    setSuccess('Service booked successfully!');
                     setError('');
-                    setService('');
                 } catch (err) {
                     console.error('Booking error:', err.response?.data || err.message);
                     setError('Failed to book service.');
@@ -319,7 +314,6 @@
                         });
                         console.log('Booking cancelled:', id);
                         setBookings(bookings.filter(b => b._id !== id));
-                        setSuccess('Booking cancelled.');
                         setError('');
                     } catch (err) {
                         console.error('Cancel booking error:', err.response?.data || err.message);
@@ -328,9 +322,7 @@
                 }
             };
 
-            if (loading) {
-                return <div className="card"><p>Loading bookings...</p></div>;
-            }
+            if (loading) return <div className="card"><p>Loading bookings...</p></div>;
 
             return (
                 <div className="card">
@@ -366,6 +358,7 @@
                     ) : (
                         <p>No bookings yet.</p>
                     )}
+                    {error && <div className="error block">{error}</div>}
                 </div>
             );
         };
@@ -453,11 +446,12 @@
                         />
                         <button onClick={sendMessage} className="submit-btn ml-2">Send</button>
                     </div>
+                    {error && <div className="error block">{error}</div>}
                 </div>
             );
         };
 
-        const DataUpload = ({ setSuccess, setError }) => {
+        const DataUpload = ({ setError }) => {
             const handleUpload = async (e) => {
                 e.preventDefault();
                 const file = e.target.querySelector('#data-file').files[0];
@@ -473,9 +467,7 @@
                     await axios.post('https://a-k-analytics-backend.onrender.com/api/customer/upload', formData, {
                         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
                     });
-                    setSuccess('Data uploaded successfully! Analysis in progress.');
                     setError('');
-                    e.target.reset();
                 } catch (err) {
                     console.error('Upload error:', err.response?.data || err.message);
                     setError('Data upload failed.');
@@ -495,11 +487,12 @@
                         />
                         <button type="submit" className="submit-btn">Upload</button>
                     </form>
+                    {error && <div className="error block">{error}</div>}
                 </div>
             );
         };
 
-        const DatabaseConnection = ({ setSuccess, setError }) => {
+        const DatabaseConnection = ({ setError }) => {
             const [dbType, setDbType] = useState('');
             const [host, setHost] = useState('');
             const [port, setPort] = useState('');
@@ -526,14 +519,7 @@
                     }, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
-                    setSuccess('Database connected successfully! Analysis in progress.');
                     setError('');
-                    setDbType('');
-                    setHost('');
-                    setPort('');
-                    setDatabase('');
-                    setUsername('');
-                    setPassword('');
                 } catch (err) {
                     console.error('Database connection error:', err.response?.data || err.message);
                     setError('Database connection failed.');
@@ -620,6 +606,7 @@
                         </div>
                         <button type="submit" className="submit-btn">Connect</button>
                     </form>
+                    {error && <div className="error block">{error}</div>}
                 </div>
             );
         };
