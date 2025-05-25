@@ -50,6 +50,7 @@
         class ErrorBoundary extends React.Component {
             state = { hasError: false, errorMessage: '' };
             static getDerivedStateFromError(error) {
+                console.error('ErrorBoundary caught an error:', error.message);
                 return { hasError: true, errorMessage: error.message };
             }
             render() {
@@ -73,10 +74,11 @@
             const [success, setSuccess] = useState('');
 
             useEffect(() => {
+                console.log('CustomerPortal useEffect triggered');
                 const token = getToken();
-                console.log('Token:', token);
+                console.log('Token retrieved:', token);
                 if (!token) {
-                    console.error('No token, redirecting to login');
+                    console.error('No token found, redirecting to login');
                     window.location.href = 'login.html';
                     return;
                 }
@@ -85,8 +87,9 @@
 
             const fetchProfile = async (token) => {
                 try {
+                    console.log('Fetching user profile with token:', token);
                     const userData = await fetchUserProfile(token);
-                    console.log('Profile data:', userData);
+                    console.log('Profile data received:', userData);
                     setUser(userData);
                     localStorage.setItem('userId', userData._id);
                     localStorage.setItem('email', userData.email);
@@ -96,13 +99,17 @@
                     removeToken();
                     localStorage.removeItem('userId');
                     localStorage.removeItem('email');
-                    setTimeout(() => window.location.href = 'login.html', 2000);
+                    setTimeout(() => {
+                        console.log('Redirecting to login.html due to profile fetch error');
+                        window.location.href = 'login.html';
+                    }, 2000);
                 } finally {
                     setLoading(false);
                 }
             };
 
             const logout = () => {
+                console.log('Logging out user');
                 removeToken();
                 localStorage.removeItem('userId');
                 localStorage.removeItem('email');
@@ -113,6 +120,14 @@
                 return (
                     <div className="text-center p-4">
                         <p>Loading...</p>
+                    </div>
+                );
+            }
+
+            if (!user) {
+                return (
+                    <div className="text-center p-4">
+                        <p>No user data loaded. Please <a href="login.html" className="text-blue-600">log in again</a>.</p>
                     </div>
                 );
             }
@@ -188,8 +203,9 @@
             const [loading, setLoading] = useState(true);
 
             useEffect(() => {
+                console.log('Dashboard useEffect triggered');
                 const token = getToken();
-                console.log('Fetching dashboard with token:', token);
+                console.log('Dashboard fetching with token:', token);
                 Promise.all([
                     axios.get('https://a-k-analytics-backend.onrender.com/api/customer/dashboard', {
                         headers: { Authorization: `Bearer ${token}` }
@@ -247,8 +263,14 @@
             const [bookings, setBookings] = useState([]);
             const [service, setService] = useState('');
             const [loading, setLoading] = useState(true);
+            const services = [
+                { value: 'basic_report', label: 'Basic Report (KES 15,000 / USD 115)' },
+                { value: 'advanced_forecasting', label: 'Advanced Forecasting (KES 50,000 / USD 385)' },
+                { value: 'ml_model', label: 'Machine Learning Model (KES 100,000 / USD 770)' }
+            ];
 
             useEffect(() => {
+                console.log('ServiceBooking useEffect triggered');
                 const token = getToken();
                 console.log('Fetching bookings with token:', token);
                 axios.get('https://a-k-analytics-backend.onrender.com/api/customer/bookings', {
@@ -350,6 +372,7 @@
 
         const ScheduleCall = () => {
             useEffect(() => {
+                console.log('ScheduleCall useEffect triggered');
                 try {
                     console.log('Initializing Calendly');
                     Calendly.initInlineWidget({
@@ -378,6 +401,7 @@
             const [socket, setSocket] = useState(null);
 
             useEffect(() => {
+                console.log('LiveChat useEffect triggered');
                 const newSocket = io('https://a-k-analytics-backend.onrender.com', { transports: ['websocket'] });
                 newSocket.on('connect', () => {
                     console.log('Socket connected');
@@ -390,14 +414,10 @@
                 newSocket.on('message', (data) => {
                     setMessages(prev => [...prev, { sender: data.sender, text: data.text }]);
                     const chatMessages = document.getElementById('chat-messages');
-                    if (chatMessages) {
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                    }
+                    if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
                 });
                 setSocket(newSocket);
-                return () => {
-                    newSocket.disconnect();
-                };
+                return () => newSocket.disconnect();
             }, [setError]);
 
             const sendMessage = () => {
@@ -406,9 +426,7 @@
                     setMessages(prev => [...prev, { sender: 'Customer', text: message }]);
                     setMessage('');
                     const chatMessages = document.getElementById('chat-messages');
-                    if (chatMessages) {
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                    }
+                    if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
                 }
             };
 
