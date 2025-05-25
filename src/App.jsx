@@ -172,29 +172,39 @@ function Dashboard({ setError }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        console.log('Dashboard useEffect triggered');
+        console.log('Dashboard: Initializing useEffect');
         const token = getToken();
-        console.log('Dashboard fetching with token:', token);
+        console.log('Dashboard: Token retrieved:', token);
+        if (!token) {
+            console.error('Dashboard: No token found');
+            setError('Authentication required for dashboard.');
+            setLoading(false);
+            return;
+        }
+
         Promise.all([
             axios.get('https://a-k-analytics-backend.onrender.com/api/customer/dashboard', {
                 headers: { Authorization: `Bearer ${token}` }
             }).then(res => {
-                console.log('Dashboard response:', res.data);
+                console.log('Dashboard: API response from /api/customer/dashboard:', res.data);
                 setDashboardUrl(res.data.dashboardUrl || '');
             }).catch(err => {
-                console.error('Dashboard fetch error:', err.response?.data || err.message);
-                setError('Failed to load dashboard.');
+                console.error('Dashboard: Fetch error for /api/customer/dashboard:', err.response?.data || err.message);
+                setError('Failed to load dashboard: ' + (err.response?.data?.error || err.message));
             }),
             axios.get('https://a-k-analytics-backend.onrender.com/api/customer/analytics', {
                 headers: { Authorization: `Bearer ${token}` }
             }).then(res => {
-                console.log('Analytics response:', res.data);
+                console.log('Dashboard: API response from /api/customer/analytics:', res.data);
                 setAnalytics(res.data || []);
             }).catch(err => {
-                console.error('Analytics fetch error:', err.response?.data || err.message);
-                setError('Failed to load analytics reports.');
+                console.error('Dashboard: Fetch error for /api/customer/analytics:', err.response?.data || err.message);
+                setError('Failed to load analytics reports: ' + (err.response?.data?.error || err.message));
             })
-        ]).finally(() => setLoading(false));
+        ]).finally(() => {
+            console.log('Dashboard: Finished loading');
+            setLoading(false);
+        });
     }, [setError]);
 
     if (loading) return <div className="card col-span-2"><p>Loading dashboard...</p></div>;
@@ -237,18 +247,28 @@ function ServiceBooking({ setSuccess, setError }) {
     ];
 
     useEffect(() => {
-        console.log('ServiceBooking useEffect triggered');
+        console.log('ServiceBooking: Initializing useEffect');
         const token = getToken();
-        console.log('Fetching bookings with token:', token);
+        console.log('ServiceBooking: Token retrieved:', token);
+        if (!token) {
+            console.error('ServiceBooking: No token found');
+            setError('Authentication required for bookings.');
+            setLoading(false);
+            return;
+        }
+
         axios.get('https://a-k-analytics-backend.onrender.com/api/customer/bookings', {
             headers: { Authorization: `Bearer ${token}` }
         }).then(res => {
-            console.log('Bookings response:', res.data);
+            console.log('ServiceBooking: API response from /api/customer/bookings:', res.data);
             setBookings(res.data || []);
         }).catch(err => {
-            console.error('Bookings fetch error:', err.response?.data || err.message);
-            setError('Failed to load bookings.');
-        }).finally(() => setLoading(false));
+            console.error('ServiceBooking: Fetch error for /api/customer/bookings:', err.response?.data || err.message);
+            setError('Failed to load bookings: ' + (err.response?.data?.error || err.message));
+        }).finally(() => {
+            console.log('ServiceBooking: Finished loading');
+            setLoading(false);
+        });
     }, [setError]);
 
     const handleBooking = async (e) => {
@@ -259,20 +279,20 @@ function ServiceBooking({ setSuccess, setError }) {
         }
         try {
             const token = getToken();
-            console.log('Posting booking:', { service });
+            console.log('ServiceBooking: Posting booking with service:', service);
             const response = await axios.post('https://a-k-analytics-backend.onrender.com/api/customer/bookings', {
                 service
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log('Booking response:', response.data);
+            console.log('ServiceBooking: Booking response:', response.data);
             setBookings([...bookings, response.data]);
             setSuccess('Service booked successfully!');
             setError('');
             setService('');
         } catch (err) {
-            console.error('Booking error:', err.response?.data || err.message);
-            setError('Failed to book service.');
+            console.error('ServiceBooking: Booking error:', err.response?.data || err.message);
+            setError('Failed to book service: ' + (err.response?.data?.error || err.message));
         }
     };
 
@@ -280,17 +300,17 @@ function ServiceBooking({ setSuccess, setError }) {
         if (window.confirm('Cancel this booking?')) {
             try {
                 const token = getToken();
-                console.log('Canceling booking:', id);
+                console.log('ServiceBooking: Canceling booking with ID:', id);
                 await axios.delete(`https://a-k-analytics-backend.onrender.com/api/customer/bookings/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                console.log('Booking cancelled:', id);
+                console.log('ServiceBooking: Booking cancelled:', id);
                 setBookings(bookings.filter(b => b._id !== id));
                 setSuccess('Booking cancelled.');
                 setError('');
             } catch (err) {
-                console.error('Cancel booking error:', err.response?.data || err.message);
-                setError('Failed to cancel booking.');
+                console.error('ServiceBooking: Cancel booking error:', err.response?.data || err.message);
+                setError('Failed to cancel booking: ' + (err.response?.data?.error || err.message));
             }
         }
     };
@@ -337,16 +357,17 @@ function ServiceBooking({ setSuccess, setError }) {
 
 function ScheduleCall() {
     useEffect(() => {
-        console.log('ScheduleCall useEffect triggered');
+        console.log('ScheduleCall: Initializing useEffect');
         try {
-            console.log('Initializing Calendly');
+            console.log('ScheduleCall: Initializing Calendly widget');
             Calendly.initInlineWidget({
                 url: 'https://calendly.com/akanalytics/consultation',
                 parentElement: document.getElementById('calendly-widget'),
                 prefill: { email: localStorage.getItem('email') || '' }
             });
+            console.log('ScheduleCall: Calendly widget initialized');
         } catch (err) {
-            console.error('Calendly initialization error:', err);
+            console.error('ScheduleCall: Calendly initialization error:', err);
         }
     }, []);
 
@@ -366,32 +387,39 @@ function LiveChat({ setError }) {
     const [socket, setSocket] = useState(null);
 
     useEffect(() => {
-        console.log('LiveChat useEffect triggered');
+        console.log('LiveChat: Initializing useEffect');
         const newSocket = io('https://a-k-analytics-backend.onrender.com', { transports: ['websocket'] });
         newSocket.on('connect', () => {
-            console.log('Socket connected');
+            console.log('LiveChat: Socket connected');
             newSocket.emit('join', { userId: localStorage.getItem('userId'), role: 'customer' });
         });
         newSocket.on('connect_error', (err) => {
-            console.error('Socket connection error:', err.message);
-            setError('Failed to connect to live chat.');
+            console.error('LiveChat: Socket connection error:', err.message);
+            setError('Failed to connect to live chat: ' + err.message);
         });
         newSocket.on('message', (data) => {
+            console.log('LiveChat: Received message:', data);
             setMessages(prev => [...prev, { sender: data.sender, text: data.text }]);
             const chatMessages = document.getElementById('chat-messages');
             if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
         });
         setSocket(newSocket);
-        return () => newSocket.disconnect();
+        return () => {
+            console.log('LiveChat: Disconnecting socket');
+            newSocket.disconnect();
+        };
     }, [setError]);
 
     const sendMessage = () => {
         if (message.trim() && socket) {
+            console.log('LiveChat: Sending message:', message);
             socket.emit('message', { text: message, sender: 'Customer' });
             setMessages(prev => [...prev, { sender: 'Customer', text: message }]);
             setMessage('');
             const chatMessages = document.getElementById('chat-messages');
             if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+        } else {
+            console.error('LiveChat: Cannot send message - socket not ready or message empty');
         }
     };
 
@@ -434,16 +462,17 @@ function DataUpload({ setSuccess, setError }) {
         formData.append('data', file);
         try {
             const token = getToken();
-            console.log('Uploading file:', file.name);
-            await axios.post('https://a-k-analytics-backend.onrender.com/api/customer/upload', formData, {
+            console.log('DataUpload: Uploading file:', file.name);
+            const response = await axios.post('https://a-k-analytics-backend.onrender.com/api/customer/upload', formData, {
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
             });
+            console.log('DataUpload: Upload response:', response.data);
             setSuccess('Data uploaded successfully! Analysis in progress.');
             setError('');
             e.target.reset();
         } catch (err) {
-            console.error('Upload error:', err.response?.data || err.message);
-            setError('Data upload failed.');
+            console.error('DataUpload: Upload error:', err.response?.data || err.message);
+            setError('Data upload failed: ' + (err.response?.data?.error || err.message));
         }
     };
 
@@ -480,8 +509,8 @@ function DatabaseConnection({ setSuccess, setError }) {
         }
         try {
             const token = getToken();
-            console.log('Connecting database:', { dbType, host, port, database });
-            await axios.post('https://a-k-analytics-backend.onrender.com/api/customer/db-connect', {
+            console.log('DatabaseConnection: Connecting with details:', { dbType, host, port, database });
+            const response = await axios.post('https://a-k-analytics-backend.onrender.com/api/customer/db-connect', {
                 dbType,
                 host,
                 port,
@@ -491,6 +520,7 @@ function DatabaseConnection({ setSuccess, setError }) {
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+            console.log('DatabaseConnection: Connection response:', response.data);
             setSuccess('Database connected successfully! Analysis in progress.');
             setError('');
             setDbType('');
@@ -500,8 +530,8 @@ function DatabaseConnection({ setSuccess, setError }) {
             setUsername('');
             setPassword('');
         } catch (err) {
-            console.error('Database connection error:', err.response?.data || err.message);
-            setError('Database connection failed.');
+            console.error('DatabaseConnection: Connection error:', err.response?.data || err.message);
+            setError('Database connection failed: ' + (err.response?.data?.error || err.message));
         }
     };
 
