@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insights - Data-Driven Solutions | A & K Analytics</title>
+    <meta name="description" content="Explore the latest data-driven insights, trends, and reports from A & K Analytics to empower your business with actionable strategies.">
+    <meta name="keywords" content="data analytics, insights, trends, business solutions, A & K Analytics, data-driven decisions">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://yourdomain.com/insights.html">
+    <meta property="og:title" content="Insights - A & K Analytics">
+    <meta property="og:description" content="Discover the latest insights and trends in data analytics from A & K Analytics to stay ahead in your industry.">
+    <meta property="og:image" content="https://yourdomain.com/images/insights-banner.jpg">
+    <meta property="og:url" content="https://yourdomain.com/insights.html">
+    <meta property="og:type" content="article">
+    <link rel="stylesheet" href="insights.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            A & K Analytics
+            <span>Data Solutions</span>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search...">
+            <i class="fas fa-search"></i>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="industries.html">Industries</a></li>
+                <li><a href="insights.html">Insights</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="book-online.html">Book Online</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="insights-section" itemscope itemtype="https://schema.org/Blog">
+        <div class="insights-header">
+            <h1>Insights from A & K Analytics</h1>
+            <p>Explore our latest data-driven insights, trends, and reports to help your business stay ahead.</p>
+        </div>
+        <div class="insights-grid">
+            <article class="insight-card animate-section" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+                <h2 itemprop="headline">The Future of Data Analytics in 2025</h2>
+                <div class="insight-date" itemprop="datePublished">May 10, 2025</div>
+                <p itemprop="description">Discover the emerging trends in data analytics for 2025, including AI-driven insights and real-time decision-making tools.</p>
+                <a href="insights-1.html" class="read-more" itemprop="url">Read More</a>
+                <meta itemprop="author" content="A & K Analytics Team">
+            </article>
+            <article class="insight-card animate-section" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+                <h2 itemprop="headline">Leveraging Big Data for Small Businesses</h2>
+                <div class="insight-date" itemprop="datePublished">April 15, 2025</div>
+                <p itemprop="description">Learn how small businesses can harness the power of big data to drive growth and improve efficiency without breaking the bank.</p>
+                <a href="insights-2.html" class="read-more" itemprop="url">Read More</a>
+                <meta itemprop="author" content="A & K Analytics Team">
+            </article>
+            <article class="insight-card animate-section" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+                <h2 itemprop="headline">AI and Machine Learning: Transforming Industries</h2>
+                <div class="insight-date" itemprop="datePublished">March 20, 2025</div>
+                <p itemprop="description">Explore how AI and machine learning are revolutionizing industries like healthcare, finance, and retail through advanced analytics.</p>
+                <a href="insights-3.html" class="read-more" itemprop="url">Read More</a>
+                <meta itemprop="author" content="A & K Analytics Team">
+            </article>
+        </div>
+    </section>
+
+    <footer class="footer-section">
+        <div class="footer-content">
+            <div class="footer-logo">
+                A & K Analytics
+                <span>Data Solutions</span>
+            </div>
+            <nav class="footer-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="industries.html">Industries</a></li>
+                    <li><a href="insights.html">Insights</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="book-online.html">Book Online</a></li>
+                </ul>
+            </nav>
+            <div class="footer-social">
+                <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+            </div>
+            <p class="footer-copyright">© 2025 A & K Analytics. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.animate-section').forEach(element => {
+                observer.observe(element);
+            });
+        });
+    </script>
+</body>
+</html>

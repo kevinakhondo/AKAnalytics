@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - A & K Analytics</title>
+    <meta name="description" content="Manage clients, uploads, analytics, appointments, and communications for A & K Analytics.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.5.0/dist/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/babel-standalone@6/babel.min.js"></script>
+    <style>
+        .hero-section { background: linear-gradient(to right, #2563eb, #1e40af); color: white; padding: 2rem; }
+        .logo { font-size: 1.5rem; font-weight: bold; }
+        .logo span { font-size: 1rem; font-weight: normal; }
+        .sidebar { width: 250px; height: 100vh; position: fixed; background: #1e40af; color: white; padding: 1rem; }
+        .sidebar a { color: white; display: block; padding: 0.5rem; }
+        .sidebar a:hover { background: #2563eb; }
+        .content { margin-left: 260px; padding: 1rem; }
+        .submit-btn { background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.25rem; }
+        .submit-btn:hover { background-color: #1e40af; }
+        .action-btn { background-color: #2563eb; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; margin-right: 0.5rem; }
+        .action-btn.danger { background-color: #dc2626; }
+        .action-btn:hover { opacity: 0.9; }
+        .footer-section { background: #1f2937; color: white; padding: 2rem; }
+        .footer-nav a { color: white; margin-right: 1rem; }
+        .footer-social a { color: white; margin-right: 1rem; }
+        .error, .success { display: none; margin-bottom: 1rem; text-align: center; }
+        .error { color: #dc2626; }
+        .success { color: #16a34a; }
+        .card { background: white; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 1.5rem; }
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: static; }
+            .content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Utility functions
+        const getToken = () => localStorage.getItem('token');
+        const removeToken = () => localStorage.removeItem('token');
+        const getUserId = () => localStorage.getItem('userId');
+        const setUserId = (id) => localStorage.setItem('userId', id);
+        const sanitizeInput = (input) => {
+            const div = document.createElement('div');
+            div.textContent = input;
+            return div.innerHTML;
+        };
+
+        // Main App Component
+        const AdminPortal = () => {
+            const [user, setUser] = useState(null);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState('');
+            const [success, setSuccess] = useState('');
+            const [activeSection, setActiveSection] = useState('dashboard');
+
+            useEffect(() => {
+                const token = getToken();
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                fetchProfile(token);
+            }, []);
+
+            const fetchProfile = async (token) => {
+                try {
+                    const response = await axios.get('https://a-k-analytics-backend.onrender.com/api/users/profile', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (response.data.role !== 'admin') {
+                        throw new Error('Unauthorized');
+                    }
+                    setUser(response.data);
+                    setUserId(response.data._id);
+                } catch (err) {
+                    setError('Session expired or unauthorized. Please log in again.');
+                    removeToken();
+                    setTimeout(() => window.location.href = 'login.html', 2000);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const logout = () => {
+                removeToken();
+                localStorage.removeItem('userId');
+                window.location.href = 'login.html';
+            };
+
+            if (loading) {
+                return (
+                    <div className="text-center p-4">
+                        <p>Loading...</p>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="flex">
+                    <div className="sidebar">
+                        <h2 className="text-xl font-bold mb-4">Admin Portal</h2>
+                        <ul>
+                            <li><a href="#dashboard" onClick={() => setActiveSection('dashboard')} className="hover:underline">Dashboard</a></li>
+                            <li><a href="#clients" onClick={() => setActiveSection('clients')} className="hover:underline">Clients</a></li>
+                            <li><a href="#uploads" onClick={() => setActiveSection('uploads')} className="hover:underline">Uploads</a></li>
+                            <li><a href="#reports" onClick={() => setActiveSection('reports')} className="hover:underline">Reports</a></li>
+                            <li><a href="#appointments" onClick={() => setActiveSection('appointments')} className="hover:underline">Appointments</a></li>
+                            <li><a href="#messages" onClick={() => setActiveSection('messages')} className="hover:underline">Messages</a></li>
+                            <li><a href="#databases" onClick={() => setActiveSection('databases')} className="hover:underline">Databases</a></li>
+                            <li><a href="#audit" onClick={() => setActiveSection('audit')} className="hover:underline">Audit Logs</a></li>
+                            <li><a href="#" onClick={logout} className="hover:underline">Logout</a></li>
+                        </ul>
+                    </div>
+                    <div className="content container mx-auto">
+                        <h1 className="text-3xl font-bold mb-6">Welcome, {user?.name}!</h1>
+                        {error && <div className="error">{error}</div>}
+                        {success && <div className="success">{success}</div>}
+                        {activeSection === 'dashboard' && <Dashboard setError={setError} />}
+                        {activeSection === 'clients' && <Clients setSuccess={setSuccess} setError={setError} />}
+                        {activeSection === 'uploads' && <Uploads setSuccess={setSuccess} setError={setError} />}
+                        {activeSection === 'reports' && <Reports setSuccess={setSuccess} setError={setError} />}
+                        {activeSection === 'appointments' && <Appointments setSuccess={setSuccess} setError={setError} />}
+                        {activeSection === 'messages' && <Messages setError={setError} />}
+                        {activeSection === 'databases' && <Databases setError={setError} />}
+                        {activeSection === 'audit' && <AuditLogs setError={setError} />}
+                    </div>
+                    <footer className="footer-section">
+                        <div className="footer-content container mx-auto">
+                            <div className="footer-logo">
+                                A & K Analytics
+                                <span>Data Solutions</span>
+                            </div>
+                            <nav className="footer-nav">
+                                <ul className="flex flex-wrap">
+                                    <li><a href="about.html">About</a></li>
+                                    <li><a href="industries.html">Industries</a></li>
+                                    <li><a href="insights.html">Insights</a></li>
+                                    <li><a href="index.html#contact">Contact</a></li>
+                                    <li><a href="blog.html">Blog</a></li>
+                                    <li><a href="book-online.html">Book Online</a></li>
+                                </ul>
+                            </nav>
+                            <div className="footer-social">
+                                <a href="https://facebook.com/akanalytics" className="social-icon" aria-label="Facebook"><i className="fab fa-facebook-f"></i></a>
+                                <a href="https://twitter.com/akanalytics" className="social-icon" aria-label="Twitter"><i className="fab fa-twitter"></i></a>
+                                <a href="https://linkedin.com/company/akanalytics" className="social-icon" aria-label="LinkedIn"><i className="fab fa-linkedin-in"></i></a>
+                                <a href="https://instagram.com/akanalytics" className="social-icon" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
+                            </div>
+                            <div className="footer-copyright">
+                                <p>© 2025 A & K Analytics. All rights reserved.</p>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        // Dashboard Component
+        const Dashboard = ({ setError }) => {
+            const [stats, setStats] = useState({ clients: 0, projects: 0, uploads: 0, calls: 0 });
+
+            useEffect(() => {
+                const token = getToken();
+                axios.get('https://a-k-analytics-backend.onrender.com/api/admin/stats', {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(res => {
+                    setStats(res.data);
+                }).catch(err => {
+                    setError('Failed to load dashboard stats.');
+                    console.error('Error loading stats:', err);
+                });
+            }, []);
+
+            return (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div className="card">
+                        <h3 className="text-xl font-bold">Total Clients</h3>
+                        <p className="text-3xl">{stats.clients}</p>
+                    </div>
+                    <div className="card">
+                        <h3 className="text-xl font-bold">Projects in Progress</h3>
+                        <p className="text-3xl">{stats.projects}</p>
+                    </div>
+                    <div className="card">
+                        <h3 className="text-xl font-bold">New Uploads Today</h3>
+                        <p className="text-3xl">{stats.uploads}</p>
+                    </div>
+                    <div className="card">
+                        <h3 className="text-xl font-bold">Upcoming Calls</h3>
+                        <p className="text-3xl">{stats.calls}</p>
+                    </div>
+                </div>
+            );
+        };
+
+        // Clients Component
+        const Clients = ({ setSuccess, setError }) => {
+            const [clients, setClients] = useState([]);
+            const [search, setSearch] = useState('');
+
+            useEffect(() => {
+                const token = getToken();
+                axios.get('https://a-k-analytics-backend.onrender.com/api/admin/clients', {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(res => {
+                    setClients(res.data);
+                }).catch(err => {
+                    setError('Failed to load clients.');
+                    console.error('Error loading clients:', err);
+                });
+            }, []);
+
+            const deleteClient = async (id) => {
+                if (window.confirm('Delete this client?')) {
+                    try {
+                        const token = getToken();
+                        await axios.delete(`https://a-k-analytics-backend.onrender.com/api/admin/clients/${id}`, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
+                        setClients(clients.filter(c => c._id !== id));
+                        setSuccess('Client deleted.');
+                        setError('');
+                    } catch (err) {
+                        setError('Failed to delete client.');
+                        console.error('Error deleting client:', err);
+                    }
+                }
+            };
+
+            const resetPassword = async (id) => {
+                if (window.confirm('Reset password for this client?')) {
+                    try {
+                        const token = getToken();
+                        await axios.post(`https://a-k-analytics-backend.onrender.com/api/admin/clients/${id}/reset-password`, {}, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
+                        setSuccess('Password reset email sent.');
+                        setError('');
+                    } catch (err) {
+                        setError('Failed to reset password.');
+                        console.error('Error resetting password:', err);
+                    }
+                }
+            };
+
+            const filteredClients = clients.filter(c => 
+                c.name.toLowerCase().includes(search.toLowerCase()) || 
+                c.email.toLowerCase().includes(search.toLowerCase())
+            );
+
+            return (
+                <div className="card">
+                    <h2 className="text-2xl font-bold mb-4">Manage Clients</h2>
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-full p-2 border rounded mb-4"
+                        placeholder="Search clients..."
+                        aria-label="Search clients"
+                    />
+                    <table className="w-full border-collapse">
+                        <thead>
+                            <tr className="bg-gray-100">
+                                <th className="p-2 text-left">Name</th>
+                                <th className="p-2 text-left">Email</th>
+                                <th className="p-2 text-left">Last Login</th>
+                                <th className="p-2 text-left">Projects</th>
+                                <th className="p-2 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredClients.map(c => (
+                                <tr key={c._id} className="border-b">
+                                    <td className="p-2">{sanitizeInput(c.name)}</td>
+                                    <td className="p-2">{sanitizeInput(c.email)}</td>
+                                    <td className="p-2">{c.lastLogin ? new Date(c.lastLogin).toLocaleString() : '-'}</td>
+                                    <td className="p-2">{c.projectCount || 0}</td>
+                                    <td className="p-2">
+                                        <button onClick={() => resetPassword(c._id)} className="action-btn">Reset Password</button>
+                                        <button onClick={() => deleteClient(c._id)} className="action-btn danger">Delete</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    <button
+                        onClick={() => alert('Add client form (implement modal)')}
+                        className="submit-btn mt-4"
+                    >
+                        Add Client
+                    </button>
+                </div>
+            );
+        };
+
+        // Uploads Component
+        const Uploads = ({ setSuccess, setError }) => {
+            const [uploads, setUploads] = useState([]);
+
+            useEffect(() => {
+                const token = getToken();
+                axios.get('https://a-k-analytics-backend.onrender.com/api/admin/uploads', {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(res => {
+                    setUploads(res.data);
+                }).catch(err => {
+                    setError('Failed to load uploads.');
+                    console.error('Error loading uploads:', err);
+                });
+            }, []);
+
+            const downloadFile = async (id, filename) => {
+                try {
+                    const token = getToken();
+                    const response = await axios.get(`https://a-k-analytics-backend.onrender.com/api/admin/uploads/${id}/download`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                        responseType: 'blob'
+                    });
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', filename);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                } catch (err) {
+                    setError('Failed to download file.');
+                    console.error('Error downloading file:', err);
+                }
+            };
+
+            return (
+                <div className="card">
+                    <h2 className="text-2xl font-bold mb-4">Review Data Uploads</h2>
+                    <table className="w-full border-collapse">
+                        <thead>
+                            <tr className="bg-gray-100">
+                                <th className="p-2 text-left">Client</th>
+                                <th className="p-2 text-left">Filename</th>
+                                <th className="p-2 text-left">Uploaded</th>
+                                <th className="p-2 text-left">Status</th>
+                                <th className="p-2 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {uploads.map(u => (
+                                <tr key={u._id} className="border-b">
+                                    <td className="p-2">{sanitizeInput(u.clientName)}</td>
+                                    <td className="p-2">{sanitizeInput(u.filename)}</td>
+                                    <td className="p-2">{new Date(u.uploadedAt).toLocaleString()}</td>
+                                    <td className="p-2">{sanitizeInput(u.status)}</td>
+                                    <td className="p-2">
+                                        <button onClick={() => downloadFile(u._id, u.filename)} className="action-btn">Download</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            );
+        };
+
+        // Reports Component
+        const Reports = ({ setSuccess, setError }) => {
+            const [projects, setProjects] = useState([]);
+            const [analysts, setAnalysts] = useState([]);
+            const [reportFile, setReportFile] = useState(null);
+            const [reportUrl, setReportUrl] = useState('');
+
+            useEffect(() => {
+                const token = getToken();
+                Promise.all([
+                    axios.get('https://a-k-analytics-backend.onrender.com/api/admin/projects', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }),
+                    axios.get('https://a-k-analytics-backend.onrender.com/api/admin/analysts', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    })
+                ]).then(([projectsRes, analystsRes]) => {
+                    setProjects(projectsRes.data);
+                    setAnalysts(analystsRes.data);
+                }).catch(err => {
+                    setError('Failed to load projects or analysts.');
+                    console.error('Error loading data:', err);
+                });
+            }, []);
+
+            const assignAnalyst = async (projectId, analystId) => {
+                try {
+                    const token = getToken();
+                    await axios.patch(`https://a-k-analytics-backend.onrender.com/api/admin/projects/${projectId}/assign`, {
+                        analystId
+                    }, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    setProjects(projects.map(p => p._id === projectId ? { ...p, analystId } : p));
+                    setSuccess('Analyst assigned.');
+                    setError('');
+                } catch (err) {
+                    setError('Failed to assign analyst.');
+                    console.error('Error assigning analyst:', err);
+                }
+            };
+
+            const triggerAnalysis = async (projectId) => {
+                try {
+                    const token = getToken();
+                    await axios.post(`https://a-k-analytics-backend.onrender.com/api/admin/projects/${projectId}/analyze`, {}, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    setProjects(projects.map(p => p._id === projectId ? { ...p, status: 'In Progress' } : p));
+                    setSuccess('Analysis triggered.');
+                    setError('');
+                } catch (err) {
+                    setError('Failed to trigger analysis.');
+                    console.error('Error triggering analysis:', err);
+                }
+            };
+
+            const uploadReport = async (projectId) => {
+                if (!reportFile && !reportUrl) {
+                    setError('Please provide a file or URL.');
+                    return;
+                }
+                try {
+                    const token = getToken();
+                    const formData = new FormData();
+                    if (reportFile) {
+                        formData.append('report', reportFile);
+                    }
+                    if (reportUrl) {
+                        formData.append('reportUrl', reportUrl);
+                    }
+                    await axios.post(`https://a-k-analytics-backend.onrender.com/api/admin/projects/${projectId}/report`, formData, {
+                        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
+                    });
+                    setProjects(projects.map(p => p._id === projectId ? { ...p, status: 'Completed' } : p));
+                    setSuccess('Report uploaded.');
+                    setError('');
+                    setReportFile(null);
+                    setReportUrl('');
+                } catch (err) {
+                    setError('Failed to upload report.');
+                    console.error('Error uploading report:', err);
+                }
+            };
+
+            return (
+                <div className="card">
+                    <h2 className="text-2xl font-bold mb-4">Analytics Projects</h2>
+                    <table className="w-full border-collapse">
+                        <thead>
+                            <tr className="bg-gray-100">
+                                <th className="p-2 text-left">Client</th>
+                                <th className="p-2 text-left">Project</th>
+                                <th className="p-2 text-left">Analyst</th>
+                                <th className="p-2 text-left">Status</th>
+                                <th className="p-2 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {projects.map(p => (
+                                <tr key={p._id} className="border-b">
+                                    <td className="p-2">{sanitizeInput(p.clientName)}</td>
+                                    <td className="p-2">{sanitizeInput(p.title)}</td>
+                                    <td className="p-2">
+                                        <select
+                                            value={p.analystId || ''}
+                                            onChange={(e) => assignAnalyst(p._id, e.target.value)}
+                                            className="p-1 border rounded"
+                                        >
+                                            <option value="">Assign Analyst</option>
+                                            {analysts.map(a => (
+                                                <option key={a._id} value={a._id}>{sanitizeInput(a.name)}</option>
+                                            ))}
+                                        </select>
+                                    </td>
+                                    <td className="p-2">{sanitizeInput(p.status)}</td>
+                                    <td className="p-2">
+                                        <button onClick={() => triggerAnalysis(p._id)} className="action-btn">Run Analysis</button>
+                                        <input
+                                            type="file"
+                                            accept=".pdf,.xlsx"
+                                            onChange={(e) => setReportFile(e.target.files[0])}
+                                            className="inline-block"
+                                        />
+                                        <input
+                                            type="text"
+                                            value={reportUrl}
+                                            onChange={(e) => setReportUrl(e.target.value)}
+                                            placeholder="Dashboard URL"
+                                            className="p-1 border rounded inline-block"
+                                        />
+                                        <button onClick={() => uploadReport(p._id)} className="action-btn">Upload Report</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            );
+        };
+
+        // Appointments Component
+        const Appointments = ({ setSuccess, setError }) => {
+            const [appointments, setAppointments] = useState([]);
+            const [analysts, setAnalysts] = useState([]);
+
+            useEffect(() => {
+                const token = getToken();
+                Promise.all([
+                    axios.get('https://a-k-analytics-backend.onrender.com/api/admin/appointments', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }),
+                    axios.get('https://a-k-analytics-backend.onrender.com/api/admin/analysts', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    })
+                ]).then(([appointmentsRes, analystsRes]) => {
+                    setAppointments(appointmentsRes.data);
+                    setAnalysts(analystsRes.data);
+                }).catch(err => {
+                    setError('Failed to load appointments or analysts.');
+                    console.error('Error loading data:', err);
+                });
+            }, []);
+
+            const assignAnalyst = async (appointmentId, analystId) => {
+                try {
+                    const token = getToken();
+                    await axios.patch(`https://a-k-analytics-backend.onrender.com/api/admin/appointments/${appointmentId}/assign`, {
+                        analystId
+                    }, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    setAppointments(appointments.map(a => a._id === appointmentId ? { ...a, analystId } : a));
+                    setSuccess('Analyst assigned.');
+                    setError('');
+                } catch (err) {
+                    setError('Failed to assign analyst.');
+                    console.error('Error assigning analyst:', err);
+                }
+            };
+
+            const reschedule = (appointmentId) => {
+                alert(`Reschedule appointment ${appointmentId} (implement Calendly or modal)`);
+                // Future: Integrate Calendly or custom scheduler
+            };
+
+            return (
+                <div className="card">
+                    <h2 className="text-2xl font-bold mb-4">Appointments</h2>
+                    <table className="w-full border-collapse">
+                        <thead>
+                            <tr className="bg-gray-100">
+                                <th className="p-2 text-left">Client</th>
+                                <th className="p-2 text-left">Schedule</th>
+                                <th className="p-2 text-left">Analyst</th>
+                                <th className="p-2 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {appointments.map(a => (
+                                <tr key={a._id} className="border-b">
+                                    <td className="p-2">{sanitizeInput(a.clientName)}</td>
+                                    <td className="p-2">{new Date(a.callTime).toLocaleString()}</td>
+                                    <td className="p-2">
+                                        <select
+                                            value={a.analystId || ''}
+                                            onChange={(e) => assignAnalyst(a._id, e.target.value)}
+                                            className="p-1 border rounded"
+                                        >
+                                            <option value="">Assign Analyst</option>
+                                            {analysts.map(analyst => (
+                                                <option key={analyst._id} value={analyst._id}>{sanitizeInput(analyst.name)}</option>
+                                            ))}
+                                        </select>
+                                    </td>
+                                    <td className="p-2">
+                                        <button onClick={() => reschedule(a._id)} className="action-btn">Reschedule</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            );
+        };
+
+        // Messages Component
+        const Messages = ({ setError }) => {
+            const [messages, setMessages] = useState([]);
+
+            useEffect(() => {
+                const token = getToken();
+                const socket = io('https://a-k-analytics-backend.onrender.com');
+                socket.on('connect', () => {
+                    socket.emit('join', { userId: getUserId(), role: 'admin' });
+                });
+                socket.on('message', (data) => {
+                    setMessages(prev => [...prev, { sender: data.sender, text: data.text, timestamp: new Date() }]);
+                });
+
+                axios.get('https://a-k-analytics-backend.onrender.com/api/admin/messages', {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(res => {
+                    setMessages(res.data);
+                }).catch(err => {
+                    setError('Failed to load messages.');
+                    console.error('Error loading messages:', err);
+                });
+
+                return () => socket.disconnect();
+            }, []);
+
+            return (
+                <div className="card">
+                    <h2 className="text-2xl font-bold mb-4">Chat Logs</h2>
+                    <div className="h-64 overflow-y-scroll bg-gray-50 p-4 rounded">
+                        {messages.map((m, i) => (
+                            <p key={i}>
+                                <strong>{sanitizeInput(m.sender)}</strong> [{new Date(m.timestamp).toLocaleString()}]: {sanitizeInput(m.text)}
+                            </p>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Databases Component
+        const Databases = ({ setError }) => {
+            const [databases, setDatabases] = useState([]);
+
+            useEffect(() => {
+                const token = getToken();
+                axios.get('https://a-k-analytics-backend.onrender.com/api/admin/databases', {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(res => {
+                    setDatabases(res.data);
+                }).catch(err => {
+                    setError('Failed to load databases.');
+                    console.error('Error loading databases:', err);
+                });
+            }, []);
+
+            return (
+                <div className="card">
+                    <h2 className="text-2xl font-bold mb-4">Connected Databases</h2>
+                    <table className="w-full border-collapse">
+                        <thead>
+                            <tr className="bg-gray-100">
+                                <th className="p-2 text-left">Client</th>
+                                <th className="p-2 text-left">DB Type</th>
+                                <th className="p-2 text-left">Last Sync</th>
+                                <th className="p-2 text-left">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {databases.map(d => (
+                                <tr key={d._id} className="border-b">
+                                    <td className="p-2">{sanitizeInput(d.clientName)}</td>
+                                    <td className="p-2">{sanitizeInput(d.dbType)}</td>
+                                    <td className="p-2">{d.lastSync ? new Date(d.lastSync).toLocaleString() : '-'}</td>
+                                    <td className="p-2">{sanitizeInput(d.status)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            );
+        };
+
+        // Audit Logs Component
+        const AuditLogs = ({ setError }) => {
+            const [logs, setLogs] = useState([]);
+
+            useEffect(() => {
+                const token = getToken();
+                axios.get('https://a-k-analytics-backend.onrender.com/api/admin/audit-logs', {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(res => {
+                    setLogs(res.data);
+                }).catch(err => {
+                    setError('Failed to load audit logs.');
+                    console.error('Error loading audit logs:', err);
+                });
+            }, []);
+
+            return (
+                <div className="card">
+                    <h2 className="text-2xl font-bold mb-4">Audit Logs</h2>
+                    <table className="w-full border-collapse">
+                        <thead>
+                            <tr className="bg-gray-100">
+                                <th className="p-2 text-left">User</th>
+                                <th className="p-2 text-left">Action</th>
+                                <th className="p-2 text-left">Timestamp</th>
+                                <th className="p-2 text-left">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {logs.map(l => (
+                                <tr key={l._id} className="border-b">
+                                    <td className="p-2">{sanitizeInput(l.userName)}</td>
+                                    <td className="p-2">{sanitizeInput(l.action)}</td>
+                                    <td className="p-2">{new Date(l.timestamp).toLocaleString()}</td>
+                                    <td className="p-2">{sanitizeInput(l.details)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            );
+        };
+
+        // Render App
+        ReactDOM.render(<AdminPortal />, document.getElementById('root'));
+    </script>
+</body>
+</html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A & K Analytics - Data Solutions</title>
+    <meta name="description" content="A & K Analytics provides cutting-edge data solutions, including predictive analytics, data visualization, and business intelligence to transform your business.">
+    <meta name="keywords" content="data analytics, predictive analytics, data visualization, business intelligence, machine learning, A & K Analytics, Kenya analytics">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" defer>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/i18next@21.9.2/dist/umd/i18next.min.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "A & K Analytics",
+            "url": "https://akaana.netlify.app",
+            "sameAs": [
+                "https://facebook.com/akanalytics",
+                "https://twitter.com/akanalytics",
+                "https://linkedin.com/company/akanalytics",
+                "https://instagram.com/akanalytics"
+            ],
+            "description": "A & K Analytics offers advanced data analytics services to help businesses make data-driven decisions.",
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+254720947197",
+                "contactType": "Customer Service",
+                "areaServed": "KE",
+                "availableLanguage": ["English"]
+            }
+        }
+    </script>
+</head>
+<body>
+    <noscript>
+        <p>This site requires JavaScript for full functionality. Please enable it in your browser settings.</p>
+    </noscript>
+    <section class="hero-section">
+        <header>
+            <div class="logo">
+                A & K Analytics
+                <span>Data Solutions</span>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search solutions..." aria-label="Search site content">
+                <i class="fas fa-search" aria-hidden="true"></i>
+            </div>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="index.html" class="nav-link" aria-label="Home">Home</a></li>
+                    <li><a href="about.html" class="nav-link" aria-label="About">About</a></li>
+                    <li><a href="industries.html" class="nav-link" aria-label="Industries">Industries</a></li>
+                    <li><a href="insights.html" class="nav-link" aria-label="Insights">Insights</a></li>
+                    <li><a href="#contact" class="nav-link" aria-label="Contact">Contact</a></li>
+                    <li><a href="blog.html" class="nav-link" aria-label="Blog">Blog</a></li>
+                    <li><a href="book-online.html" class="nav-link" aria-label="Book Online">Book Online</a></li>
+                    <li><a href="signup.html" id="signup-link" class="nav-link" aria-label="Sign Up">Sign Up</a></li>
+                    <li><a href="login.html" id="login-link" class="nav-link" aria-label="Login">Login</a></li>
+                    <li><a href="#" onclick="logout()" id="logout-link" class="nav-link" style="display: none;" aria-label="Logout">Logout</a></li>
+                    <li><a href="customer-portal.html" id="customer-portal-link" class="nav-link" style="display: none;" aria-label="My Portal">My Portal</a></li>
+                    <li><a href="admin-portal.html" id="admin-portal-link" class="nav-link" style="display: none;" aria-label="Admin Portal">Admin Portal</a></li>
+                </ul>
+            </nav>
+        </header>
+        <div id="hero-content" class="content">
+            <h1 class="headline">Taking Your Business to the Next Level</h1>
+            <div class="intro">
+                <p>We provide data-driven solutions to help your business grow. Let us help you achieve your goals</p>
+                <a href="industries.html"><button class="read-more">Read More</button></a>
+            </div>
+        </div>
+    </section>
+
+    <div id="verify-message" style="display: none;">
+        <h2>Email Verification</h2>
+        <p id="verify-text"></p>
+    </div>
+
+    <div id="loading" style="display: none; text-align: center; padding: 20px;">
+        <p>Loading...</p>
+    </div>
+
+    <div id="public-content">
+        <section class="features-section">
+            <div class="features-header">
+                <h2>Our Solutions</h2>
+                <p>Discover how A & K Analytics can empower your business with cutting-edge data solutions.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Data Visualization</h3>
+                    <p>Transform raw data into actionable insights with interactive dashboards. (KES 15,000 / USD 115)</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Predictive Analytics</h3>
+                    <p>Leverage advanced models to forecast trends and make informed decisions. (KES 50,000 / USD 385)</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Business Intelligence</h3>
+                    <p>Unlock the full potential of your data with comprehensive BI tools. (KES 100,000 / USD 770)</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="testimonials-section">
+            <div class="testimonials-header">
+                <h2>What Our Clients Say</h2>
+                <p>Read what our clients have said about their experience with A & K Analytics.</p>
+            </div>
+            <div class="testimonials-grid" id="reviews-container">
+                <p>Loading reviews...</p>
+            </div>
+            <div class="text-center mt-6">
+                <p>Want to share your experience? <a href="customer-portal.html" class="text-blue-600 hover:underline">Submit a review</a> in your portal. </p>
+            </div>
+        </section>
+
+        <section class="contact-section" id="contact">
+            <div class="contact-header">
+                <h2>Contact Us</h2>
+                <p>Ready to transform your business with data? Get in touch with our team today.</p>
+            </div>
+            <div class="form-message" style="display: none; color: red; margin-bottom: 10px;"></div>
+            <form action="https://formspree.io/f/mwpoaazq" method="POST" class="contact-form">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Your Name" required aria-label="Your Name">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Your Email" required aria-label="Your Email">
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" placeholder="Your Message" rows="5" required aria-label="Your Message"></textarea>
+                </div>
+                <input type="text" name="_gotcha" style="display:none" />
+                <input type="hidden" name="_next" value="https://akaana.netlify.app/thanks.html" />
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+            <div class="contact-info">
+                <p>Email us directly at: <a href="mailto:info@akanalytics.com">info@akanalytics.com</a></p>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer-section">
+        <div class="footer-content">
+            <div class="footer-logo">
+                A & K Analytics
+                <span>Data Solutions</span>
+            </div>
+            <nav class="footer-nav">
+                <ul>
+                    <li><a href="about.html" aria-label="About">About</a></li>
+                    <li><a href="industries.html" aria-label="Industries">Industries</a></li>
+                    <li><a href="insights.html" aria-label="Insights">Insights</a></li>
+                    <li><a href="#contact" aria-label="Contact">Contact</a></li>
+                    <li><a href="blog.html" aria-label="Blog">Blog</a></li>
+                    <li><a href="book-online.html" aria-label="Book Online">Book Online</a></li>
+                </ul>
+            </nav>
+            <div class="footer-social">
+                <a href="https://facebook.com/akanalytics" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com/akanalytics" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://linkedin.com/company/akanalytics" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://instagram.com/akanalytics" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+            <div class="footer-copyright">
+                <p>© 2025 A & K Analytics. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { getToken, removeToken, fetchUserProfile, isAdmin, sanitizeInput } from '/auth.js';
+
+        // Initialize i18n for multi-language support
+        i18n.init({
+            lng: 'en',
+            resources: {
+                en: {
+                    translation: {
+                        'Taking Your Business to the Next Level': 'Taking Your Business to the Next Level',
+                        'We provide data-driven solutions to help your business grow. Let us help you achieve your goals.': 'We provide data-driven solutions to help your business grow. Let us help you achieve your goals.',
+                        'Our Solutions': 'Our Solutions',
+                        'Discover how A & K Analytics can empower your business with cutting-edge data solutions.': 'Discover how A & K Analytics can empower your business with cutting-edge data solutions.',
+                        'What Our Clients Say': 'What Our Clients Say',
+                        'Read what our clients have said about their experience with A & K Analytics.': 'Read what our clients have said about their experience with A & K Analytics.',
+                        'Contact Us': 'Contact Us',
+                        'Ready to transform your business with data? Get in touch with our team today.': 'Ready to transform your business with data? Get in touch with our team today.'
+                    }
+                },
+                es: {
+                    translation: {
+                        'Taking Your Business to the Next Level': 'Llevando tu negocio al siguiente nivel',
+                        'We provide data-driven solutions to help your negocio a crecer. Permítenos ayudarte a alcanzar tus metas.',
+                        'Our Solutions': 'Nuestras Soluciones',
+                        'Discover how A & K Analytics can empower your business with cutting-edge data solutions.': 'Descubre cómo A & K Analytics puede potenciar tu negocio con soluciones de datos de vanguardia.',
+                        'What Our Clients Say': 'Lo que dicen nuestros clientes',
+                        'Read what our clients have said about their experience with A & K Analytics.': 'Lee lo que nuestros clientes han dicho sobre su experiencia con A & K Analytics.',
+                        'Contact Us': 'Contáctanos',
+                        'Ready to transform your business with data? Get in touch with our team today.': '¿Listo para transformar tu negocio con datos? Ponte en contacto con nuestro equipo hoy.'
+                    }
+                }
+            }
+        }, (err, t) => {
+            if (err) console.error('i18n init error:', err);
+            updateContent();
+        });
+
+        function updateContent() {
+            document.querySelector('.headline').textContent = i18n.t('Taking Your Business to the Next Level');
+            document.querySelector('.intro p').textContent = i18n.t('We provide data-driven solutions to help your business grow. Let us help you achieve your goals.');
+            document.querySelector('.features-header h2').textContent = i18n.t('Our Solutions');
+            document.querySelector('.features-header p').textContent = i18n.t('Discover how A & K Analytics can empower your business with cutting-edge data solutions.');
+            document.querySelector('.testimonials-header h2').textContent = i18n.t('What Our Clients Say');
+            document.querySelector('.testimonials-header p').textContent = i18n.t('Read what our clients have said about their experience with A & K Analytics.');
+            document.querySelector('.contact-header h2').textContent = i18n.t('Contact Us');
+            document.querySelector('.contact-header p').textContent = i18n.t('Ready to transform your business with data? Get in touch with our team today.');
+        }
+
+        // Show error/success message
+        function showMessage(containerId, message, color = 'red') {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container ${containerId} not found`);
+                return;
+            }
+            const messageDiv = container.querySelector('.review-message') || document.createElement('div');
+            messageDiv.className = 'review-message';
+            messageDiv.style.display = 'block';
+            messageDiv.style.color = color;
+            messageDiv.textContent = message;
+            if (!container.querySelector('.review-message')) container.prepend(messageDiv);
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Update UI based on user authentication and role
+        async function updateUI() {
+            const token = getToken();
+            const publicContent = document.getElementById('public-content');
+            const signupLink = document.getElementById('signup-link');
+            const loginLink = document.getElementById('login-link');
+            const logoutLink = document.getElementById('logout-link');
+            const customerPortalLink = document.getElementById('customer-portal-link');
+            const adminPortalLink = document.getElementById('admin-portal-link');
+
+            document.getElementById('loading').style.display = 'block';
+            try {
+                if (token) {
+                    const user = await fetchUserProfile(token);
+                    publicContent.style.display = 'block';
+                    signupLink.style.display = 'none';
+                    loginLink.style.display = 'none';
+                    logoutLink.style.display = 'inline';
+                    const adminStatus = isAdmin(user);
+                    adminPortalLink.style.display = adminStatus ? 'inline' : 'none';
+                    customerPortalLink.style.display = adminStatus ? 'none' : 'inline';
+                    // Redirect based on role
+                    if (adminStatus) {
+                        window.location.href = 'admin-portal.html';
+                    } else {
+                        window.location.href = 'customer-portal.html';
+                    }
+                } else {
+                    resetUI();
+                }
+            } catch (error) {
+                console.error('Update UI error:', error.message);
+                removeToken();
+                localStorage.clear();
+                resetUI();
+                showMessage('public-content', 'Session expired. Please log in again.', 'red');
+            }
+
+            function resetUI() {
+                publicContent.style.display = 'block';
+                signupLink.style.display = 'inline';
+                loginLink.style.display = 'inline';
+                logoutLink.style.display = 'none';
+                customerPortalLink.style.display = 'none';
+                adminPortalLink.style.display = 'none';
+            }
+
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.clear();
+            updateUI();
+            showMessage('public-content', 'Logged out successfully', 'green');
+        }
+
+        // Handle verification
+        async function handleVerification() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('verify');
+            if (token) {
+                document.getElementById('loading').style.display = 'block';
+                try {
+                    const response = await axios.get(`https://a-k-analytics-backend.onrender.com/api/users/verify?token=${token}`);
+                    if (response.status !== 200) throw new Error(response.data.error || 'Verification failed');
+                    document.getElementById('verify-message').style.display = 'block';
+                    document.getElementById('verify-text').textContent = 'Email verified successfully! You can now log in.';
+                    document.getElementById('public-content').style.display = 'none';
+                } catch (error) {
+                    document.getElementById('verify-message').style.display = 'block';
+                    document.getElementById('verify-text').textContent = `Verification failed: ${error.message}`;
+                }
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Display reviews
+        async function displayReviews() {
+            try {
+                const response = await axios.get('https://a-k-analytics-backend.onrender.com/api/reviews');
+                const reviews = response.data;
+                const reviewsContainer = document.getElementById('reviews-container');
+                reviewsContainer.innerHTML = '';
+                if (reviews.length === 0) {
+                    reviewsContainer.innerHTML = '<p>No reviews yet.</p>';
+                } else {
+                    reviews.forEach(review => {
+                        const item = document.createElement('div');
+                        item.className = 'review-item';
+                        const stars = '<i class="fas fa-star"></i>'.repeat(review.rating) +
+                                     '<i class="far fa-star"></i>'.repeat(5 - review.rating);
+                        item.innerHTML = `
+                            <p><strong>${sanitizeInput(review.name)}</strong></p>
+                            <p>${sanitizeInput(review.text)}</p>
+                            <p class="rating">${stars}</p>
+                        `;
+                        reviewsContainer.appendChild(item);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching reviews:', error);
+                document.getElementById('reviews-container').innerHTML = '<p>Failed to load reviews.</p>';
+            }
+        }
+
+        // Handle search
+        const searchInput = document.getElementById('search-input');
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = sanitizeInput(searchInput.value.toLowerCase());
+                if (query) {
+                    const solutions = [
+                        { name: 'Data Visualization', url: 'industries.html#visualization' },
+                        { name: 'Predictive Analytics', url: 'industries.html#predictive' },
+                        { name: 'Business Intelligence', url: 'industries.html#bi' }
+                    ];
+                    const match = solutions.find(s => s.name.toLowerCase().includes(query));
+                    if (match) {
+                        window.location.href = match.url;
+                    } else {
+                        showMessage('public-content', 'No matching solutions found.', 'red');
+                    }
+                }
+            }
+        });
+
+        // Handle contact form submission
+        const contactForm = document.querySelector('.contact-form');
+        contactForm.addEventListener('submit', (e) => {
+            const name = sanitizeInput(document.getElementById('name').value);
+            const email = sanitizeInput(document.getElementById('email').value);
+            const message = sanitizeInput(document.getElementById('message').value);
+            if (!name || !email || !message) {
+                e.preventDefault();
+                showMessage('contact-section', 'Please fill all fields.', 'red');
+            }
+        });
+
+        // Debug link clicks
+        document.getElementById('signup-link').addEventListener('click', () => {
+            console.log('Sign Up link clicked');
+        });
+        document.getElementById('login-link').addEventListener('click', () => {
+            console.log('Login link clicked');
+        });
+
+        // Initialize page
+        window.onload = () => {
+            // updateUI(); // Temporarily disabled for testing
+            handleVerification();
+            displayReviews();
+            document.querySelector('.footer-copyright p').textContent = `© ${new Date().getFullYear()} A & K Analytics. All rights reserved.`;
+        };
+    </script>
+</body>
+</html>

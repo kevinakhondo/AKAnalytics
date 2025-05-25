@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Portal - A & K Analytics</title>
+    <meta name="description" content="Access your A & K Analytics portal for dashboards, bookings, analyst support, and data analytics.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.5.0/dist/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"></script>
+    <script src="https://assets.calendly.com/assets/external/widget.js"></script>
+    <link rel="stylesheet" href="https://assets.calendly.com/assets/external/widget.css">
+    <style>
+        .hero-section { background: linear-gradient(to right, #2563eb, #1e40af); color: white; padding: 2rem; }
+        .logo { font-size: 1.5rem; font-weight: bold; }
+        .logo span { font-size: 1rem; font-weight: normal; }
+        .nav-link { color: white; padding: 0.5rem; }
+        .nav-link:hover { text-decoration: underline; }
+        .submit-btn { background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.25rem; }
+        .submit-btn:hover { background-color: #1e40af; }
+        .action-btn { background-color: #2563eb; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; margin-right: 0.5rem; }
+        .action-btn.cancel-btn { background-color: #dc2626; }
+        .action-btn:hover { opacity: 0.9; }
+        .footer-section { background: #1f2937; color: white; padding: 2rem; }
+        .footer-nav a { color: white; margin-right: 1rem; }
+        .footer-social a { color: white; margin-right: 1rem; }
+        .error, .success { display: none; margin-bottom: 1rem; text-align: center; }
+        .error { color: #dc2626; }
+        .error.block, .success.block { display: block; }
+        .card { background: white; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 1.5rem; }
+        @media (max-width: 768px) {
+            .grid-cols-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Inline auth.js functions
+        function sanitizeInput(input) {
+            if (typeof input !== 'string') return '';
+            const div = document.createElement('div');
+            div.textContent = input;
+            return div.innerHTML;
+        }
+
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        function setToken(token) {
+            localStorage.setItem('token', token);
+        }
+
+        function removeToken() {
+            localStorage.removeItem('token');
+        }
+
+        async function fetchUserProfile(token) {
+            try {
+                const response = await axios.get('https://a-k-analytics-backend.onrender.com/api/users/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                return response.data;
+            } catch (err) {
+                throw new Error(err.response?.data?.error || 'Failed to fetch user profile');
+            }
+        }
+
+        function isAdmin(user) {
+            return user.role === 'admin' || user.email === 'kevinakhondo9@gmail.com';
+        }
+
+        async function login(email, password) {
+            try {
+                const response = await axios.post('https://a-k-analytics-backend.onrender.com/api/users/login', {
+                    email: sanitizeInput(email),
+                    password,
+                }, {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                return response.data.token;
+            } catch (err) {
+                throw new Error(err.response?.data?.error || 'Login failed');
+            }
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function validatePassword(password) {
+            const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+            return re.test(password);
+        }
+
+        class ErrorBoundary extends React.Component {
+            state = { hasError: false, errorMessage: '' };
+            static getDerivedStateFromError(error) {
+                console.error('ErrorBoundary caught an error:', error.message);
+                return { hasError: true, errorMessage: error.message };
+            }
+            render() {
+                if (this.state.hasError) {
+                    return (
+                        <div className="container mx-auto p-6">
+                            <h1 className="text-2xl font-bold text-red-600">Something went wrong</h1>
+                            <p>{this.state.errorMessage}</p>
+                            <p>Please try refreshing the page or <a href="login.html" className="text-blue-600">log in again</a>.</p>
+                        </div>
+                    );
+                }
+                return this.props.children;
+            }
+        }
+
+        const CustomerPortal = () => {
+            const [user, setUser] = useState(null);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState('');
+
+            useEffect(() => {
+                console.log('CustomerPortal useEffect triggered');
+                const token = getToken();
+                console.log('Token retrieved:', token);
+                if (!token) {
+                    console.error('No token found, redirecting to login');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                fetchProfile(token);
+            }, []);
+
+            const fetchProfile = async (token) => {
+                try {
+                    console.log('Fetching user profile with token:', token);
+                    const userData = await fetchUserProfile(token);
+                    console.log('Profile data received:', userData);
+                    setUser(userData);
+                    localStorage.setItem('userId', userData._id);
+                    localStorage.setItem('email', userData.email);
+                } catch (err) {
+                    console.error('Profile fetch error:', err.message);
+                    setError('Session expired. Please log in again.');
+                    removeToken();
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('email');
+                    setTimeout(() => {
+                        console.log('Redirecting to login.html due to profile fetch error');
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const logout = () => {
+                console.log('Logging out user');
+                removeToken();
+                localStorage.removeItem('userId');
+                localStorage.removeItem('email');
+                window.location.href = 'login.html';
+            };
+
+            if (loading) {
+                return (
+                    <div className="text-center p-4">
+                        <p>Loading...</p>
+                    </div>
+                );
+            }
+
+            if (error || !user) {
+                return (
+                    <div className="container mx-auto p-6">
+                        <h1 className="text-2xl font-bold text-red-600">Authentication Error</h1>
+                        <p>{error || 'No user data loaded.'}</p>
+                        <p>Please <a href="login.html" className="text-blue-600">log in again</a>.</p>
+                    </div>
+                );
+            }
+
+            return (
+                <ErrorBoundary>
+                    <div>
+                        <section className="hero-section">
+                            <header className="container mx-auto flex justify-between items-center">
+                                <div className="logo">
+                                    A & K Analytics
+                                    <span>Data Solutions</span>
+                                </div>
+                                <nav>
+                                    <ul className="flex space-x-4">
+                                        <li><a href="index.html" className="nav-link">Home</a></li>
+                                        <li><a href="book-online.html" className="nav-link">Book Services</a></li>
+                                        <li><a href="#" onClick={logout} className="nav-link">Logout</a></li>
+                                    </ul>
+                                </nav>
+                            </header>
+                        </section>
+                        <div className="container mx-auto p-6">
+                            <h1 className="text-3xl font-bold mb-6">
+                                Welcome, {user?.name || 'Customer'}!
+                            </h1>
+                            {error && <div className="error block">{error}</div>}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="card col-span-2"><p>Dashboard Placeholder</p></div>
+                                <div className="card"><p>ServiceBooking Placeholder</p></div>
+                                <div className="card"><p>ScheduleCall Placeholder</p></div>
+                                <div className="card"><p>LiveChat Placeholder</p></div>
+                                <div className="card"><p>DataUpload Placeholder</p></div>
+                                <div className="card"><p>DatabaseConnection Placeholder</p></div>
+                            </div>
+                        </div>
+                        <footer className="footer-section">
+                            <div className="footer-content container mx-auto">
+                                <div className="footer-logo">
+                                    A & K Analytics
+                                    <span>Data Solutions</span>
+                                </div>
+                                <nav className="footer-nav">
+                                    <ul className="flex flex-wrap">
+                                        <li><a href="about.html">About</a></li>
+                                        <li><a href="industries.html">Industries</a></li>
+                                        <li><a href="insights.html">Insights</a></li>
+                                        <li><a href="index.html#contact">Contact</a></li>
+                                        <li><a href="blog.html">Blog</a></li>
+                                        <li><a href="book-online.html">Book Online</a></li>
+                                    </ul>
+                                </nav>
+                                <div className="footer-social">
+                                    <a href="https://facebook.com/akanalytics" className="social-icon" aria-label="Facebook"><i className="fab fa-facebook-f"></i></a>
+                                    <a href="https://twitter.com/akanalytics" className="social-icon" aria-label="Twitter"><i className="fab fa-twitter"></i></a>
+                                    <a href="https://linkedin.com/company/akanalytics" className="social-icon" aria-label="LinkedIn"><i className="fab fa-linkedin-in"></i></a>
+                                    <a href="https://instagram.com/akanalytics" className="social-icon" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
+                                </div>
+                                <div className="footer-copyright">
+                                    <p>© 2025 A & K Analytics. All rights reserved.</p>
+                                </div>
+                            </div>
+                        </footer>
+                    </div>
+                </ErrorBoundary>
+            );
+        };
+
+        ReactDOM.render(<CustomerPortal />, document.getElementById('root'));
+    </script>
+</body>
+</html>

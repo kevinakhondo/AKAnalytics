@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - A & K Analytics</title>
+    <meta name="description" content="A & K Analytics provides cutting-edge data solutions, including predictive analytics, data visualization, and business intelligence, to transform your business.">
+    <meta name="keywords" content="data analytics, predictive analytics, data visualization, business intelligence, A & K Analytics">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="blog.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            "url": "https://akanalytics.com/blog.html",
+            "name": "A & K Analytics Blog",
+            "description": "Stay updated with the latest trends and insights in data analytics.",
+            "publisher": {
+                "@type": "Organization",
+                "name": "A & K Analytics",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://akanalytics.com/logo.png"
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            A & K Analytics
+            <span>Data Solutions</span>
+        </div>
+        <div class="search-bar">
+             <input type="text" id="search-input" placeholder="Search...">
+             <i class="fas fa-search"></i>
+           </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="industries.html">Industries</a></li>
+                <li><a href="careers.html">Careers</a></li>
+                <li><a href="insights.html">Insights</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="book-online.html">Book Online</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Blog Section -->
+    <section class="blog-section">
+        <div class="blog-header">
+            <h1>Our Blog</h1>
+            <p>Stay updated with the latest trends, insights, and tips in data analytics.</p>
+        </div>
+        <div class="blog-posts">
+            <div class="blog-post">
+                <h2>The Future of Predictive Analytics</h2>
+                <p class="post-date">May 10, 2025</p>
+                <p>Explore how predictive analytics is transforming industries with advanced machine learning techniques. Learn about the latest tools and strategies to forecast trends accurately.</p>
+                <a href="post1.html" class="read-more">Read More</a>
+            </div>
+            <div class="blog-post">
+                <h2>Data Visualization Best Practices</h2>
+                <p class="post-date">May 08, 2025</p>
+                <p>Discover the best practices for creating impactful data visualizations that communicate insights effectively. We cover design principles and tool recommendations.</p>
+                <a href="post2.html" class="read-more">Read More</a>
+            </div>
+            <div class="blog-post">
+                <h2>Case Study: Boosting Retail Sales</h2>
+                <p class="post-date">May 05, 2025</p>
+                <p>A detailed case study on how A & K Analytics helped a retail client increase sales by 20% using business intelligence tools.</p>
+                <a href="post3.html" class="read-more">Read More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-section">
+        <div class="footer-content">
+            <div class="footer-logo">
+                A & K Analytics
+                <span>Data Solutions</span>
+            </div>
+            <nav class="footer-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="industries.html">Industries</a></li>
+                    <li><a href="careers.html">Careers</a></li>
+                    <li><a href="insights.html">Insights</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="book-online.html">Book Online</a></li>
+                </ul>
+            </nav>
+            <div class="footer-social">
+                <a href="https://facebook.com/akanalytics" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com/akanalytics" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="https://linkedin.com/company/akanalytics" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://instagram.com/akanalytics" class="social-icon"><i class="fab fa-instagram"></i></a>
+            </div>
+            <div class="footer-copyright">
+                <p>© 2025 A & K Analytics. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.blog-post').forEach(element => {
+            observer.observe(element);
+        });
+
+        const searchInput = document.getElementById('search-input');
+        const blogPosts = document.querySelectorAll('.blog-post');
+
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            blogPosts.forEach(post => {
+                const text = post.textContent.toLowerCase();
+                post.style.display = text.includes(searchTerm) ? 'block' : 'none';
+            });
+        });
+    });
+</script>
+</body>
+</html>

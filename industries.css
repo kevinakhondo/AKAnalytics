@@ -1,0 +1,980 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto',sans-serif;
+}
+
+/* styling the body */
+
+body {
+    height: 100vh;
+    overflow: auto;
+    padding-top: 80px; /* Space for the fixed header */
+}
+
+/* Styling the background video */
+.hero-section {
+    position: relative;
+    height: 100vh;
+    min-height: 100%;
+    min-width: 100%;
+    background: url(Images/vecteezy_ai-generated-streamlining-business-computer-monitor_40888601.jpg)no-repeat center center/100% 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 0;
+}
+
+
+/* Styling the header */
+header{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    background: #2c3e50;
+    z-index: 100; /* Ensure it stays above other content */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+    box-sizing: border-box; /* Explicitly ensure box-sizing */
+    animation: fadeInDown 0.5s ease-out;
+}
+
+/* Styling the logo */
+
+.logo{
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.logo span{
+    font-size: 16px;
+    font-weight: normal;
+    display: block;
+    color: #a0a0a0;
+    display: block;
+}
+
+.search-bar {
+    position: relative;
+    margin: 0 20px;
+}
+
+.search-bar input {
+    padding: 8px 35px 8px 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    outline: none;
+    background: #34495e;
+    color: #ecf0f1;
+    width: 200px;
+    transition: width 0.3s, background 0.3s;
+}
+
+.search-bar input:focus {
+    background: #465c71;
+    width: 250px;
+}
+
+.search-bar .fa-search {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #b0b0b0;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Styling the navigation bars */
+
+nav ul{
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+nav ul li a{
+    color: #d0d0d0; /* Lighter gray for navigation links */
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    transition: color o.3s;
+    text-transform: uppercase;
+}
+
+nav ul li a:hover{
+    color: #00bcd4;
+}
+nav ul li a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    background: #00bcd4;
+    bottom: -4px;
+    left: 0;
+    transition: width 0.3s;
+}
+nav ul li a:hover::after {
+    width: 100%;
+}
+
+/* Industries Section */
+.industries-section {
+    background: #f5f5f5;
+    padding: 60px 50px;
+    text-align: center;
+    z-index: 1;
+    position: relative;
+    min-height: 100vh;
+}
+
+.industries-header h1 {
+    font-size: 48px;
+    font-weight: 700;
+    color: #333333;
+    margin-bottom: 20px;
+}
+
+.industries-header p {
+    font-size: 18px;
+    font-weight: 400;
+    color: #666666;
+    margin-bottom: 40px;
+}
+
+.industries-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.industry-block {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+    text-align: left;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.industry-block h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333333;
+    margin-bottom: 10px;
+}
+
+.industry-block p {
+    font-size: 16px;
+    font-weight: 400;
+    color: #666666;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.industry-block .read-more {
+    padding: 8px 16px;
+    background: #00bcd4;
+    border: none;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.industry-block .read-more:hover {
+    background: #0097a7;
+}
+
+.industry-block:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+/* Animation */
+.animate-section {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.animate-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Animation Keyframes */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Footer Section */
+.footer-section {
+    background: #2c3e50;
+    padding: 40px 50px;
+    color: #ecf0f1;
+    text-align: center;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.footer-logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.footer-logo span {
+    font-size: 14px;
+    font-weight: 400;
+    color: #b0b0b0;
+    display: block;
+}
+
+.footer-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.footer-nav ul li a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    transition: color 0.3s;
+    text-transform: uppercase;
+}
+
+.footer-nav ul li a:hover {
+    color: #00bcd4;
+}
+
+.footer-social {
+    display: flex;
+    gap: 15px;
+}
+
+.social-icon {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.social-icon:hover {
+    color: #00bcd4;
+}
+
+.footer-copyright {
+    font-size: 14px;
+    color: #b0b0b0;
+}
+/* Responsive Design for Tablets and Phones */
+@media (max-width: 768px) {
+    body {
+        padding-top: 180px;
+    }
+
+    header {
+        padding: 15px 30px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .logo {
+        font-size: 20px;
+    }
+
+    .logo span {
+        font-size: 12px;
+    }
+
+    .search-bar {
+        margin: 10px 0;
+    }
+
+    .search-bar input {
+        width: 150px;
+    }
+
+    .search-bar input:focus {
+        width: 200px;
+    }
+
+    nav ul {
+        gap: 15px;
+    }
+
+    nav ul li a {
+        font-size: 14px;
+    }
+
+    .content {
+        flex-direction: column;
+        padding: 20px 30px;
+        text-align: center;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .headline {
+        font-size: 36px;
+        max-width: 100%;
+    }
+
+    .intro {
+        max-width: 100%;
+        font-size: 14px;
+    }
+
+    .read-more {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    .features-section {
+        padding: 40px 30px;
+    }
+
+    .features-header h2 {
+        font-size: 28px;
+    }
+
+    .features-header p {
+        font-size: 16px;
+    }
+
+    .feature-card {
+        max-width: 100%;
+        padding: 20px;
+    }
+
+    .testimonials-section {
+        padding: 40px 30px;
+    }
+
+    .testimonials-header h2 {
+        font-size: 28px;
+    }
+
+    .testimonials-header p {
+        font-size: 16px;
+    }
+
+    .testimonial-card {
+        max-width: 100%;
+        padding: 20px;
+    }
+
+    .contact-section {
+        padding: 40px 30px;
+    }
+
+    .contact-header h2 {
+        font-size: 28px;
+    }
+
+    .contact-header p {
+        font-size: 16px;
+    }
+
+    .contact-form {
+        max-width: 100%;
+    }
+
+    .form-group label {
+        font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        font-size: 14px;
+    }
+
+    .submit-btn {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    .contact-info {
+        font-size: 14px;
+    }
+
+    .about-section {
+        padding: 40px 30px;
+    }
+
+    .about-header h1 {
+        font-size: 36px;
+    }
+
+    .about-header p {
+        font-size: 16px;
+    }
+
+    .about-content {
+        max-width: 100%;
+    }
+
+    .about-mission h2, .about-history h2, .about-team h2, .about-values h2 {
+        font-size: 24px;
+    }
+
+    .about-mission p, .about-history p, .about-team p, .about-values li {
+        font-size: 14px;
+    }
+
+    .blog-section {
+        padding: 40px 30px;
+    }
+
+    .blog-header h1 {
+        font-size: 36px;
+    }
+
+    .blog-header p {
+        font-size: 16px;
+    }
+
+    .blog-posts {
+        max-width: 100%;
+    }
+
+    .blog-post {
+        padding: 15px;
+    }
+
+    .blog-post h2 {
+        font-size: 20px;
+    }
+
+    .post-date {
+        font-size: 12px;
+    }
+
+    .blog-post p {
+        font-size: 14px;
+    }
+
+    .blog-post .read-more {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .blog-post-section {
+        padding: 40px 30px;
+    }
+
+    .blog-post-header h1 {
+        font-size: 28px;
+    }
+
+    .blog-post-header .post-date {
+        font-size: 14px;
+    }
+
+    .blog-post-content {
+        max-width: 100%;
+    }
+
+    .blog-post-content p {
+        font-size: 14px;
+    }
+
+    .blog-post-content h2 {
+        font-size: 20px;
+    }
+
+    .back-to-blog {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    .industries-section {
+        padding: 40px 30px;
+    }
+
+    .industries-header h1 {
+        font-size: 36px;
+    }
+
+    .industries-header p {
+        font-size: 16px;
+    }
+
+    .industries-content {
+        max-width: 100%;
+    }
+
+    .industry-card {
+        padding: 15px;
+    }
+
+    .industry-card h2 {
+        font-size: 20px;
+    }
+
+    .industry-card p {
+        font-size: 14px;
+    }
+
+    .industry-card .read-more {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .careers-section {
+        padding: 40px 30px;
+    }
+
+    .careers-header h1 {
+        font-size: 36px;
+    }
+
+    .careers-header p {
+        font-size: 16px;
+    }
+
+    .careers-content {
+        max-width: 100%;
+    }
+
+    .job-listing {
+        padding: 15px;
+    }
+
+    .job-listing h2 {
+        font-size: 20px;
+    }
+
+    .job-listing p {
+        font-size: 14px;
+    }
+
+    .job-listing .read-more {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .application-form {
+        padding: 20px;
+        max-width: 100%;
+    }
+
+    .application-form h2 {
+        font-size: 24px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group input[type="file"] {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .submit-btn {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    .footer-section {
+        padding: 30px 30px;
+    }
+
+    .footer-logo {
+        font-size: 20px;
+    }
+
+    .footer-logo span {
+        font-size: 12px;
+    }
+
+    .footer-nav ul {
+        gap: 15px;
+    }
+
+    .footer-nav ul li a {
+        font-size: 14px;
+    }
+
+    .social-icon {
+        font-size: 18px;
+    }
+
+    .footer-copyright {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding-top: 150px;
+    }
+
+    header {
+        padding: 10px 20px;
+    }
+
+    .logo {
+        font-size: 18px;
+    }
+
+    .logo span {
+        font-size: 10px;
+    }
+
+    .search-bar {
+        margin: 10px 0;
+    }
+
+    .search-bar input {
+        width: 120px;
+        padding: 6px 30px 6px 10px;
+    }
+
+    .search-bar input:focus {
+        width: 150px;
+    }
+
+    .search-bar .fa-search {
+        right: 8px;
+        font-size: 14px;
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    nav ul li a {
+        font-size: 12px;
+    }
+
+    .content {
+        padding: 15px 20px;
+        gap: 15px;
+    }
+
+    .headline {
+        font-size: 28px;
+    }
+
+    .intro {
+        font-size: 12px;
+    }
+
+    .read-more {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .hero-section {
+        background: url('Images/vecteezy_ai-generated-streamlining-business-computer-monitor_40888601.jpg') no-repeat center center/cover;
+    }
+
+    .features-section {
+        padding: 30px 20px;
+    }
+
+    .features-header h2 {
+        font-size: 24px;
+    }
+
+    .features-header p {
+        font-size: 14px;
+    }
+
+    .feature-card {
+        padding: 15px;
+    }
+
+    .feature-card h3 {
+        font-size: 18px;
+    }
+
+    .feature-card p {
+        font-size: 14px;
+    }
+
+    .testimonials-section {
+        padding: 30px 20px;
+    }
+
+    .testimonials-header h2 {
+        font-size: 24px;
+    }
+
+    .testimonials-header p {
+        font-size: 14px;
+    }
+
+    .testimonial-card {
+        padding: 15px;
+    }
+
+    .testimonial-card blockquote {
+        font-size: 14px;
+    }
+
+    .testimonial-card .author {
+        font-size: 12px;
+    }
+
+    .contact-section {
+        padding: 30px 20px;
+    }
+
+    .contact-header h2 {
+        font-size: 24px;
+    }
+
+    .contact-header p {
+        font-size: 14px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        font-size: 12px;
+    }
+
+    .submit-btn {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .contact-info {
+        font-size: 12px;
+    }
+
+    .about-section {
+        padding: 30px 20px;
+    }
+
+    .about-header h1 {
+        font-size: 28px;
+    }
+
+    .about-header p {
+        font-size: 14px;
+    }
+
+    .about-mission h2, .about-history h2, .about-team h2, .about-values h2 {
+        font-size: 20px;
+    }
+
+    .about-mission p, .about-history p, .about-team p, .about-values li {
+        font-size: 12px;
+    }
+
+    .blog-section {
+        padding: 30px 20px;
+    }
+
+    .blog-header h1 {
+        font-size: 28px;
+    }
+
+    .blog-header p {
+        font-size: 14px;
+    }
+
+    .blog-post {
+        padding: 10px;
+    }
+
+    .blog-post h2 {
+        font-size: 18px;
+    }
+
+    .post-date {
+        font-size: 10px;
+    }
+
+    .blog-post p {
+        font-size: 12px;
+    }
+
+    .blog-post .read-more {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+
+    .blog-post-section {
+        padding: 30px 20px;
+    }
+
+    .blog-post-header h1 {
+        font-size: 24px;
+    }
+
+    .blog-post-header .post-date {
+        font-size: 12px;
+    }
+
+    .blog-post-content p {
+        font-size: 12px;
+    }
+
+    .blog-post-content h2 {
+        font-size: 18px;
+    }
+
+    .back-to-blog {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .industries-section {
+        padding: 30px 20px;
+    }
+
+    .industries-header h1 {
+        font-size: 28px;
+    }
+
+    .industries-header p {
+        font-size: 14px;
+    }
+
+    .industries-content {
+        max-width: 100%;
+    }
+
+    .industry-card {
+        padding: 10px;
+    }
+
+    .industry-card h2 {
+        font-size: 18px;
+    }
+
+    .industry-card p {
+        font-size: 12px;
+    }
+
+    .industry-card .read-more {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+
+    .careers-section {
+        padding: 30px 20px;
+    }
+
+    .careers-header h1 {
+        font-size: 28px;
+    }
+
+    .careers-header p {
+        font-size: 14px;
+    }
+
+    .careers-content {
+        max-width: 100%;
+    }
+
+    .job-listing {
+        padding: 10px;
+    }
+
+    .job-listing h2 {
+        font-size: 18px;
+    }
+
+    .job-listing p {
+        font-size: 12px;
+    }
+
+    .job-listing .read-more {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+
+    .application-form {
+        padding: 15px;
+    }
+
+    .application-form h2 {
+        font-size: 20px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group input[type="file"] {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .submit-btn {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .footer-section {
+        padding: 20px 20px;
+    }
+
+    .footer-logo {
+        font-size: 18px;
+    }
+
+    .footer-logo span {
+        font-size: 10px;
+    }
+
+    .footer-nav ul {
+        gap: 10px;
+    }
+
+    .footer-nav ul li a {
+        font-size: 12px;
+    }
+
+    .social-icon {
+        font-size: 16px;
+    }
+
+    .footer-copyright {
+        font-size: 10px;
+    }
+}

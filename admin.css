@@ -1,0 +1,631 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Styling the body */
+body {
+    height: 100vh;
+    overflow: auto;
+    padding-top: 80px; /* Space for the fixed header */
+}
+
+/* Styling the background video */
+.hero-section {
+    position: relative;
+    height: 100vh;
+    min-height: 100%;
+    min-width: 100%;
+    background: url(Images/vecteezy_ai-generated-streamlining-business-computer-monitor_40888601.jpg) no-repeat center center/100% 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 0;
+}
+
+/* Styling the header */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    background: #2c3e50;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
+    animation: fadeInDown 0.5s ease-out;
+}
+
+/* Styling the logo */
+.logo {
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.logo span {
+    font-size: 16px;
+    font-weight: normal;
+    display: block;
+    color: #a0a0a0;
+}
+
+.search-bar {
+    position: relative;
+    margin: 0 20px;
+}
+
+.search-bar input {
+    padding: 8px 35px 8px 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    outline: none;
+    background: #34495e;
+    color: #ecf0f1;
+    width: 200px;
+    transition: width 0.3s, background 0.3s;
+}
+
+.search-bar input:focus {
+    background: #465c71;
+    width: 250px;
+}
+
+.search-bar .fa-search {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #b0b0b0;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Styling the navigation bars */
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+nav ul li a {
+    color: #d0d0d0;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    transition: color 0.3s;
+    text-transform: uppercase;
+    position: relative;
+}
+
+nav ul li a:hover {
+    color: #00bcd4;
+}
+
+nav ul li a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    background: #00bcd4;
+    bottom: -4px;
+    left: 0;
+    transition: width 0.3s;
+}
+
+nav ul li a:hover::after {
+    width: 100%;
+
+/* Previous styles unchanged, adding new styles at the end */
+.admin-section {
+    background: #ffffff;
+    padding: 60px 50px;
+    text-align: center;
+    z-index: 1;
+    position: relative;
+}
+
+.admin-section h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #333333;
+    margin-bottom: 20px;
+}
+
+.admin-section .error {
+    color: #d32f2f;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.admin-section .loading {
+    font-size: 16px;
+    color: #666666;
+    margin-bottom: 20px;
+}
+
+.admin-section table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.admin-section th,
+.admin-section td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: left;
+    font-size: 16px;
+    color: #333333;
+}
+
+.admin-section th {
+    background: #e8ecef;
+    font-weight: 700;
+}
+
+.admin-section td .fa-star {
+    color: #f5c518;
+}
+
+.admin-section button {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+/* Responsive Design for Tablets */
+@media (max-width: 768px) {
+    body {
+        padding-top: 250px;
+    }
+
+    header {
+        padding: 15px 30px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .logo {
+        font-size: 20px;
+    }
+
+    .logo span {
+        font-size: 12px;
+    }
+
+    .search-bar {
+        margin: 10px 0;
+    }
+
+    .search-bar input {
+        width: 150px;
+    }
+
+    .search-bar input:focus {
+        width: 200px;
+    }
+
+    nav ul {
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    nav ul li a {
+        font-size: 14px;
+    }
+
+    .content {
+        flex-direction: column;
+        padding: 20px 30px;
+        text-align: center;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .headline {
+        font-size: 36px;
+        max-width: 100%;
+    }
+
+    .intro {
+        max-width: 100%;
+        font-size: 14px;
+    }
+
+    .read-more {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+
+    .modal-content h2 {
+        font-size: 20px;
+    }
+
+    .modal-content .close {
+        font-size: 20px;
+    }
+
+    .modal-content label {
+        font-size: 14px;
+    }
+
+    .modal-content input {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .modal-content button {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    #verify-message {
+        padding: 20px;
+        margin: 15px auto;
+    }
+
+    #verify-message h2 {
+        font-size: 20px;
+    }
+
+    #verify-message p {
+        font-size: 14px;
+    }
+
+    #profile {
+        padding: 20px;
+        margin: 15px auto;
+    }
+
+    #profile h2 {
+        font-size: 20px;
+    }
+
+    #profile p {
+        font-size: 14px;
+    }
+
+    .features-section {
+        padding: 40px 30px;
+    }
+
+    .features-header h2 {
+        font-size: 28px;
+    }
+
+    .features-header p {
+        font-size: 16px;
+    }
+
+    .feature-card {
+        max-width: 100%;
+        padding: 20px;
+    }
+
+    .testimonials-section {
+        padding: 40px 30px;
+    }
+
+    .testimonials-header h2 {
+        font-size: 28px;
+    }
+
+    .testimonials-header p {
+        font-size: 16px;
+    }
+
+    .testimonial-card {
+        max-width: 100%;
+        padding: 20px;
+    }
+
+    .contact-section {
+        padding: 40px 30px;
+    }
+
+    .contact-header h2 {
+        font-size: 28px;
+    }
+
+    .contact-header p {
+        font-size: 16px;
+    }
+
+    .contact-form {
+        max-width: 100%;
+    }
+
+    .form-group label {
+        font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        font-size: 14px;
+    }
+
+    .submit-btn {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    .contact-info {
+        font-size: 14px;
+    }
+
+    .footer-section {
+        padding: 30px 30px;
+    }
+
+    .footer-logo {
+        font-size: 20px;
+    }
+
+    .footer-logo span {
+        font-size: 12px;
+    }
+
+    .footer-nav ul {
+        gap: 15px;
+    }
+
+    .footer-nav ul li a {
+        font-size: 14px;
+    }
+
+    .social-icon {
+        font-size: 18px;
+    }
+
+    .footer-copyright {
+        font-size: 12px;
+    }
+}
+
+/* Responsive Design for Phones */
+@media (max-width: 480px) {
+    body {
+        padding-top: 150px;
+    }
+
+    header {
+        padding: 10px 20px;
+    }
+
+    .logo {
+        font-size: 18px;
+    }
+
+    .logo span {
+        font-size: 10px;
+    }
+
+    .search-bar {
+        margin: 10px 0;
+    }
+
+    .search-bar input {
+        width: 120px;
+        padding: 6px 30px 6px 10px;
+    }
+
+    .search-bar input:focus {
+        width: 150px;
+    }
+
+    .search-bar .fa-search {
+        right: 8px;
+        font-size: 14px;
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    nav ul li a {
+        font-size: 12px;
+    }
+
+    .content {
+        padding: 15px 20px;
+        gap: 15px;
+    }
+
+    .headline {
+        font-size: 28px;
+    }
+
+    .intro {
+        font-size: 12px;
+    }
+
+    .read-more {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .hero-section {
+        background: url('Images/vecteezy_ai-generated-streamlining-business-computer-monitor_40888601.jpg') no-repeat center center/cover;
+    }
+
+    .modal-content {
+        width: 90%;
+        padding: 15px;
+    }
+
+    .modal-content h2 {
+        font-size: 18px;
+    }
+
+    .modal-content .close {
+        font-size: 18px;
+        top: 10px;
+        right: 15px;
+    }
+
+    .modal-content label {
+        font-size: 12px;
+    }
+
+    .modal-content input {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .modal-content button {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    #verify-message {
+        padding: 15px;
+        margin: 10px auto;
+    }
+
+    #verify-message h2 {
+        font-size: 18px;
+    }
+
+    #verify-message p {
+        font-size: 12px;
+    }
+
+    #profile {
+        padding: 15px;
+        margin: 10px auto;
+    }
+
+    #profile h2 {
+        font-size: 18px;
+    }
+
+    #profile p {
+        font-size: 12px;
+    }
+
+    .features-section {
+        padding: 30px 20px;
+    }
+
+    .features-header h2 {
+        font-size: 24px;
+    }
+
+    .features-header p {
+        font-size: 14px;
+    }
+
+    .feature-card {
+        padding: 15px;
+    }
+
+    .feature-card h3 {
+        font-size: 18px;
+    }
+
+    .feature-card p {
+        font-size: 14px;
+    }
+
+    .testimonials-section {
+        padding: 30px 20px;
+    }
+
+    .testimonials-header h2 {
+        font-size: 24px;
+    }
+
+    .testimonials-header p {
+        font-size: 14px;
+    }
+
+    .testimonial-card {
+        padding: 15px;
+    }
+
+    .testimonial-card blockquote {
+        font-size: 14px;
+    }
+
+    .testimonial-card .author {
+        font-size: 12px;
+    }
+
+    .contact-section {
+        padding: 30px 20px;
+    }
+
+    .contact-header h2 {
+        font-size: 24px;
+    }
+
+    .contact-header p {
+        font-size: 14px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        font-size: 12px;
+    }
+
+    .submit-btn {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .contact-info {
+        font-size: 12px;
+    }
+
+    .footer-section {
+        padding: 20px 20px;
+    }
+
+    .footer-logo {
+        font-size: 18px;
+    }
+
+    .footer-logo span {
+        font-size: 10px;
+    }
+
+    .footer-nav ul {
+        gap: 10px;
+    }
+
+    .footer-nav ul li a {
+        font-size: 12px;
+    }
+
+    .social-icon {
+        font-size: 16px;
+    }
+
+    .footer-copyright {
+        font-size: 10px;
+    }
+}
