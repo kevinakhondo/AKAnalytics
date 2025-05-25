@@ -11,7 +11,10 @@
     <script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.production.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.production.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.5.0/dist/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"></script>
+    <script src="https://assets.calendly.com/assets/external/widget.js"></script>
+    <link rel="stylesheet" href="https://assets.calendly.com/assets/external/widget.css">
     <script type="module" src="auth.js"></script>
     <style>
         .hero-section { background: linear-gradient(to right, #2563eb, #1e40af); color: white; padding: 2rem; }
@@ -27,9 +30,10 @@
         .footer-section { background: #1f2937; color: white; padding: 2rem; }
         .footer-nav a { color: white; margin-right: 1rem; }
         .footer-social a { color: white; margin-right: 1rem; }
-        .error, .success { margin-bottom: 1rem; text-align: center; }
-        .error { color: #dc2626; display: block; }
-        .success { color: #16a34a; display: block; }
+        .error, .success { display: none; margin-bottom: 1rem; text-align: center; }
+        .error { color: #dc2626; }
+        .success { color: #16a34a; }
+        .error.block, .success.block { display: block; }
         .card { background: white; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 1.5rem; }
         @media (max-width: 768px) {
             .grid-cols-2 { grid-template-columns: 1fr; }
@@ -41,17 +45,12 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // Import auth utilities
-        import { getToken, removeToken, sanitizeInput, fetchUserProfile } from '/auth.js';
+        import { getToken, setToken, removeToken, sanitizeInput, validateEmail, fetchUserProfile } from '/auth.js';
 
-        // Error Boundary Component
         class ErrorBoundary extends React.Component {
             state = { hasError: false, errorMessage: '' };
             static getDerivedStateFromError(error) {
                 return { hasError: true, errorMessage: error.message };
-            }
-            componentDidCatch(error, info) {
-                console.error('ErrorBoundary caught:', error, info);
             }
             render() {
                 if (this.state.hasError) {
@@ -67,7 +66,6 @@
             }
         }
 
-        // Main App Component
         const CustomerPortal = () => {
             const [user, setUser] = useState(null);
             const [loading, setLoading] = useState(true);
@@ -75,10 +73,10 @@
             const [success, setSuccess] = useState('');
 
             useEffect(() => {
-                console.log('CustomerPortal useEffect: Initializing');
                 const token = getToken();
+                console.log('Token:', token);
                 if (!token) {
-                    console.warn('No token found, redirecting to login');
+                    console.error('No token found, redirecting to login');
                     window.location.href = 'login.html';
                     return;
                 }
@@ -87,15 +85,14 @@
 
             const fetchProfile = async (token) => {
                 try {
-                    console.log('Fetching profile with token:', token);
                     const userData = await fetchUserProfile(token);
-                    console.log('Profile fetched:', userData);
+                    console.log('Profile data:', userData);
                     setUser(userData);
                     localStorage.setItem('userId', userData._id);
                     localStorage.setItem('email', userData.email);
                 } catch (err) {
                     console.error('Profile fetch error:', err.message);
-                    setError('Session expired or profile fetch failed. Please log in again.');
+                    setError('Session expired. Please log in again.');
                     removeToken();
                     localStorage.removeItem('userId');
                     localStorage.removeItem('email');
@@ -106,7 +103,6 @@
             };
 
             const logout = () => {
-                console.log('Logging out');
                 removeToken();
                 localStorage.removeItem('userId');
                 localStorage.removeItem('email');
@@ -116,7 +112,7 @@
             if (loading) {
                 return (
                     <div className="text-center p-4">
-                        <p>Loading customer portal...</p>
+                        <p>Loading...</p>
                     </div>
                 );
             }
@@ -143,11 +139,15 @@
                             <h1 className="text-3xl font-bold mb-6">
                                 Welcome, {user?.name || 'Customer'}!
                             </h1>
-                            {error && <div className="error">{error}</div>}
-                            {success && <div className="success">{success}</div>}
+                            {error && <div className="error block">{error}</div>}
+                            {success && <div className="success block">{success}</div>}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <Dashboard setError={setError} />
                                 <ServiceBooking setSuccess={setSuccess} setError={setError} />
+                                <ScheduleCall />
+                                <LiveChat setError={setError} />
+                                <DataUpload setSuccess={setSuccess} setError={setError} />
+                                <DatabaseConnection setSuccess={setSuccess} setError={setError} />
                             </div>
                         </div>
                         <footer className="footer-section">
@@ -182,15 +182,15 @@
             );
         };
 
-        // Dashboard Component
         const Dashboard = ({ setError }) => {
             const [dashboardUrl, setDashboardUrl] = useState('');
             const [analytics, setAnalytics] = useState([]);
             const [loading, setLoading] = useState(true);
+            const [dashboardError, setDashboardError] = useState(false);
 
             useEffect(() => {
-                console.log('Dashboard useEffect: Fetching data');
                 const token = getToken();
+                console.log('Fetching dashboard with token:', token);
                 Promise.all([
                     axios.get('https://a-k-analytics-backend.onrender.com/api/customer/dashboard', {
                         headers: { Authorization: `Bearer ${token}` }
@@ -198,8 +198,10 @@
                         console.log('Dashboard response:', res.data);
                         setDashboardUrl(res.data.dashboardUrl || 'https://public.tableau.com/views/sample-sales-dashboard');
                     }).catch(err => {
-                        console.error('Dashboard fetch error:', err);
-                        setError('Failed to load dashboard.');
+                        console.error('Dashboard fetch error:', err.response?.data || err.message);
+                        setError('Failed to load dashboard. Using fallback.');
+                        setDashboardUrl('https://public.tableau.com/views/sample-sales-dashboard');
+                        setDashboardError(true);
                     }),
                     axios.get('https://a-k-analytics-backend.onrender.com/api/customer/analytics', {
                         headers: { Authorization: `Bearer ${token}` }
@@ -207,13 +209,13 @@
                         console.log('Analytics response:', res.data);
                         setAnalytics(res.data || []);
                     }).catch(err => {
-                        console.error('Analytics fetch error:', err);
-                        setError('Failed to load analytics reports.');
+                        console.error('Analytics fetch error:', err.response?.data || err.message);
+                        setError('Failed to load analytics reports. Using fallback.');
+                        setAnalytics([
+                            { _id: 'mock1', title: 'Sample Report', status: 'Completed', resultsUrl: 'https://public.tableau.com/views/sample-sales-dashboard' }
+                        ]);
                     })
-                ]).finally(() => {
-                    console.log('Dashboard fetch complete');
-                    setLoading(false);
-                });
+                ]).finally(() => setLoading(false));
             }, [setError]);
 
             if (loading) {
@@ -223,6 +225,7 @@
             return (
                 <div className="card col-span-2">
                     <h2 className="text-2xl font-bold mb-4">Personalized Dashboard</h2>
+                    {dashboardError && <p className="text-red-600 mb-2">Dashboard unavailable. Showing sample dashboard.</p>}
                     {dashboardUrl ? (
                         <iframe src={dashboardUrl} width="100%" height="600px" className="border rounded" title="Customer Dashboard"></iframe>
                     ) : (
@@ -247,11 +250,11 @@
             );
         };
 
-        // Service Booking Component
         const ServiceBooking = ({ setSuccess, setError }) => {
             const [bookings, setBookings] = useState([]);
             const [service, setService] = useState('');
             const [loading, setLoading] = useState(true);
+            const [isAvailable, setIsAvailable] = useState(true);
             const services = [
                 { value: 'basic_report', label: 'Basic Report (KES 15,000 / USD 115)' },
                 { value: 'advanced_forecasting', label: 'Advanced Forecasting (KES 50,000 / USD 385)' },
@@ -259,31 +262,33 @@
             ];
 
             useEffect(() => {
-                console.log('ServiceBooking useEffect: Fetching bookings');
                 const token = getToken();
+                console.log('Fetching bookings with token:', token);
                 axios.get('https://a-k-analytics-backend.onrender.com/api/customer/bookings', {
                     headers: { Authorization: `Bearer ${token}` }
                 }).then(res => {
                     console.log('Bookings response:', res.data);
                     setBookings(res.data || []);
                 }).catch(err => {
-                    console.error('Bookings fetch error:', err);
-                    setError('Failed to load bookings.');
-                }).finally(() => {
-                    console.log('Bookings fetch complete');
-                    setLoading(false);
-                });
+                    console.error('Bookings fetch error:', err.response?.data || err.message);
+                    setError('Bookings unavailable at this time.');
+                    setIsAvailable(false);
+                }).finally(() => setLoading(false));
             }, [setError]);
 
             const handleBooking = async (e) => {
                 e.preventDefault();
+                if (!isAvailable) {
+                    setError('Booking service is currently unavailable.');
+                    return;
+                }
                 if (!service) {
                     setError('Please select a service.');
                     return;
                 }
                 try {
-                    console.log('Booking service:', service);
                     const token = getToken();
+                    console.log('Posting booking:', { service });
                     const response = await axios.post('https://a-k-analytics-backend.onrender.com/api/customer/bookings', {
                         service
                     }, {
@@ -295,25 +300,32 @@
                     setError('');
                     setService('');
                 } catch (err) {
-                    console.error('Booking error:', err);
-                    setError('Failed to book service.');
+                    console.error('Booking error:', err.response?.data || err.message);
+                    setError('Failed to book service. This feature may be unavailable.');
+                    setIsAvailable(false);
                 }
             };
 
             const cancelBooking = async (id) => {
+                if (!isAvailable) {
+                    setError('Booking service is currently unavailable.');
+                    return;
+                }
                 if (window.confirm('Cancel this booking?')) {
                     try {
-                        console.log('Cancelling booking:', id);
                         const token = getToken();
+                        console.log('Canceling booking:', id);
                         await axios.delete(`https://a-k-analytics-backend.onrender.com/api/customer/bookings/${id}`, {
                             headers: { Authorization: `Bearer ${token}` }
                         });
+                        console.log('Booking cancelled:', id);
                         setBookings(bookings.filter(b => b._id !== id));
                         setSuccess('Booking cancelled.');
                         setError('');
                     } catch (err) {
-                        console.error('Cancel booking error:', err);
-                        setError('Failed to cancel booking.');
+                        console.error('Cancel booking error:', err.response?.data || err.message);
+                        setError('Failed to cancel booking. This feature may be unavailable.');
+                        setIsAvailable(false);
                     }
                 }
             };
@@ -325,26 +337,30 @@
             return (
                 <div className="card">
                     <h2 className="text-2xl font-bold mb-4">Book Our Services</h2>
-                    <form onSubmit={handleBooking} className="space-y-4">
-                        <div>
-                            <label htmlFor="service" className="block text-gray-700">Select Service</label>
-                            <select
-                                id="service"
-                                value={service}
-                                onChange={(e) => setService(e.target.value)}
-                                className="w-full p-2 border rounded"
-                                required
-                            >
-                                <option value="">Choose a service</option>
-                                {services.map(s => (
-                                    <option key={s.value} value={s.value}>{s.label}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <button type="submit" className="submit-btn">Book Service</button>
-                    </form>
+                    {isAvailable ? (
+                        <form onSubmit={handleBooking} className="space-y-4">
+                            <div>
+                                <label htmlFor="service" className="block text-gray-700">Select Service</label>
+                                <select
+                                    id="service"
+                                    value={service}
+                                    onChange={(e) => setService(e.target.value)}
+                                    className="w-full p-2 border rounded"
+                                    required
+                                >
+                                    <option value="">Choose a service</option>
+                                    {services.map(s => (
+                                        <option key={s.value} value={s.value}>{s.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <button type="submit" className="submit-btn">Book Service</button>
+                        </form>
+                    ) : (
+                        <p className="text-red-600">Booking service is currently unavailable. Please try again later or contact support.</p>
+                    )}
                     <h3 className="text-xl font-bold mt-4 mb-2">My Bookings</h3>
-                    {bookings.length ? (
+                    {isAvailable && bookings.length ? (
                         <ul className="space-y-2">
                             {bookings.map(b => (
                                 <li key={b._id} className="border-b py-2 flex justify-between items-center">
@@ -354,27 +370,253 @@
                             ))}
                         </ul>
                     ) : (
-                        <p>No bookings yet.</p>
+                        <p>No bookings yet{!isAvailable ? ' (service unavailable)' : ''}.</p>
                     )}
                 </div>
             );
         };
 
-        // Test Render
-        console.log('Attempting to render CustomerPortal');
-        try {
-            ReactDOM.render(<CustomerPortal />, document.getElementById('root'));
-            console.log('Render successful');
-        } catch (err) {
-            console.error('Render failed:', err);
-            document.getElementById('root').innerHTML = `
-                <div className="container mx-auto p-6">
-                    <h1 className="text-2xl font-bold text-red-600">Error Loading Portal</h1>
-                    <p>Failed to load the customer portal: ${err.message}</p>
-                    <p>Please try <a href="login.html" className="text-blue-600">logging in again</a>.</p>
+        const ScheduleCall = () => {
+            useEffect(() => {
+                try {
+                    console.log('Initializing Calendly');
+                    Calendly.initInlineWidget({
+                        url: 'https://calendly.com/akanalytics/consultation',
+                        parentElement: document.getElementById('calendly-widget'),
+                        prefill: { email: localStorage.getItem('email') || '' }
+                    });
+                } catch (err) {
+                    console.error('Calendly initialization error:', err);
+                }
+            }, []);
+
+            return (
+                <div className="card">
+                    <h2 className="text-2xl font-bold mb-4">Schedule a Call</h2>
+                    <div id="calendly-widget" className="h-96">
+                        <p>Loading Calendly widget...</p>
+                    </div>
                 </div>
-            `;
-        }
+            );
+        };
+
+        const LiveChat = ({ setError }) => {
+            const [messages] = useState([]);
+            const [message] = useState('');
+
+            // Socket.IO is disabled since the backend likely doesn't support it
+            return (
+                <div className="card">
+                    <h2 className="text-2xl font-bold mb-4">Talk to an Analyst</h2>
+                    <p className="text-red-600 mb-4">Live chat is currently unavailable. Please contact support via email or schedule a call.</p>
+                    <div id="chat-messages" className="h-64 overflow-y-scroll bg-gray-50 p-4 rounded">
+                        <p>No messages yet.</p>
+                    </div>
+                    <div className="flex mt-2">
+                        <input
+                            type="text"
+                            value={message}
+                            onChange={() => {}} // Disabled
+                            className="w-full p-2 border rounded"
+                            placeholder="Live chat unavailable"
+                            aria-label="Chat message"
+                            disabled
+                        />
+                        <button className="submit-btn ml-2 opacity-50 cursor-not-allowed">Send</button>
+                    </div>
+                </div>
+            );
+        };
+
+        const DataUpload = ({ setSuccess, setError }) => {
+            const [isAvailable, setIsAvailable] = useState(true);
+
+            const handleUpload = async (e) => {
+                e.preventDefault();
+                if (!isAvailable) {
+                    setError('Data upload is currently unavailable.');
+                    return;
+                }
+                const file = e.target.querySelector('#data-file').files[0];
+                if (!file) {
+                    setError('Please select a file.');
+                    return;
+                }
+                const formData = new FormData();
+                formData.append('data', file);
+                try {
+                    const token = getToken();
+                    console.log('Uploading file:', file.name);
+                    await axios.post('https://a-k-analytics-backend.onrender.com/api/customer/upload', formData, {
+                        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
+                    });
+                    setSuccess('Data uploaded successfully! Analysis in progress.');
+                    setError('');
+                    e.target.reset();
+                } catch (err) {
+                    console.error('Upload error:', err.response?.data || err.message);
+                    setError('Data upload failed. This feature may be unavailable.');
+                    setIsAvailable(false);
+                }
+            };
+
+            return (
+                <div className="card">
+                    <h2 className="text-2xl font-bold mb-4">Upload Dataset</h2>
+                    {isAvailable ? (
+                        <form onSubmit={handleUpload} encType="multipart/form-data">
+                            <input
+                                type="file"
+                                id="data-file"
+                                accept=".csv,.xlsx"
+                                className="mb-2"
+                                aria-label="Upload data file"
+                            />
+                            <button type="submit" className="submit-btn">Upload</button>
+                        </form>
+                    ) : (
+                        <p className="text-red-600">Data upload is currently unavailable. Please try again later or contact support.</p>
+                    )}
+                </div>
+            );
+        };
+
+        const DatabaseConnection = ({ setSuccess, setError }) => {
+            const [dbType, setDbType] = useState('');
+            const [host, setHost] = useState('');
+            const [port, setPort] = useState('');
+            const [database, setDatabase] = useState('');
+            const [username, setUsername] = useState('');
+            const [password, setPassword] = useState('');
+            const [isAvailable, setIsAvailable] = useState(true);
+
+            const handleConnect = async (e) => {
+                e.preventDefault();
+                if (!isAvailable) {
+                    setError('Database connection is currently unavailable.');
+                    return;
+                }
+                if (!dbType || !host || !port || !database || !username || !password) {
+                    setError('Please fill all fields.');
+                    return;
+                }
+                try {
+                    const token = getToken();
+                    console.log('Connecting database:', { dbType, host, port, database });
+                    await axios.post('https://a-k-analytics-backend.onrender.com/api/customer/db-connect', {
+                        dbType,
+                        host,
+                        port,
+                        database,
+                        username,
+                        password
+                    }, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    setSuccess('Database connected successfully! Analysis in progress.');
+                    setError('');
+                    setDbType('');
+                    setHost('');
+                    setPort('');
+                    setDatabase('');
+                    setUsername('');
+                    setPassword('');
+                } catch (err) {
+                    console.error('Database connection error:', err.response?.data || err.message);
+                    setError('Database connection failed. This feature may be unavailable.');
+                    setIsAvailable(false);
+                }
+            };
+
+            return (
+                <div className="card">
+                    <h2 className="text-2xl font-bold mb-4">Connect Database</h2>
+                    {isAvailable ? (
+                        <form onSubmit={handleConnect} className="space-y-4">
+                            <div>
+                                <label htmlFor="db-type" className="block text-gray-700">Database Type</label>
+                                <select
+                                    id="db-type"
+                                    value={dbType}
+                                    onChange={(e) => setDbType(e.target.value)}
+                                    className="w-full p-2 border rounded"
+                                    required
+                                >
+                                    <option value="">Select type</option>
+                                    <option value="postgresql">PostgreSQL</option>
+                                    <option value="mysql">MySQL</option>
+                                    <option value="mongodb">MongoDB</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label htmlFor="host" className="block text-gray-700">Host</label>
+                                <input
+                                    type="text"
+                                    id="host"
+                                    value={host}
+                                    onChange={(e) => setHost(e.target.value)}
+                                    className="w-full p-2 border rounded"
+                                    placeholder="e.g., localhost"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="port" className="block text-gray-700">Port</label>
+                                <input
+                                    type="number"
+                                    id="port"
+                                    value={port}
+                                    onChange={(e) => setPort(e.target.value)}
+                                    className="w-full p-2 border rounded"
+                                    placeholder="e.g., 5432"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="database" className="block text-gray-700">Database Name</label>
+                                <input
+                                    type="text"
+                                    id="database"
+                                    value={database}
+                                    onChange={(e) => setDatabase(e.target.value)}
+                                    className="w-full p-2 border rounded"
+                                    placeholder="e.g., mydb"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="username" className="block text-gray-700">Username</label>
+                                <input
+                                    type="text"
+                                    id="username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    className="w-full p-2 border rounded"
+                                    placeholder="e.g., admin"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="password" className="block text-gray-700">Password</label>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full p-2 border rounded"
+                                    required
+                                />
+                            </div>
+                            <button type="submit" className="submit-btn">Connect</button>
+                        </form>
+                    ) : (
+                        <p className="text-red-600">Database connection is currently unavailable. Please try again later or contact support.</p>
+                    )}
+                </div>
+            );
+        };
+
+        ReactDOM.render(<CustomerPortal />, document.getElementById('root'));
     </script>
 </body>
 </html>
