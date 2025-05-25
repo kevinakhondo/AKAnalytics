@@ -76,7 +76,7 @@
                 const token = getToken();
                 console.log('Token:', token);
                 if (!token) {
-                    console.error('No token found, redirecting to login');
+                    console.error('No token, redirecting to login');
                     window.location.href = 'login.html';
                     return;
                 }
@@ -186,7 +186,6 @@
             const [dashboardUrl, setDashboardUrl] = useState('');
             const [analytics, setAnalytics] = useState([]);
             const [loading, setLoading] = useState(true);
-            const [dashboardError, setDashboardError] = useState(false);
 
             useEffect(() => {
                 const token = getToken();
@@ -196,12 +195,10 @@
                         headers: { Authorization: `Bearer ${token}` }
                     }).then(res => {
                         console.log('Dashboard response:', res.data);
-                        setDashboardUrl(res.data.dashboardUrl || 'https://public.tableau.com/views/sample-sales-dashboard');
+                        setDashboardUrl(res.data.dashboardUrl || '');
                     }).catch(err => {
                         console.error('Dashboard fetch error:', err.response?.data || err.message);
-                        setError('Failed to load dashboard. Using fallback.');
-                        setDashboardUrl('https://public.tableau.com/views/sample-sales-dashboard');
-                        setDashboardError(true);
+                        setError('Failed to load dashboard.');
                     }),
                     axios.get('https://a-k-analytics-backend.onrender.com/api/customer/analytics', {
                         headers: { Authorization: `Bearer ${token}` }
@@ -210,10 +207,7 @@
                         setAnalytics(res.data || []);
                     }).catch(err => {
                         console.error('Analytics fetch error:', err.response?.data || err.message);
-                        setError('Failed to load analytics reports. Using fallback.');
-                        setAnalytics([
-                            { _id: 'mock1', title: 'Sample Report', status: 'Completed', resultsUrl: 'https://public.tableau.com/views/sample-sales-dashboard' }
-                        ]);
+                        setError('Failed to load analytics reports.');
                     })
                 ]).finally(() => setLoading(false));
             }, [setError]);
@@ -225,7 +219,6 @@
             return (
                 <div className="card col-span-2">
                     <h2 className="text-2xl font-bold mb-4">Personalized Dashboard</h2>
-                    {dashboardError && <p className="text-red-600 mb-2">Dashboard unavailable. Showing sample dashboard.</p>}
                     {dashboardUrl ? (
                         <iframe src={dashboardUrl} width="100%" height="600px" className="border rounded" title="Customer Dashboard"></iframe>
                     ) : (
@@ -254,12 +247,6 @@
             const [bookings, setBookings] = useState([]);
             const [service, setService] = useState('');
             const [loading, setLoading] = useState(true);
-            const [isAvailable, setIsAvailable] = useState(true);
-            const services = [
-                { value: 'basic_report', label: 'Basic Report (KES 15,000 / USD 115)' },
-                { value: 'advanced_forecasting', label: 'Advanced Forecasting (KES 50,000 / USD 385)' },
-                { value: 'ml_model', label: 'Machine Learning Model (KES 100,000 / USD 770)' }
-            ];
 
             useEffect(() => {
                 const token = getToken();
@@ -271,17 +258,12 @@
                     setBookings(res.data || []);
                 }).catch(err => {
                     console.error('Bookings fetch error:', err.response?.data || err.message);
-                    setError('Bookings unavailable at this time.');
-                    setIsAvailable(false);
+                    setError('Failed to load bookings.');
                 }).finally(() => setLoading(false));
             }, [setError]);
 
             const handleBooking = async (e) => {
                 e.preventDefault();
-                if (!isAvailable) {
-                    setError('Booking service is currently unavailable.');
-                    return;
-                }
                 if (!service) {
                     setError('Please select a service.');
                     return;
@@ -301,16 +283,11 @@
                     setService('');
                 } catch (err) {
                     console.error('Booking error:', err.response?.data || err.message);
-                    setError('Failed to book service. This feature may be unavailable.');
-                    setIsAvailable(false);
+                    setError('Failed to book service.');
                 }
             };
 
             const cancelBooking = async (id) => {
-                if (!isAvailable) {
-                    setError('Booking service is currently unavailable.');
-                    return;
-                }
                 if (window.confirm('Cancel this booking?')) {
                     try {
                         const token = getToken();
@@ -324,8 +301,7 @@
                         setError('');
                     } catch (err) {
                         console.error('Cancel booking error:', err.response?.data || err.message);
-                        setError('Failed to cancel booking. This feature may be unavailable.');
-                        setIsAvailable(false);
+                        setError('Failed to cancel booking.');
                     }
                 }
             };
@@ -337,30 +313,26 @@
             return (
                 <div className="card">
                     <h2 className="text-2xl font-bold mb-4">Book Our Services</h2>
-                    {isAvailable ? (
-                        <form onSubmit={handleBooking} className="space-y-4">
-                            <div>
-                                <label htmlFor="service" className="block text-gray-700">Select Service</label>
-                                <select
-                                    id="service"
-                                    value={service}
-                                    onChange={(e) => setService(e.target.value)}
-                                    className="w-full p-2 border rounded"
-                                    required
-                                >
-                                    <option value="">Choose a service</option>
-                                    {services.map(s => (
-                                        <option key={s.value} value={s.value}>{s.label}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <button type="submit" className="submit-btn">Book Service</button>
-                        </form>
-                    ) : (
-                        <p className="text-red-600">Booking service is currently unavailable. Please try again later or contact support.</p>
-                    )}
+                    <form onSubmit={handleBooking} className="space-y-4">
+                        <div>
+                            <label htmlFor="service" className="block text-gray-700">Select Service</label>
+                            <select
+                                id="service"
+                                value={service}
+                                onChange={(e) => setService(e.target.value)}
+                                className="w-full p-2 border rounded"
+                                required
+                            >
+                                <option value="">Choose a service</option>
+                                {services.map(s => (
+                                    <option key={s.value} value={s.value}>{s.label}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <button type="submit" className="submit-btn">Book Service</button>
+                    </form>
                     <h3 className="text-xl font-bold mt-4 mb-2">My Bookings</h3>
-                    {isAvailable && bookings.length ? (
+                    {bookings.length ? (
                         <ul className="space-y-2">
                             {bookings.map(b => (
                                 <li key={b._id} className="border-b py-2 flex justify-between items-center">
@@ -370,7 +342,7 @@
                             ))}
                         </ul>
                     ) : (
-                        <p>No bookings yet{!isAvailable ? ' (service unavailable)' : ''}.</p>
+                        <p>No bookings yet.</p>
                     )}
                 </div>
             );
@@ -401,42 +373,75 @@
         };
 
         const LiveChat = ({ setError }) => {
-            const [messages] = useState([]);
-            const [message] = useState('');
+            const [messages, setMessages] = useState([]);
+            const [message, setMessage] = useState('');
+            const [socket, setSocket] = useState(null);
 
-            // Socket.IO is disabled since the backend likely doesn't support it
+            useEffect(() => {
+                const newSocket = io('https://a-k-analytics-backend.onrender.com', { transports: ['websocket'] });
+                newSocket.on('connect', () => {
+                    console.log('Socket connected');
+                    newSocket.emit('join', { userId: localStorage.getItem('userId'), role: 'customer' });
+                });
+                newSocket.on('connect_error', (err) => {
+                    console.error('Socket connection error:', err.message);
+                    setError('Failed to connect to live chat.');
+                });
+                newSocket.on('message', (data) => {
+                    setMessages(prev => [...prev, { sender: data.sender, text: data.text }]);
+                    const chatMessages = document.getElementById('chat-messages');
+                    if (chatMessages) {
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                });
+                setSocket(newSocket);
+                return () => {
+                    newSocket.disconnect();
+                };
+            }, [setError]);
+
+            const sendMessage = () => {
+                if (message.trim() && socket) {
+                    socket.emit('message', { text: message, sender: 'Customer' });
+                    setMessages(prev => [...prev, { sender: 'Customer', text: message }]);
+                    setMessage('');
+                    const chatMessages = document.getElementById('chat-messages');
+                    if (chatMessages) {
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                }
+            };
+
             return (
                 <div className="card">
                     <h2 className="text-2xl font-bold mb-4">Talk to an Analyst</h2>
-                    <p className="text-red-600 mb-4">Live chat is currently unavailable. Please contact support via email or schedule a call.</p>
                     <div id="chat-messages" className="h-64 overflow-y-scroll bg-gray-50 p-4 rounded">
-                        <p>No messages yet.</p>
+                        {messages.length ? (
+                            messages.map((msg, i) => (
+                                <p key={i}><strong>{sanitizeInput(msg.sender)}:</strong> {sanitizeInput(msg.text)}</p>
+                            ))
+                        ) : (
+                            <p>No messages yet.</p>
+                        )}
                     </div>
                     <div className="flex mt-2">
                         <input
                             type="text"
                             value={message}
-                            onChange={() => {}} // Disabled
+                            onChange={(e) => setMessage(e.target.value)}
                             className="w-full p-2 border rounded"
-                            placeholder="Live chat unavailable"
+                            placeholder="Message analyst..."
                             aria-label="Chat message"
-                            disabled
                         />
-                        <button className="submit-btn ml-2 opacity-50 cursor-not-allowed">Send</button>
+                        <button onClick={sendMessage} className="submit-btn ml-2">Send</button>
                     </div>
                 </div>
             );
         };
 
         const DataUpload = ({ setSuccess, setError }) => {
-            const [isAvailable, setIsAvailable] = useState(true);
-
             const handleUpload = async (e) => {
                 e.preventDefault();
-                if (!isAvailable) {
-                    setError('Data upload is currently unavailable.');
-                    return;
-                }
                 const file = e.target.querySelector('#data-file').files[0];
                 if (!file) {
                     setError('Please select a file.');
@@ -455,28 +460,23 @@
                     e.target.reset();
                 } catch (err) {
                     console.error('Upload error:', err.response?.data || err.message);
-                    setError('Data upload failed. This feature may be unavailable.');
-                    setIsAvailable(false);
+                    setError('Data upload failed.');
                 }
             };
 
             return (
                 <div className="card">
                     <h2 className="text-2xl font-bold mb-4">Upload Dataset</h2>
-                    {isAvailable ? (
-                        <form onSubmit={handleUpload} encType="multipart/form-data">
-                            <input
-                                type="file"
-                                id="data-file"
-                                accept=".csv,.xlsx"
-                                className="mb-2"
-                                aria-label="Upload data file"
-                            />
-                            <button type="submit" className="submit-btn">Upload</button>
-                        </form>
-                    ) : (
-                        <p className="text-red-600">Data upload is currently unavailable. Please try again later or contact support.</p>
-                    )}
+                    <form onSubmit={handleUpload} encType="multipart/form-data">
+                        <input
+                            type="file"
+                            id="data-file"
+                            accept=".csv,.xlsx"
+                            className="mb-2"
+                            aria-label="Upload data file"
+                        />
+                        <button type="submit" className="submit-btn">Upload</button>
+                    </form>
                 </div>
             );
         };
@@ -488,14 +488,9 @@
             const [database, setDatabase] = useState('');
             const [username, setUsername] = useState('');
             const [password, setPassword] = useState('');
-            const [isAvailable, setIsAvailable] = useState(true);
 
             const handleConnect = async (e) => {
                 e.preventDefault();
-                if (!isAvailable) {
-                    setError('Database connection is currently unavailable.');
-                    return;
-                }
                 if (!dbType || !host || !port || !database || !username || !password) {
                     setError('Please fill all fields.');
                     return;
@@ -523,95 +518,90 @@
                     setPassword('');
                 } catch (err) {
                     console.error('Database connection error:', err.response?.data || err.message);
-                    setError('Database connection failed. This feature may be unavailable.');
-                    setIsAvailable(false);
+                    setError('Database connection failed.');
                 }
             };
 
             return (
                 <div className="card">
                     <h2 className="text-2xl font-bold mb-4">Connect Database</h2>
-                    {isAvailable ? (
-                        <form onSubmit={handleConnect} className="space-y-4">
-                            <div>
-                                <label htmlFor="db-type" className="block text-gray-700">Database Type</label>
-                                <select
-                                    id="db-type"
-                                    value={dbType}
-                                    onChange={(e) => setDbType(e.target.value)}
-                                    className="w-full p-2 border rounded"
-                                    required
-                                >
-                                    <option value="">Select type</option>
-                                    <option value="postgresql">PostgreSQL</option>
-                                    <option value="mysql">MySQL</option>
-                                    <option value="mongodb">MongoDB</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label htmlFor="host" className="block text-gray-700">Host</label>
-                                <input
-                                    type="text"
-                                    id="host"
-                                    value={host}
-                                    onChange={(e) => setHost(e.target.value)}
-                                    className="w-full p-2 border rounded"
-                                    placeholder="e.g., localhost"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="port" className="block text-gray-700">Port</label>
-                                <input
-                                    type="number"
-                                    id="port"
-                                    value={port}
-                                    onChange={(e) => setPort(e.target.value)}
-                                    className="w-full p-2 border rounded"
-                                    placeholder="e.g., 5432"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="database" className="block text-gray-700">Database Name</label>
-                                <input
-                                    type="text"
-                                    id="database"
-                                    value={database}
-                                    onChange={(e) => setDatabase(e.target.value)}
-                                    className="w-full p-2 border rounded"
-                                    placeholder="e.g., mydb"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="username" className="block text-gray-700">Username</label>
-                                <input
-                                    type="text"
-                                    id="username"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    className="w-full p-2 border rounded"
-                                    placeholder="e.g., admin"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="password" className="block text-gray-700">Password</label>
-                                <input
-                                    type="password"
-                                    id="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full p-2 border rounded"
-                                    required
-                                />
-                            </div>
-                            <button type="submit" className="submit-btn">Connect</button>
-                        </form>
-                    ) : (
-                        <p className="text-red-600">Database connection is currently unavailable. Please try again later or contact support.</p>
-                    )}
+                    <form onSubmit={handleConnect} className="space-y-4">
+                        <div>
+                            <label htmlFor="db-type" className="block text-gray-700">Database Type</label>
+                            <select
+                                id="db-type"
+                                value={dbType}
+                                onChange={(e) => setDbType(e.target.value)}
+                                className="w-full p-2 border rounded"
+                                required
+                            >
+                                <option value="">Select type</option>
+                                <option value="postgresql">PostgreSQL</option>
+                                <option value="mysql">MySQL</option>
+                                <option value="mongodb">MongoDB</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label htmlFor="host" className="block text-gray-700">Host</label>
+                            <input
+                                type="text"
+                                id="host"
+                                value={host}
+                                onChange={(e) => setHost(e.target.value)}
+                                className="w-full p-2 border rounded"
+                                placeholder="e.g., localhost"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="port" className="block text-gray-700">Port</label>
+                            <input
+                                type="number"
+                                id="port"
+                                value={port}
+                                onChange={(e) => setPort(e.target.value)}
+                                className="w-full p-2 border rounded"
+                                placeholder="e.g., 5432"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="database" className="block text-gray-700">Database Name</label>
+                            <input
+                                type="text"
+                                id="database"
+                                value={database}
+                                onChange={(e) => setDatabase(e.target.value)}
+                                className="w-full p-2 border rounded"
+                                placeholder="e.g., mydb"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="username" className="block text-gray-700">Username</label>
+                            <input
+                                type="text"
+                                id="username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="w-full p-2 border rounded"
+                                placeholder="e.g., admin"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="password" className="block text-gray-700">Password</label>
+                            <input
+                                type="password"
+                                id="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full p-2 border rounded"
+                                required
+                            />
+                        </div>
+                        <button type="submit" className="submit-btn">Connect</button>
+                    </form>
                 </div>
             );
         };
