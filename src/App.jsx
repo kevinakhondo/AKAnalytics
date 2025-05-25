@@ -189,16 +189,16 @@ function Dashboard({ setError }) {
                 console.log('Dashboard: API response from /api/customer/dashboard:', res.data);
                 setDashboardUrl(res.data.dashboardUrl || '');
             }).catch(err => {
-                console.error('Dashboard: Fetch error for /api/customer/dashboard:', err.response?.data || err.message);
+                console.error('Dashboard: Fetch error for /api/customer/dashboard:', err.response?.status, err.response?.data || err.message);
                 setError('Failed to load dashboard: ' + (err.response?.data?.error || err.message));
             }),
             axios.get('https://a-k-analytics-backend.onrender.com/api/customer/analytics', {
                 headers: { Authorization: `Bearer ${token}` }
             }).then(res => {
                 console.log('Dashboard: API response from /api/customer/analytics:', res.data);
-                setAnalytics(res.data || []);
+                setAnalytics(Array.isArray(res.data) ? res.data : []);
             }).catch(err => {
-                console.error('Dashboard: Fetch error for /api/customer/analytics:', err.response?.data || err.message);
+                console.error('Dashboard: Fetch error for /api/customer/analytics:', err.response?.status, err.response?.data || err.message);
                 setError('Failed to load analytics reports: ' + (err.response?.data?.error || err.message));
             })
         ]).finally(() => {
@@ -261,9 +261,9 @@ function ServiceBooking({ setSuccess, setError }) {
             headers: { Authorization: `Bearer ${token}` }
         }).then(res => {
             console.log('ServiceBooking: API response from /api/customer/bookings:', res.data);
-            setBookings(res.data || []);
+            setBookings(Array.isArray(res.data) ? res.data : []);
         }).catch(err => {
-            console.error('ServiceBooking: Fetch error for /api/customer/bookings:', err.response?.data || err.message);
+            console.error('ServiceBooking: Fetch error for /api/customer/bookings:', err.response?.status, err.response?.data || err.message);
             setError('Failed to load bookings: ' + (err.response?.data?.error || err.message));
         }).finally(() => {
             console.log('ServiceBooking: Finished loading');
@@ -291,7 +291,7 @@ function ServiceBooking({ setSuccess, setError }) {
             setError('');
             setService('');
         } catch (err) {
-            console.error('ServiceBooking: Booking error:', err.response?.data || err.message);
+            console.error('ServiceBooking: Booking error:', err.response?.status, err.response?.data || err.message);
             setError('Failed to book service: ' + (err.response?.data?.error || err.message));
         }
     };
@@ -309,7 +309,7 @@ function ServiceBooking({ setSuccess, setError }) {
                 setSuccess('Booking cancelled.');
                 setError('');
             } catch (err) {
-                console.error('ServiceBooking: Cancel booking error:', err.response?.data || err.message);
+                console.error('ServiceBooking: Cancel booking error:', err.response?.status, err.response?.data || err.message);
                 setError('Failed to cancel booking: ' + (err.response?.data?.error || err.message));
             }
         }
@@ -360,14 +360,18 @@ function ScheduleCall() {
         console.log('ScheduleCall: Initializing useEffect');
         try {
             console.log('ScheduleCall: Initializing Calendly widget');
-            Calendly.initInlineWidget({
-                url: 'https://calendly.com/akanalytics/consultation',
-                parentElement: document.getElementById('calendly-widget'),
-                prefill: { email: localStorage.getItem('email') || '' }
-            });
-            console.log('ScheduleCall: Calendly widget initialized');
+            if (window.Calendly) {
+                Calendly.initInlineWidget({
+                    url: 'https://calendly.com/akanalytics/consultation',
+                    parentElement: document.getElementById('calendly-widget'),
+                    prefill: { email: localStorage.getItem('email') || '' }
+                });
+                console.log('ScheduleCall: Calendly widget initialized');
+            } else {
+                console.error('ScheduleCall: Calendly script not loaded');
+            }
         } catch (err) {
-            console.error('ScheduleCall: Calendly initialization error:', err);
+            console.error('ScheduleCall: Calendly initialization error:', err.message);
         }
     }, []);
 
