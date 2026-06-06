@@ -35,7 +35,7 @@ async function fetchUserProfile(token) {
 }
 
 function isAdmin(user) {
-  return user.role === 'admin' || user.email === 'kevinakhondo9@gmail.com';
+  return user.role === 'admin';
 }
 
 async function login(email, password) {
