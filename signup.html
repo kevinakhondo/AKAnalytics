@@ -90,7 +90,7 @@
         </div>
     </footer>
     <script type="module">
-        import { setToken, validateEmail, validatePassword, sanitizeInput } from '/auth.js';
+        import { validateEmail, validatePassword, sanitizeInput } from '/auth.js';
 
         const signupForm = document.getElementById('signup-form');
         if (signupForm) {
@@ -113,19 +113,18 @@
 
                 document.getElementById('loading').style.display = 'block';
                 try {
-                    const response = await axios.post('https://a-k-analytics-backend.onrender.com/api/users/signup', {
+                    await axios.post('https://a-k-analytics-backend.onrender.com/api/users/signup', {
                         name,
                         email,
                         password
                     });
-                    setToken(response.data.token);
                     document.getElementById('success-message').style.display = 'block';
-                    document.getElementById('success-message').textContent = 'Sign up successful! Please check your email to verify your account.';
+                    document.getElementById('success-message').textContent = 'Account created! Redirecting to login…';
                     document.getElementById('error-message').style.display = 'none';
                     signupForm.reset();
                     setTimeout(() => {
                         window.location.href = 'login.html';
-                    }, 3000);
+                    }, 2000);
                 } catch (error) {
                     document.getElementById('error-message').style.display = 'block';
                     document.getElementById('error-message').textContent = error.response?.data?.error || 'Sign up failed. Please try again.';

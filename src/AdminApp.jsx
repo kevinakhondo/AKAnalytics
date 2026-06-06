@@ -69,14 +69,14 @@ function AdminPortal() {
         return;
       }
       setUser(userData);
-      localStorage.setItem('userId', userData._id);
-      localStorage.setItem('email', userData.email);
+      localStorage.setItem('aka_userId', userData._id);
+      localStorage.setItem('aka_email', userData.email);
     } catch (err) {
       console.error('Profile fetch error:', err.message);
       setError('Session expired. Please log in again.');
       removeToken();
-      localStorage.removeItem('userId');
-      localStorage.removeItem('email');
+      localStorage.removeItem('aka_userId');
+      localStorage.removeItem('aka_email');
       setTimeout(() => {
         window.location.href = 'login.html';
       }, 2000);
@@ -86,10 +86,9 @@ function AdminPortal() {
   };
 
   const logout = () => {
-    console.log('Logging out admin');
     removeToken();
-    localStorage.removeItem('userId');
-    localStorage.removeItem('email');
+    localStorage.removeItem('aka_userId');
+    localStorage.removeItem('aka_email');
     window.location.href = 'login.html';
   };
 
@@ -262,7 +261,7 @@ function BookingManagement({ setSuccess, setError }) {
         <ul className="space-y-2">
           {bookings.map(b => (
             <li key={b._id} className="border-b py-2 flex justify-between items-center">
-              <p>{sanitizeInput(b.service)} - {sanitizeInput(b.userEmail)} - {new Date(b.callTime).toLocaleString()}</p>
+              <p>{sanitizeInput(b.service)} — {sanitizeInput(b.userId?.email || 'Unknown user')} — {new Date(b.callTime).toLocaleString()}</p>
               <button onClick={() => cancelBooking(b._id)} className="action-btn cancel-btn">Cancel</button>
             </li>
           ))}
