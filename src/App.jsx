@@ -4,7 +4,6 @@ import axios from 'axios';
 import {
   sanitizeInput,
   getToken,
-  setToken,
   removeToken,
   fetchUserProfile,
 } from './auth.js';
@@ -53,40 +52,46 @@ function CustomerPortal() {
   }, []);
 
   const fetchProfile = async (token) => {
-    try {
-      console.log('Fetching user profile with token:', token);
-      const userData = await fetchUserProfile(token);
-      console.log('Profile data received:', userData);
-      setUser(userData);
-      localStorage.setItem('userId', userData._id);
-      localStorage.setItem('email', userData.email);
-    } catch (err) {
-      console.error('Profile fetch error:', err.message);
-      setError('Session expired. Please log in again.');
-      removeToken();
-      localStorage.removeItem('userId');
-      localStorage.removeItem('email');
-      setTimeout(() => {
-        console.log('Redirecting to login.html due to profile fetch error');
-        window.location.href = 'login.html';
-      }, 2000);
-    } finally {
-      setLoading(false);
+    const MAX_ATTEMPTS = 3;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        const userData = await fetchUserProfile(token);
+        setUser(userData);
+        localStorage.setItem('aka_userId', userData._id);
+        localStorage.setItem('aka_email', userData.email);
+        setLoading(false);
+        return;
+      } catch (err) {
+        const isRetryable = !err.response || [502, 503, 504].includes(err.response?.status);
+        if (isRetryable && attempt < MAX_ATTEMPTS) {
+          setError(`Backend warming up, retrying (${attempt}/${MAX_ATTEMPTS})…`);
+          await new Promise(r => setTimeout(r, 4000 * attempt));
+          continue;
+        }
+        console.error('Profile fetch error:', err.message);
+        setError('Session expired. Please log in again.');
+        removeToken();
+        localStorage.removeItem('aka_userId');
+        localStorage.removeItem('aka_email');
+        setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+        setLoading(false);
+        return;
+      }
     }
   };
 
   const logout = () => {
-    console.log('Logging out user');
     removeToken();
-    localStorage.removeItem('userId');
-    localStorage.removeItem('email');
+    localStorage.removeItem('aka_userId');
+    localStorage.removeItem('aka_email');
     window.location.href = 'login.html';
   };
 
   if (loading) {
     return (
       <div className="text-center p-4">
-        <p>Loading...</p>
+        <p>Loading…</p>
+        {error && <p className="text-sm text-yellow-600 mt-2">{error}</p>}
       </div>
     );
   }
@@ -333,7 +338,7 @@ function ScheduleCall() {
       window.Calendly.initInlineWidget({
         url: 'https://calendly.com/akanalytics/consultation',
         parentElement: document.getElementById('calendly-widget'),
-        prefill: { email: localStorage.getItem('email') || '' },
+        prefill: { email: localStorage.getItem('aka_email') || '' },
       });
     } catch (err) {
       console.error('Calendly initialization error:', err);
@@ -354,16 +359,24 @@ function LiveChat({ setError }) {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [socket, setSocket] = useState(null);
+  const [chatStatus, setChatStatus] = useState('connecting');
 
   useEffect(() => {
-    console.log('LiveChat useEffect triggered');
-    const newSocket = io('https://a-k-analytics-backend.onrender.com', { transports: ['websocket'] });
-    newSocket.on('connect', () => {
-      console.log('Socket connected');
-      newSocket.emit('join', { userId: localStorage.getItem('userId'), role: 'customer' });
+    const newSocket = io('https://a-k-analytics-backend.onrender.com', {
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
     });
-    newSocket.on('connect_error', (err) => {
-      console.error('Socket connection error:', err.message);
+    newSocket.on('connect', () => {
+      setChatStatus('connected');
+      newSocket.emit('join', { userId: localStorage.getItem('aka_userId'), role: 'customer' });
+    });
+    newSocket.on('reconnecting', () => setChatStatus('reconnecting'));
+    newSocket.on('reconnect', () => setChatStatus('connected'));
+    newSocket.on('reconnect_failed', () => setChatStatus('failed'));
+    newSocket.on('connect_error', () => {
+      setChatStatus('error');
       setError('Failed to connect to live chat.');
     });
     newSocket.on('message', (data) => {
@@ -385,9 +398,12 @@ function LiveChat({ setError }) {
     }
   };
 
+  const statusLabel = { connecting: 'Connecting…', reconnecting: 'Reconnecting…', failed: 'Connection failed', error: 'Connection error' }[chatStatus];
+
   return (
     <div className="card">
       <h2 className="text-2xl font-bold mb-4">Talk to an Analyst</h2>
+      {statusLabel && <p className="text-sm text-yellow-600 mb-2">{statusLabel}</p>}
       <div id="chat-messages" className="h-64 overflow-y-scroll bg-gray-50 p-4 rounded">
         {messages.length ? (
           messages.map((msg, i) => (

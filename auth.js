@@ -12,15 +12,15 @@ function sanitizeInput(input) {
 }
 
 function getToken() {
-  return localStorage.getItem('token');
+  return localStorage.getItem('aka_token');
 }
 
 function setToken(token) {
-  localStorage.setItem('token', token);
+  localStorage.setItem('aka_token', token);
 }
 
 function removeToken() {
-  localStorage.removeItem('token');
+  localStorage.removeItem('aka_token');
 }
 
 async function fetchUserProfile(token) {

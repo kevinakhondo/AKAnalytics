@@ -20,7 +20,7 @@ body {
     height: 100vh;
     min-height: 100%;
     min-width: 100%;
-    background: url(Images/vecteezy_ai-generated-streamlining-business-computer-monitor_40888601.jpg) no-repeat center center/100% 100%;
+    background: url(Images/hero.webp) no-repeat center center/100% 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -1507,7 +1507,7 @@ nav ul li a:hover::after {
     }
 
     .hero-section {
-        background: url('Images/vecteezy_ai-generated-streamlining-business-computer-monitor_40888601.jpg') no-repeat center center/cover;
+        background: url('Images/hero.webp') no-repeat center center/cover;
     }
 
     .modal-content {
